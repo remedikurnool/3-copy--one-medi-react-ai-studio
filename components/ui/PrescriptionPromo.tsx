@@ -1,0 +1,83 @@
+
+import React, { useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useCartStore } from '../../store/cartStore';
+
+interface PrescriptionPromoProps {
+  compact?: boolean;
+  className?: string;
+}
+
+export const PrescriptionPromo: React.FC<PrescriptionPromoProps> = ({ compact = false, className = '' }) => {
+  const navigate = useNavigate();
+  const setPrescription = useCartStore((state) => state.setPrescription);
+  const [isUploading, setIsUploading] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setIsUploading(true);
+      // Simulate upload delay
+      setTimeout(() => {
+        const url = URL.createObjectURL(file);
+        setPrescription(url);
+        setIsUploading(false);
+        navigate('/cart');
+      }, 1500);
+    }
+  };
+
+  const handleClick = () => {
+    inputRef.current?.click();
+  };
+
+  return (
+    <div className={`relative overflow-hidden rounded-2xl bg-gradient-to-r from-teal-500 to-blue-600 shadow-lg text-white ${compact ? 'p-4' : 'p-5'} ${className}`}>
+      {/* Background Decor */}
+      <div className="absolute top-0 right-0 -mr-8 -mt-8 size-32 rounded-full bg-white/10 blur-2xl"></div>
+      <div className="absolute bottom-0 left-0 -ml-8 -mb-8 size-24 rounded-full bg-white/10 blur-2xl"></div>
+
+      <div className="relative z-10 flex items-center justify-between gap-4">
+        <div className="flex-1">
+          <div className="flex items-center gap-2 mb-1">
+            <div className="flex size-8 items-center justify-center rounded-lg bg-white/20 backdrop-blur-sm">
+              <span className="material-symbols-outlined text-xl">description</span>
+            </div>
+            <span className="text-xs font-bold uppercase tracking-wider bg-white/20 px-2 py-0.5 rounded-full">Easy Order</span>
+          </div>
+          <h3 className={`font-bold leading-tight ${compact ? 'text-lg' : 'text-xl'}`}>
+            Have a Prescription?
+          </h3>
+          <p className="text-blue-50 text-xs mt-1 font-medium max-w-[250px]">
+            Upload your Rx, and our pharmacists will pack the medicines for you.
+          </p>
+        </div>
+
+        <div className="shrink-0">
+          <input 
+            type="file" 
+            ref={inputRef} 
+            accept="image/*,application/pdf" 
+            className="hidden" 
+            onChange={handleFileChange}
+          />
+          <button 
+            onClick={handleClick}
+            disabled={isUploading}
+            className="flex flex-col items-center justify-center bg-white text-teal-600 rounded-xl px-4 py-2 shadow-md hover:bg-blue-50 active:scale-95 transition-all disabled:opacity-80 disabled:scale-100"
+          >
+            {isUploading ? (
+              <span className="material-symbols-outlined animate-spin text-2xl">progress_activity</span>
+            ) : (
+              <>
+                <span className="material-symbols-outlined text-2xl mb-0.5">upload_file</span>
+                <span className="text-[10px] font-bold uppercase">Upload Now</span>
+              </>
+            )}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
