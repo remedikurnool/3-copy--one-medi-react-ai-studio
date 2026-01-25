@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 
 // Helper to trigger the animation from anywhere
@@ -25,7 +24,18 @@ export const FlyingCartAnimation = () => {
   useEffect(() => {
     const handler = (e: any) => {
       const { start, image } = e.detail;
-      const cartIcon = document.getElementById('cart-icon-target');
+      
+      // Smart detection: Find the visible cart icon (Desktop or Mobile)
+      const cartIcons = document.querySelectorAll('[id="cart-icon-target"]');
+      let cartIcon = null;
+      
+      // Pick the first visible cart icon
+      for (const icon of Array.from(cartIcons)) {
+        if ((icon as HTMLElement).offsetWidth > 0 && (icon as HTMLElement).offsetHeight > 0) {
+          cartIcon = icon;
+          break;
+        }
+      }
       
       if (!cartIcon) return;
 
@@ -35,13 +45,13 @@ export const FlyingCartAnimation = () => {
         y: cartRect.top + cartRect.height / 2
       };
 
-      const id = Date.now();
+      const id = Math.random().toString(36).substr(2, 9);
 
+      // Initial state
       setFlyingItems(prev => [...prev, { id, start, end, image, status: 'start' }]);
 
-      // Trigger animation frame
+      // Transition to flying state
       requestAnimationFrame(() => {
-        // Double RAF to ensure browser paints the start position first
         requestAnimationFrame(() => {
           setFlyingItems(prev => prev.map(item => 
             item.id === id ? { ...item, status: 'flying' } : item
@@ -49,10 +59,16 @@ export const FlyingCartAnimation = () => {
         });
       });
 
-      // Cleanup after animation
+      // Cleanup
       setTimeout(() => {
         setFlyingItems(prev => prev.filter(item => item.id !== id));
-      }, 800);
+        
+        // Brief pulse on the target icon
+        if (cartIcon) {
+          cartIcon.classList.add('animate-bounce');
+          setTimeout(() => cartIcon?.classList.remove('animate-bounce'), 400);
+        }
+      }, 700);
     };
 
     window.addEventListener('fly-to-cart', handler);
@@ -66,15 +82,16 @@ export const FlyingCartAnimation = () => {
           key={item.id}
           src={item.image}
           alt=""
-          className="absolute object-cover rounded-full shadow-xl border-2 border-white z-50"
+          className="absolute object-cover rounded-full shadow-2xl border-2 border-white z-50 pointer-events-none"
           style={{
             left: item.status === 'start' ? item.start.x : item.end.x,
             top: item.status === 'start' ? item.start.y : item.end.y,
-            width: '50px',
-            height: '50px',
-            opacity: item.status === 'flying' ? 0 : 1,
-            transform: `translate(-50%, -50%) scale(${item.status === 'flying' ? 0.2 : 1})`,
-            transition: 'all 0.7s cubic-bezier(0.2, 0.8, 0.2, 1)'
+            width: item.status === 'start' ? '60px' : '20px',
+            height: item.status === 'start' ? '60px' : '20px',
+            opacity: item.status === 'flying' ? 0.3 : 1,
+            filter: item.status === 'flying' ? 'blur(1px)' : 'none',
+            transform: `translate(-50%, -50%) rotate(${item.status === 'flying' ? '360deg' : '0deg'})`,
+            transition: 'all 0.65s cubic-bezier(0.175, 0.885, 0.32, 1.1)'
           }}
         />
       ))}

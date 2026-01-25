@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useCartStore } from '../../store/cartStore';
@@ -91,6 +90,7 @@ export default function DesktopHeader() {
             )}
 
             <Link 
+              id="cart-icon-target"
               to="/cart"
               className="flex items-center gap-2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-6 py-3 rounded-xl font-black text-sm shadow-xl shadow-black/10 hover:shadow-2xl hover:-translate-y-0.5 transition-all"
             >

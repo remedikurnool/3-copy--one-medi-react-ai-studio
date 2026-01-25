@@ -56,7 +56,7 @@ export default function SkinHairCare() {
             <h1 className="text-xl font-bold text-amber-900 dark:text-amber-100 leading-none">Skin & Hair</h1>
             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Clinical Aesthetics</p>
          </div>
-         <button onClick={() => navigate('/cart')} className="size-10 rounded-full bg-white dark:bg-gray-800 shadow-sm flex items-center justify-center text-slate-900 dark:text-white">
+         <button id="cart-icon-target" onClick={() => navigate('/cart')} className="size-10 rounded-full bg-white dark:bg-gray-800 shadow-sm flex items-center justify-center text-slate-900 dark:text-white">
             <span className="material-symbols-outlined text-2xl">shopping_cart</span>
          </button>
       </header>
@@ -79,7 +79,7 @@ export default function SkinHairCare() {
                   <span className="material-symbols-outlined text-sm">location_on</span>
                   Remedi Clinic, Kurnool
                </p>
-               <button className="bg-white text-slate-900 px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest hover:scale-105 active:scale-95 transition-all flex items-center gap-2">
+               <button className="bg-white text-slate-900 px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2">
                   Book Consultation <span className="material-symbols-outlined text-sm">arrow_forward</span>
                </button>
             </div>
