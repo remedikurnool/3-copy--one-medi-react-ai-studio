@@ -1,181 +1,244 @@
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MEDICINES, DOCTORS, LAB_TESTS, MEDICAL_SCANS } from '../../constants';
+import { Command } from 'cmdk';
+import { globalSearch } from '../../lib/supabase';
 
-type SearchResult = {
-  id: string;
-  name: string;
-  type: 'Medicine' | 'Doctor' | 'Lab Test' | 'Scan' | 'Page';
-  detail: string;
-  url: string;
-  matchType?: 'name' | 'composition' | 'symptom' | 'specialty';
-};
-
-const PAGES = [
-    { id: 'p1', name: 'My Orders', type: 'Page', detail: 'Track active orders', url: '/bookings' },
-    { id: 'p2', name: 'Profile', type: 'Page', detail: 'Edit details', url: '/profile' },
-    { id: 'p3', name: 'Ambulance', type: 'Page', detail: 'Emergency Booking', url: '/ambulance' },
+const NAVIGATION_ITEMS = [
+  { label: 'Emergency Ambulance', icon: 'ambulance', path: '/ambulance', color: 'text-red-500' },
+  { label: 'My Bookings', icon: 'receipt_long', path: '/bookings', color: 'text-blue-500' },
+  { label: 'Upload Prescription', icon: 'upload_file', path: '/upload-rx', color: 'text-primary' },
+  { label: 'Diabetes Care Hub', icon: 'bloodtype', path: '/diabetes-care', color: 'text-orange-500' }
 ];
-
-const getSmartResults = (query: string): SearchResult[] => {
-  const q = query.toLowerCase().trim();
-  if (!q) return [];
-
-  const results: SearchResult[] = [];
-
-  // 1. Medicines (Search Name, Composition, Indications)
-  MEDICINES.forEach(m => {
-    if (m.name.toLowerCase().includes(q)) {
-        results.push({ id: m.id, name: m.name, type: 'Medicine', detail: `Contains ${m.composition}`, url: `/medicines/${m.id}`, matchType: 'name' });
-    } else if (m.composition.toLowerCase().includes(q)) {
-        results.push({ id: m.id, name: m.name, type: 'Medicine', detail: `Matches composition: ${m.composition}`, url: `/medicines/${m.id}`, matchType: 'composition' });
-    } else if (m.indications.some(i => i.toLowerCase().includes(q))) {
-        results.push({ id: m.id, name: m.name, type: 'Medicine', detail: `Used for: ${m.indications.join(', ')}`, url: `/medicines/${m.id}`, matchType: 'symptom' });
-    }
-  });
-
-  // 2. Doctors (Search Name, Specialty)
-  DOCTORS.forEach(d => {
-    if (d.name.toLowerCase().includes(q)) {
-        results.push({ id: d.id, name: d.name, type: 'Doctor', detail: d.specialty, url: `/doctors/${d.id}`, matchType: 'name' });
-    } else if (d.specialty.toLowerCase().includes(q)) {
-        results.push({ id: d.id, name: d.name, type: 'Doctor', detail: `Specialist in ${d.specialty}`, url: `/doctors/${d.id}`, matchType: 'specialty' });
-    }
-  });
-
-  // 3. Labs
-  LAB_TESTS.forEach(l => {
-    if (l.name.toLowerCase().includes(q)) {
-        results.push({ id: l.id, name: l.name, type: 'Lab Test', detail: l.category, url: `/lab-tests/${l.id}`, matchType: 'name' });
-    }
-  });
-
-  // 4. Scans
-  MEDICAL_SCANS.forEach(s => {
-    if (s.name.toLowerCase().includes(q) || s.bodyPart.toLowerCase().includes(q)) {
-        results.push({ id: s.id, name: s.name, type: 'Scan', detail: `Scan for ${s.bodyPart}`, url: '/scans', matchType: 'name' });
-    }
-  });
-
-  // 5. Pages
-  PAGES.forEach(p => {
-      if (p.name.toLowerCase().includes(q) || p.detail.toLowerCase().includes(q)) {
-          results.push({ ...p, type: 'Page' });
-      }
-  });
-
-  return results.slice(0, 8); // Limit
-};
 
 export default function GlobalSearchBar() {
   const navigate = useNavigate();
-  const [isOpen, setIsOpen] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [query, setQuery] = useState('');
-  const [results, setResults] = useState<SearchResult[]>([]);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const [results, setResults] = useState<{ medicines: any[], doctors: any[], labs: any[] }>({
+    medicines: [],
+    doctors: [],
+    labs: []
+  });
 
+  // Toggle the menu when ⌘K or Ctrl+K is pressed
   useEffect(() => {
-    setResults(getSmartResults(query));
-  }, [query]);
-
-  // Click outside close
-  useEffect(() => {
-    const handleClick = (e: MouseEvent) => {
-        if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
-            setIsOpen(false);
-        }
+    const down = (e: KeyboardEvent) => {
+      if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        setOpen((open) => !open);
+      }
     };
-    document.addEventListener('mousedown', handleClick);
-    return () => document.removeEventListener('mousedown', handleClick);
+
+    document.addEventListener('keydown', down);
+    return () => document.removeEventListener('keydown', down);
   }, []);
 
-  const handleSelect = (res: SearchResult) => {
-      setQuery('');
-      setIsOpen(false);
-      if (res.type === 'Scan') {
-          navigate('/scans'); // Simplify scan nav for demo
-      } else {
-          navigate(res.url);
-      }
-  };
+  // Handle Search Fetching
+  const fetchResults = useCallback(async (q: string) => {
+    if (q.length < 2) {
+      setResults({ medicines: [], doctors: [], labs: [] });
+      return;
+    }
+    setLoading(true);
+    try {
+      const data = await globalSearch(q);
+      setResults(data);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
-  const getTypeIcon = (type: string) => {
-      switch(type) {
-          case 'Medicine': return 'pill';
-          case 'Doctor': return 'stethoscope';
-          case 'Lab Test': return 'biotech';
-          case 'Scan': return 'radiology';
-          case 'Page': return 'link';
-          default: return 'search';
-      }
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      fetchResults(query);
+    }, 250); // Snappy debounce
+    return () => clearTimeout(timer);
+  }, [query, fetchResults]);
+
+  const handleSelect = (path: string, id?: string, type?: string) => {
+    setOpen(false);
+    setQuery('');
+    if (type === 'scan') {
+        navigate(path, { state: { scanId: id } });
+    } else {
+        navigate(path);
+    }
   };
 
   return (
-    <div ref={containerRef} className="relative w-full z-50">
-        <div className={`flex items-center h-12 bg-gray-50 dark:bg-gray-800 border rounded-xl px-4 transition-all ${isOpen ? 'border-primary ring-2 ring-primary/10' : 'border-gray-200 dark:border-gray-700'}`}>
-            <span className="material-symbols-outlined text-gray-400">search</span>
-            <input 
-                className="w-full bg-transparent border-none focus:ring-0 text-sm ml-2 placeholder:text-gray-400 dark:text-white"
-                placeholder="Search 'Paracetamol', 'Fever', 'Cardiologist'..."
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                onFocus={() => setIsOpen(true)}
-            />
-            {query && (
-                <button onClick={() => setQuery('')} className="text-gray-400 hover:text-gray-600">
-                    <span className="material-symbols-outlined text-lg">close</span>
-                </button>
-            )}
+    <>
+      {/* Trigger Button (Acts as the visual search bar) */}
+      <div 
+        onClick={() => setOpen(true)}
+        className="group relative flex items-center w-full h-12 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-4 cursor-text transition-all hover:border-primary/50 hover:bg-white dark:hover:bg-gray-700 shadow-sm"
+      >
+        <span className="material-symbols-outlined text-gray-400 group-hover:text-primary transition-colors">search</span>
+        <span className="ml-3 text-sm text-gray-400 font-medium">Search medicines, specialists, lab tests...</span>
+        <div className="ml-auto flex items-center gap-2">
+          <kbd className="hidden sm:flex h-6 items-center gap-1 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-1.5 font-sans text-[10px] font-black text-gray-400">
+            <span className="text-xs">⌘</span>K
+          </kbd>
         </div>
+      </div>
 
-        {isOpen && (
-            <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-gray-900 rounded-xl shadow-2xl border border-gray-100 dark:border-gray-700 overflow-hidden max-h-[60vh] overflow-y-auto">
-                {results.length > 0 ? (
-                    <div>
-                        <div className="px-4 py-2 bg-gray-50 dark:bg-gray-800/50 text-[10px] font-bold text-gray-500 uppercase tracking-widest sticky top-0 backdrop-blur-sm">
-                            Best Matches
-                        </div>
-                        {results.map((res) => (
-                            <button 
-                                key={`${res.type}-${res.id}`}
-                                onClick={() => handleSelect(res)}
-                                className="w-full flex items-center gap-3 px-4 py-3 hover:bg-blue-50 dark:hover:bg-blue-900/10 text-left transition-colors border-b border-gray-50 dark:border-gray-800 last:border-0"
-                            >
-                                <div className="size-8 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500 shrink-0">
-                                    <span className="material-symbols-outlined text-lg">{getTypeIcon(res.type)}</span>
-                                </div>
-                                <div>
-                                    <p className="text-sm font-bold text-slate-900 dark:text-white">{res.name}</p>
-                                    <p className="text-xs text-gray-500 flex items-center gap-1">
-                                        <span className="opacity-75">{res.type}</span>
-                                        <span className="size-1 rounded-full bg-gray-300"></span>
-                                        <span className="text-primary">{res.detail}</span>
-                                    </p>
-                                </div>
-                            </button>
-                        ))}
-                    </div>
-                ) : query.length > 1 ? (
-                    <div className="p-8 text-center text-gray-400">
-                        <span className="material-symbols-outlined text-4xl mb-2">manage_search</span>
-                        <p className="text-sm">No results found for "{query}"</p>
-                        <p className="text-xs mt-1">Try searching for a symptom like "Fever"</p>
-                    </div>
-                ) : (
-                    <div className="p-4">
-                        <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Quick Links</p>
-                        <div className="flex flex-wrap gap-2">
-                            {['Dolo 650', 'Fever', 'Diabetes', 'MRI Brain', 'Dentist'].map(tag => (
-                                <button key={tag} onClick={() => setQuery(tag)} className="px-3 py-1.5 bg-gray-100 dark:bg-gray-800 rounded-lg text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-primary hover:text-white transition-colors">
-                                    {tag}
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-                )}
+      {/* Command Menu Modal */}
+      {open && (
+        <div className="fixed inset-0 z-[100] flex items-start justify-center pt-[8vh] px-4">
+          {/* Backdrop */}
+          <div 
+            className="absolute inset-0 bg-slate-900/40 backdrop-blur-md animate-in fade-in duration-300"
+            onClick={() => setOpen(false)}
+          ></div>
+
+          <Command 
+            label="Global Search"
+            className="animate-scale-in relative z-10 w-full max-w-2xl bg-white dark:bg-gray-900 rounded-[2rem] shadow-2xl border border-gray-100 dark:border-gray-800 overflow-hidden flex flex-col h-auto max-h-[80vh]"
+            shouldFilter={false} // We handle filtering via "Supabase" logic
+          >
+            <div className="flex items-center border-b border-gray-100 dark:border-gray-800 px-5">
+               <span className="material-symbols-outlined text-primary text-2xl">search</span>
+               <Command.Input 
+                 autoFocus
+                 placeholder="Search symptoms, salts, or doctors..."
+                 value={query}
+                 onValueChange={setQuery}
+                 className="flex-1 h-16 bg-transparent border-none focus:ring-0 text-base font-semibold text-slate-900 dark:text-white placeholder:text-gray-400"
+               />
+               {loading && (
+                 <div className="flex items-center gap-2 mr-2">
+                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Searching</span>
+                    <span className="material-symbols-outlined animate-spin text-primary">progress_activity</span>
+                 </div>
+               )}
+               <button 
+                 onClick={() => setOpen(false)}
+                 className="size-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-400 hover:text-red-500 transition-colors"
+               >
+                 <span className="material-symbols-outlined text-xl">close</span>
+               </button>
             </div>
-        )}
-    </div>
+
+            <Command.List className="no-scrollbar overflow-y-auto">
+              <Command.Empty className="p-16 text-center text-gray-400">
+                <div className="size-20 bg-gray-50 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4 border border-gray-100 dark:border-gray-700">
+                    <span className="material-symbols-outlined text-4xl opacity-50">search_off</span>
+                </div>
+                <p className="text-base font-black text-slate-600 dark:text-gray-300">No matches for "{query}"</p>
+                <p className="text-xs mt-2 font-medium">Try searching for a salt like <span className="text-primary cursor-pointer hover:underline" onClick={() => setQuery('Paracetamol')}>"Paracetamol"</span> or a specialty.</p>
+              </Command.Empty>
+
+              {/* 1. Quick Actions (Empty Query State) */}
+              {!query && (
+                <Command.Group heading="Frequently Accessed">
+                   {NAVIGATION_ITEMS.map((item) => (
+                      <Command.Item key={item.path} onSelect={() => handleSelect(item.path)}>
+                        <div className={`size-10 rounded-xl bg-gray-50 dark:bg-gray-800 flex items-center justify-center ${item.color} shadow-sm border border-white dark:border-gray-700`}>
+                           <span className="material-symbols-outlined">{item.icon}</span>
+                        </div>
+                        <div className="flex flex-col">
+                           <span className="font-bold text-slate-800 dark:text-gray-200">{item.label}</span>
+                           <span className="text-[10px] text-gray-400 font-bold uppercase tracking-tight">Quick Navigate</span>
+                        </div>
+                      </Command.Item>
+                   ))}
+                </Command.Group>
+              )}
+
+              {/* 2. Medicines Group with Prioritization Subtext */}
+              {results.medicines.length > 0 && (
+                <Command.Group heading={`Medicines found (${results.medicines.length})`}>
+                  {results.medicines.map((med) => {
+                    const matchBySalt = med.composition.toLowerCase().includes(query.toLowerCase());
+                    const matchByIndication = med.indications.some((i: string) => i.toLowerCase().includes(query.toLowerCase()));
+                    
+                    return (
+                        <Command.Item key={med.id} onSelect={() => handleSelect(`/medicines/${med.id}`)}>
+                          <div className="size-12 rounded-2xl bg-blue-50 dark:bg-blue-900/30 p-1.5 flex items-center justify-center border border-blue-100 dark:border-blue-800 shadow-sm shrink-0">
+                             <img src={med.image} className="size-full object-contain" alt="" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                             <p className="font-black text-slate-900 dark:text-white truncate tracking-tight">{med.name}</p>
+                             <div className="flex flex-wrap gap-2 mt-0.5">
+                                <span className={`text-[9px] font-black uppercase tracking-tighter px-1.5 py-0.5 rounded border ${matchBySalt ? 'bg-primary text-white border-primary' : 'bg-slate-100 text-slate-500 border-slate-200 dark:bg-slate-800 dark:border-slate-700'}`}>
+                                    {med.composition}
+                                </span>
+                                {matchByIndication && (
+                                    <span className="text-[9px] font-black uppercase tracking-tighter px-1.5 py-0.5 rounded bg-amber-500 text-white border-amber-500">
+                                        Matches symptom
+                                    </span>
+                                )}
+                             </div>
+                          </div>
+                          <div className="text-right shrink-0">
+                             <p className="font-black text-sm text-slate-900 dark:text-white">₹{med.price}</p>
+                             {med.discount && <span className="text-[9px] text-emerald-500 font-black">{med.discount}</span>}
+                          </div>
+                        </Command.Item>
+                    );
+                  })}
+                </Command.Group>
+              )}
+
+              {/* 3. Doctors Group */}
+              {results.doctors.length > 0 && (
+                <Command.Group heading={`Specialists in Kurnool (${results.doctors.length})`}>
+                   {results.doctors.map((doc) => (
+                      <Command.Item key={doc.id} onSelect={() => handleSelect(`/doctors/${doc.id}`)}>
+                        <div 
+                          className="size-12 rounded-[1.25rem] bg-cover bg-center shrink-0 border border-slate-200 dark:border-slate-700 shadow-sm"
+                          style={{backgroundImage: `url("${doc.image}")`}}
+                        ></div>
+                        <div className="flex-1 min-w-0">
+                           <div className="flex items-center gap-2">
+                              <p className="font-black text-slate-900 dark:text-white truncate tracking-tight">{doc.name}</p>
+                              <div className="flex items-center gap-1 bg-amber-50 dark:bg-amber-900/20 px-1.5 py-0.5 rounded-md border border-amber-100 dark:border-amber-900/40">
+                                 <span className="text-[9px] font-black text-amber-600">{doc.rating}</span>
+                                 <span className="material-symbols-outlined text-[10px] filled text-amber-500">star</span>
+                              </div>
+                           </div>
+                           <p className="text-[10px] text-primary font-black uppercase tracking-widest mt-0.5">{doc.specialty} • {doc.experience} Exp</p>
+                        </div>
+                        <span className="material-symbols-outlined text-gray-300">chevron_right</span>
+                      </Command.Item>
+                   ))}
+                </Command.Group>
+              )}
+
+              {/* 4. Lab Tests Group */}
+              {results.labs.length > 0 && (
+                <Command.Group heading={`Lab Tests & Packages (${results.labs.length})`}>
+                   {results.labs.map((lab) => (
+                      <Command.Item key={lab.id} onSelect={() => handleSelect(`/lab-tests/${lab.id}`)}>
+                         <div className="size-12 rounded-2xl bg-teal-50 dark:bg-teal-900/30 flex items-center justify-center text-teal-600 border border-teal-100 dark:border-teal-800 shadow-sm shrink-0">
+                            <span className="material-symbols-outlined text-2xl">biotech</span>
+                         </div>
+                         <div className="flex-1 min-w-0">
+                            <p className="font-black text-slate-900 dark:text-white truncate tracking-tight">{lab.name}</p>
+                            <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-0.5">{lab.parameterCount} Parameters • {lab.reportTime} Report</p>
+                         </div>
+                         <div className="text-right shrink-0">
+                            <p className="font-black text-sm text-primary">₹{lab.price}</p>
+                            <span className="text-[8px] bg-emerald-500 text-white px-2 py-0.5 rounded-full uppercase font-black tracking-widest shadow-sm">NABL</span>
+                         </div>
+                      </Command.Item>
+                   ))}
+                </Command.Group>
+              )}
+            </Command.List>
+
+            {/* Navigation Hint Footer */}
+            <div className="px-6 py-4 bg-gray-50 dark:bg-gray-800/50 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between">
+               <div className="flex items-center gap-5 text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                  <span className="flex items-center gap-1.5"><span className="material-symbols-outlined text-[16px]">keyboard_arrow_up</span><span className="material-symbols-outlined text-[16px]">keyboard_arrow_down</span> Navigate</span>
+                  <span className="flex items-center gap-1.5"><span className="material-symbols-outlined text-[16px]">keyboard_return</span> Select</span>
+               </div>
+               <span className="text-[9px] font-black text-primary bg-primary/10 px-2 py-1 rounded border border-primary/20 uppercase tracking-widest">Powered by One Medi Engine</span>
+            </div>
+          </Command>
+        </div>
+      )}
+    </>
   );
 }

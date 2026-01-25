@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { INSURANCE_PLANS } from '../../constants';
@@ -38,10 +37,8 @@ export default function InsuranceList() {
   };
 
   const handleGetQuote = () => {
-      // Simulate finding best plans
       setShowQuoteWizard(false);
       setQuoteStep(1);
-      // Logic to filter/recommend based on quoteData could go here
       setActiveCategory(quoteData.memberType as any);
       alert(`Finding best plans for ${quoteData.memberType} in ${quoteData.pincode}... (Simulated)`);
   };
@@ -106,32 +103,32 @@ export default function InsuranceList() {
                       </div>
                   </div>
                   <div className="text-right">
-                     <p className="text-xs text-gray-500 uppercase font-bold tracking-widest">Cover</p>
-                     <p className="text-xl font-black text-slate-900 dark:text-white">{plan.coverAmount >= 10000000 ? '1 Cr+' : `₹${(plan.coverAmount/100000).toFixed(0)}L`}</p>
+                     <p className="text-[9px] text-gray-500 uppercase font-black tracking-widest">Base Cover</p>
+                     <p className="text-xl font-black text-slate-900 dark:text-white">₹{(plan.coverAmount/100000).toFixed(0)}L</p>
                   </div>
                </div>
 
                {/* Key Stats Chips */}
                <div className="flex gap-2 mb-4 overflow-x-auto no-scrollbar">
                   {plan.cashless && (
-                     <span className="px-2 py-1 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 text-[10px] font-black uppercase rounded-lg border border-green-100 dark:border-green-800 whitespace-nowrap flex items-center gap-1">
+                     <div className="px-2 py-1 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 text-[9px] font-black uppercase rounded-lg border border-green-100 dark:border-green-800 whitespace-nowrap flex items-center gap-1">
                         <span className="material-symbols-outlined text-[10px] filled">bolt</span> Cashless
-                     </span>
+                     </div>
                   )}
-                  <span className="px-2 py-1 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 text-[10px] font-black uppercase rounded-lg border border-blue-100 dark:border-blue-800 whitespace-nowrap">
-                     {plan.networkHospitals}+ Hospitals
-                  </span>
-                  <span className="px-2 py-1 bg-orange-50 dark:bg-orange-900/20 text-orange-700 dark:text-orange-400 text-[10px] font-black uppercase rounded-lg border border-orange-100 dark:border-orange-800 whitespace-nowrap">
-                     {plan.claimSettlementRatio} CSR
-                  </span>
+                  <div className="px-2 py-1 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 text-[9px] font-black uppercase rounded-lg border border-blue-100 dark:border-blue-800 whitespace-nowrap">
+                     {plan.networkHospitals.toLocaleString()}+ Hospitals
+                  </div>
+                  <div className="px-2 py-1 bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400 text-[9px] font-black uppercase rounded-lg border border-amber-100 dark:border-amber-800 whitespace-nowrap flex items-center gap-1">
+                     <span className="material-symbols-outlined text-[10px]">timer</span> {plan.waitingPeriod}
+                  </div>
                </div>
 
                <div className="bg-gray-50 dark:bg-gray-900/50 rounded-xl p-3 mb-4">
                    <div className="grid grid-cols-2 gap-y-2">
                        {plan.features.slice(0, 4).map((f, i) => (
-                           <div key={i} className="flex items-center gap-2 text-xs font-medium text-slate-600 dark:text-gray-300">
-                                <span className="material-symbols-outlined text-green-500 text-[14px] filled">check</span>
-                                {f}
+                           <div key={i} className="flex items-center gap-2 text-[11px] font-bold text-slate-600 dark:text-gray-300">
+                                <span className="material-symbols-outlined text-emerald-500 text-[12px] filled">check_circle</span>
+                                <span className="truncate">{f}</span>
                            </div>
                        ))}
                    </div>
@@ -139,24 +136,30 @@ export default function InsuranceList() {
 
                <div className="flex items-end justify-between pt-4 border-t border-gray-100 dark:border-gray-700">
                   <div>
-                     <p className="text-xs text-gray-400 font-bold mb-0.5">Premium starting</p>
+                     <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-0.5">Annual Premium</p>
                      <div className="flex items-baseline gap-1">
-                        <p className="text-lg font-black text-primary">₹{plan.premium.toLocaleString('en-IN')}<span className="text-xs text-gray-500 font-medium">/yr</span></p>
+                        <p className="text-lg font-black text-primary tracking-tighter">₹{plan.premium.toLocaleString('en-IN')}</p>
+                        <span className="text-[10px] text-gray-500 font-bold">/yr</span>
                      </div>
-                     {plan.monthlyEmi && <p className="text-[10px] text-gray-400 font-medium">EMI: ₹{plan.monthlyEmi}/mo</p>}
+                     {plan.monthlyEmi && <p className="text-[10px] text-emerald-600 font-black uppercase">₹{plan.monthlyEmi}/mo EMI</p>}
                   </div>
                   
                   <div className="flex gap-2">
                       <button 
                         onClick={() => handleToggleCompare(plan.id)}
-                        className={`size-10 rounded-xl flex items-center justify-center border transition-all ${compareList.includes(plan.id) ? 'bg-slate-900 text-white border-slate-900' : 'bg-white dark:bg-gray-800 border-gray-200 text-gray-400'}`}
+                        className={`size-10 rounded-xl flex items-center justify-center border transition-all ${compareList.includes(plan.id) ? 'bg-slate-900 text-white border-slate-900 shadow-md' : 'bg-white dark:bg-gray-800 border-gray-200 text-gray-400'}`}
+                        title="Compare"
                       >
                           <span className="material-symbols-outlined text-xl">compare_arrows</span>
                       </button>
-                      <button className="bg-primary text-white px-5 h-10 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-primary-dark active:scale-95 transition-transform shadow-lg shadow-primary/30">
-                         Details
+                      <button className="bg-primary text-white px-5 h-10 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-primary-dark active:scale-95 transition-transform shadow-lg shadow-primary/30">
+                         Plan Details
                       </button>
                   </div>
+               </div>
+               
+               <div className="absolute top-0 right-0 p-1 opacity-[0.03]">
+                  <span className="material-symbols-outlined text-8xl">verified_user</span>
                </div>
             </div>
          ))}
@@ -164,12 +167,12 @@ export default function InsuranceList() {
 
       {/* Compare Floating Button */}
       {compareList.length > 0 && (
-          <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-30 animate-slide-up">
+          <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-40 animate-slide-up">
               <button 
                 onClick={() => setShowCompareModal(true)}
-                className="bg-slate-900 dark:bg-white text-white dark:text-slate-900 pl-5 pr-6 py-3 rounded-full shadow-2xl flex items-center gap-3 font-bold text-sm"
+                className="bg-slate-900 dark:bg-white text-white dark:text-slate-900 pl-5 pr-6 py-3 rounded-full shadow-2xl flex items-center gap-3 font-black text-xs uppercase tracking-widest"
               >
-                  <span className="bg-white/20 dark:bg-black/10 size-6 rounded-full flex items-center justify-center text-xs">{compareList.length}</span>
+                  <span className="bg-primary text-white size-6 rounded-full flex items-center justify-center text-[10px] font-black">{compareList.length}</span>
                   Compare Plans
               </button>
           </div>
@@ -187,15 +190,15 @@ export default function InsuranceList() {
 
                   {quoteStep === 1 && (
                       <div className="flex flex-col gap-4">
-                          <p className="text-sm font-bold text-gray-500 uppercase tracking-wide">Who is this for?</p>
+                          <p className="text-xs font-black text-gray-400 uppercase tracking-[0.2em]">Who is this for?</p>
                           <div className="grid grid-cols-2 gap-3">
                               {['Self', 'Family', 'Parents', 'Senior'].map(opt => (
                                   <button 
                                     key={opt}
                                     onClick={() => { setQuoteData({...quoteData, memberType: opt}); setQuoteStep(2); }}
-                                    className="p-4 rounded-2xl border-2 border-gray-100 dark:border-gray-700 hover:border-primary hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all text-left"
+                                    className="p-5 rounded-3xl border-2 border-gray-100 dark:border-gray-700 hover:border-primary hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all text-left group"
                                   >
-                                      <span className="font-bold block">{opt}</span>
+                                      <span className="font-black text-sm uppercase tracking-tight group-hover:text-primary">{opt}</span>
                                   </button>
                               ))}
                           </div>
@@ -204,38 +207,38 @@ export default function InsuranceList() {
 
                   {quoteStep === 2 && (
                       <div className="flex flex-col gap-4">
-                          <p className="text-sm font-bold text-gray-500 uppercase tracking-wide">Eldest Member Age</p>
+                          <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Eldest Member Age</p>
                           <input 
                             type="number" 
-                            className="w-full h-14 rounded-2xl border-2 border-gray-200 dark:border-gray-700 px-4 text-xl font-bold focus:border-primary outline-none bg-transparent"
+                            className="w-full h-14 rounded-2xl border-2 border-gray-200 dark:border-gray-700 px-4 text-xl font-black focus:border-primary outline-none bg-transparent tracking-tighter"
                             placeholder="e.g. 35"
                             value={quoteData.age}
                             onChange={(e) => setQuoteData({...quoteData, age: e.target.value})}
                           />
                           <button 
                             onClick={() => setQuoteStep(3)}
-                            className="w-full h-12 bg-primary text-white rounded-xl font-bold mt-2"
+                            className="w-full h-14 bg-primary text-white rounded-2xl font-black uppercase tracking-widest mt-2"
                           >
-                              Next
+                              Next Step
                           </button>
                       </div>
                   )}
 
                   {quoteStep === 3 && (
                       <div className="flex flex-col gap-4">
-                          <p className="text-sm font-bold text-gray-500 uppercase tracking-wide">Enter Pincode</p>
+                          <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Enter Pincode</p>
                           <input 
                             type="number" 
-                            className="w-full h-14 rounded-2xl border-2 border-gray-200 dark:border-gray-700 px-4 text-xl font-bold focus:border-primary outline-none bg-transparent"
+                            className="w-full h-14 rounded-2xl border-2 border-gray-200 dark:border-gray-700 px-4 text-xl font-black focus:border-primary outline-none bg-transparent tracking-tighter"
                             placeholder="e.g. 518002"
                             value={quoteData.pincode}
                             onChange={(e) => setQuoteData({...quoteData, pincode: e.target.value})}
                           />
                           <button 
                             onClick={handleGetQuote}
-                            className="w-full h-12 bg-slate-900 text-white rounded-xl font-bold mt-2"
+                            className="w-full h-14 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-2xl font-black uppercase tracking-widest mt-2"
                           >
-                              Show Plans
+                              Generate Quotes
                           </button>
                       </div>
                   )}
@@ -247,42 +250,43 @@ export default function InsuranceList() {
       {showCompareModal && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
               <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setShowCompareModal(false)}></div>
-              <div className="relative w-full max-w-4xl bg-white dark:bg-gray-900 rounded-3xl p-6 shadow-2xl overflow-x-auto">
-                  <div className="flex justify-between items-center mb-6">
-                      <h3 className="text-xl font-black">Compare Plans</h3>
-                      <button onClick={() => setShowCompareModal(false)}><span className="material-symbols-outlined">close</span></button>
+              <div className="relative w-full max-w-4xl bg-white dark:bg-gray-900 rounded-[2.5rem] p-8 shadow-2xl overflow-x-auto border border-white/20">
+                  <div className="flex justify-between items-center mb-8">
+                      <h3 className="text-2xl font-black uppercase tracking-tight">Compare Plans</h3>
+                      <button onClick={() => setShowCompareModal(false)} className="size-10 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center"><span className="material-symbols-outlined">close</span></button>
                   </div>
                   
-                  <div className="grid grid-cols-3 min-w-[600px] gap-4">
+                  <div className="grid grid-cols-3 min-w-[600px] gap-8">
                       {/* Headers */}
-                      <div className="col-span-3 grid grid-cols-4 gap-4 border-b pb-4 border-gray-100 dark:border-gray-800">
-                          <div className="font-bold text-gray-400 uppercase text-xs pt-10">Features</div>
+                      <div className="col-span-3 grid grid-cols-4 gap-4 border-b pb-6 border-gray-100 dark:border-gray-800">
+                          <div className="font-black text-gray-400 uppercase text-[10px] pt-12 tracking-widest">Plan Features</div>
                           {compareList.map(id => {
                               const plan = INSURANCE_PLANS.find(p => p.id === id);
                               return (
                                   <div key={id} className="text-center">
-                                      <div className="h-10 flex items-center justify-center mb-2"><img src={plan?.logo} className="h-full object-contain" alt="" /></div>
-                                      <p className="font-bold text-sm">{plan?.planName}</p>
+                                      <div className="h-12 flex items-center justify-center mb-3"><img src={plan?.logo} className="h-full object-contain" alt="" /></div>
+                                      <p className="font-black text-sm text-slate-900 dark:text-white uppercase tracking-tighter leading-tight">{plan?.planName}</p>
                                   </div>
                               );
                           })}
                       </div>
                       
                       {/* Rows */}
-                      {['Cover Amount', 'Premium', 'Network Hospitals', 'CSR', 'Copay', 'Waiting Period'].map((feature) => (
-                          <div key={feature} className="col-span-3 grid grid-cols-4 gap-4 py-3 border-b border-gray-50 dark:border-gray-800">
-                              <div className="text-sm font-bold text-gray-500">{feature}</div>
+                      {['Cover Amount', 'Premium', 'Network Hospitals', 'CSR', 'Copay', 'Waiting Period', 'Cashless Available'].map((feature) => (
+                          <div key={feature} className="col-span-3 grid grid-cols-4 gap-4 py-4 border-b border-gray-50 dark:border-gray-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                              <div className="text-xs font-black text-slate-500 uppercase tracking-wide">{feature}</div>
                               {compareList.map(id => {
                                   const plan = INSURANCE_PLANS.find(p => p.id === id);
-                                  let val = '';
+                                  let val: any = '';
                                   if(feature === 'Cover Amount') val = `₹${(plan?.coverAmount || 0)/100000}L`;
-                                  if(feature === 'Premium') val = `₹${plan?.premium}`;
-                                  if(feature === 'Network Hospitals') val = `${plan?.networkHospitals}+`;
+                                  if(feature === 'Premium') val = `₹${plan?.premium.toLocaleString()}`;
+                                  if(feature === 'Network Hospitals') val = `${plan?.networkHospitals.toLocaleString()}+`;
                                   if(feature === 'CSR') val = plan?.claimSettlementRatio || '';
                                   if(feature === 'Copay') val = plan?.copay || '';
                                   if(feature === 'Waiting Period') val = plan?.waitingPeriod || '';
+                                  if(feature === 'Cashless Available') val = plan?.cashless ? <span className="material-symbols-outlined text-emerald-500">check_circle</span> : <span className="material-symbols-outlined text-red-400">cancel</span>;
                                   
-                                  return <div key={id} className="text-sm font-medium text-center">{val}</div>;
+                                  return <div key={id} className="text-sm font-bold text-center text-slate-700 dark:text-gray-200">{val}</div>;
                               })}
                           </div>
                       ))}

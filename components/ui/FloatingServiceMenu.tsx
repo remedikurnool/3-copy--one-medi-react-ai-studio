@@ -40,31 +40,48 @@ export default function FloatingServiceMenu() {
       <div 
         className={`
           flex flex-col gap-2 p-3 
-          bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl 
+          bg-white/80 dark:bg-slate-900/80 backdrop-blur-2xl 
           border-y border-l border-white/40 dark:border-slate-700/50 
-          shadow-[0_8px_32px_0_rgba(31,38,135,0.15)] 
-          rounded-l-2xl transition-all duration-500 ease-cubic-bezier(0.4, 0, 0.2, 1) origin-right
-          ${isOpen ? 'translate-x-0 opacity-100 mr-0' : 'translate-x-[120%] opacity-0 pointer-events-none'}
+          shadow-[0_8px_32px_0_rgba(13,148,136,0.15)] 
+          rounded-l-[2rem] transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] origin-right
+          ${isOpen ? 'translate-x-0 opacity-100 mr-0 scale-100' : 'translate-x-[120%] opacity-0 pointer-events-none scale-95'}
         `}
       >
-        <div className="flex flex-col gap-1">
-            <div className="flex justify-between items-center mb-2 px-1">
-                <span className="text-[9px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">Quick Access</span>
-                <button onClick={() => setIsOpen(false)} className="text-slate-400 hover:text-slate-600 dark:hover:text-white transition-colors">
+        <div className="flex flex-col gap-1 min-w-[180px]">
+            <div className="flex justify-between items-center mb-2 px-2">
+                <span className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em]">Quick Access</span>
+                <button 
+                  onClick={() => setIsOpen(false)} 
+                  className="size-6 rounded-full flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all active:scale-90"
+                >
                     <span className="material-symbols-outlined text-sm">close</span>
                 </button>
             </div>
-            {SERVICES.map((srv) => (
-            <button
+            
+            {SERVICES.map((srv, index) => (
+              <button
                 key={srv.id}
                 onClick={() => { navigate(srv.path); setIsOpen(false); }}
-                className="group flex items-center gap-3 p-2 pr-6 rounded-xl hover:bg-white/50 dark:hover:bg-slate-800/50 transition-all active:scale-95 border border-transparent hover:border-white/20"
-            >
-                <div className={`size-9 rounded-lg flex items-center justify-center ${srv.bg} ${srv.color} shadow-sm group-hover:scale-110 transition-transform backdrop-blur-sm`}>
-                    <span className="material-symbols-outlined text-lg">{srv.icon}</span>
+                style={{ 
+                  transitionDelay: isOpen ? `${index * 50}ms` : '0ms',
+                  transform: isOpen ? 'translateX(0)' : 'translateX(20px)',
+                  opacity: isOpen ? 1 : 0
+                }}
+                className={`
+                  group flex items-center gap-3 p-2.5 pr-6 rounded-2xl 
+                  hover:bg-primary/10 dark:hover:bg-primary/20 
+                  transition-all duration-300 active:scale-[0.96] border border-transparent 
+                  hover:border-primary/20 hover:shadow-sm
+                `}
+              >
+                <div className={`size-10 rounded-xl flex items-center justify-center ${srv.bg} ${srv.color} shadow-sm group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 backdrop-blur-sm`}>
+                    <span className="material-symbols-outlined text-xl">{srv.icon}</span>
                 </div>
-                <span className="text-xs font-bold text-slate-700 dark:text-slate-200 whitespace-nowrap group-hover:text-primary transition-colors">{srv.label}</span>
-            </button>
+                <div className="flex flex-col items-start overflow-hidden">
+                  <span className="text-[13px] font-bold text-slate-800 dark:text-slate-200 whitespace-nowrap group-hover:text-primary transition-colors">{srv.label}</span>
+                  <span className="text-[8px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity translate-y-1 group-hover:translate-y-0 duration-300">Open Service</span>
+                </div>
+              </button>
             ))}
         </div>
       </div>
@@ -73,22 +90,27 @@ export default function FloatingServiceMenu() {
       <button 
         onClick={() => setIsOpen(!isOpen)}
         className={`
-          flex items-center justify-center w-9 h-28 
-          bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl 
-          shadow-[0_4px_30px_rgba(0,0,0,0.1)] 
+          flex items-center justify-center w-10 h-32 
+          bg-primary/90 dark:bg-primary/80 backdrop-blur-xl 
+          shadow-[0_4px_20px_rgba(13,148,136,0.3)] 
           border-y border-l border-white/40 dark:border-slate-700/50
-          rounded-l-xl transition-all duration-300 relative z-50 hover:w-10 group -ml-[1px]
+          rounded-l-2xl transition-all duration-500 relative z-50 hover:w-12 group -ml-[1px]
           ${isOpen ? 'translate-x-full opacity-0 pointer-events-none' : 'translate-x-0 opacity-100'}
         `}
       >
-        <div className="flex flex-col items-center gap-2">
-            <span className="material-symbols-outlined text-primary text-xl animate-pulse drop-shadow-sm">
-                grid_view
-            </span>
-            <span className="text-[10px] font-black text-primary uppercase tracking-widest [writing-mode:vertical-rl] rotate-180 drop-shadow-sm">
-                Menu
+        <div className="flex flex-col items-center gap-3">
+            <div className="size-7 rounded-lg bg-white/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+              <span className="material-symbols-outlined text-white text-lg animate-pulse drop-shadow-sm">
+                  grid_view
+              </span>
+            </div>
+            <span className="text-[11px] font-black text-white uppercase tracking-[0.25em] [writing-mode:vertical-rl] rotate-180 drop-shadow-sm group-hover:tracking-[0.3em] transition-all">
+                Quick Menu
             </span>
         </div>
+        
+        {/* Particle effect hint */}
+        <div className="absolute top-1/2 -left-1 size-1 bg-white rounded-full opacity-0 group-hover:opacity-100 group-hover:animate-ping"></div>
       </button>
     </div>
   );

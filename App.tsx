@@ -53,6 +53,7 @@ const PhysioList = lazy(() => import('./pages/physiotherapy/PhysioList'));
 const PhysioDetail = lazy(() => import('./pages/physiotherapy/PhysioDetail'));
 const DiabetesCare = lazy(() => import('./pages/diabetes/DiabetesCare'));
 const HospitalList = lazy(() => import('./pages/hospitals/HospitalList'));
+const HospitalDetail = lazy(() => import('./pages/hospitals/HospitalDetail'));
 
 // Feature: New Services (Expanded)
 const AmbulanceBooking = lazy(() => import('./pages/ambulance/AmbulanceBooking'));
@@ -112,6 +113,7 @@ const App = () => {
           <Route path="/physiotherapy" element={<Layout><PhysioList /></Layout>} />
           <Route path="/diabetes-care" element={<Layout><DiabetesCare /></Layout>} />
           <Route path="/hospitals" element={<Layout><HospitalList /></Layout>} />
+          <Route path="/hospitals/:id" element={<HospitalDetail />} />
 
           {/* New Routes */}
           <Route path="/ambulance" element={<Layout><AmbulanceBooking /></Layout>} />

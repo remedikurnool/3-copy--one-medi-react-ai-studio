@@ -8,8 +8,7 @@ export default function PhysioList() {
   const [search, setSearch] = useState('');
   const [activeFilter, setActiveFilter] = useState('All');
 
-  // New detailed filters
-  const filters = ['All', 'Neuro Care', 'Ortho Care', 'Post-Op', 'Respiratory', 'Speech'];
+  const filters = ['All', 'Ortho Care', 'Neuro Care', 'Equipment', 'Post-Op', 'Sports Rehab'];
 
   const filteredServices = PHYSIO_SERVICES.filter(service => {
     const matchesSearch = service.title.toLowerCase().includes(search.toLowerCase()) || 
@@ -26,15 +25,15 @@ export default function PhysioList() {
       {/* Sticky Header Group */}
       <div className="sticky top-0 z-50 bg-white dark:bg-gray-900 shadow-sm border-b border-gray-100 dark:border-gray-800 transition-all">
         <div className="flex items-center p-4 justify-between">
-          <button onClick={() => navigate(-1)} className="flex size-10 shrink-0 items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+          <button onClick={() => navigate('/')} className="flex size-10 shrink-0 items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
             <span className="material-symbols-outlined text-2xl">arrow_back</span>
           </button>
           <div className="flex-1 ml-3">
              <h1 className="text-xl font-bold leading-none">Physiotherapy</h1>
-             <p className="text-xs text-gray-500 font-medium mt-0.5">Rehab & Recovery Experts</p>
+             <p className="text-xs text-gray-500 font-medium mt-0.5">Experts at your doorstep</p>
           </div>
           <button className="flex size-10 shrink-0 items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-            <span className="material-symbols-outlined">filter_list</span>
+            <span className="material-symbols-outlined">tune</span>
           </button>
         </div>
 
@@ -46,7 +45,7 @@ export default function PhysioList() {
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search (e.g. Stroke, Back Pain)"
+              placeholder="Search Strokes, Back Pain, TENS..."
               className="bg-transparent border-none focus:ring-0 w-full text-sm font-medium ml-2 placeholder:text-gray-400"
             />
           </div>
@@ -58,10 +57,10 @@ export default function PhysioList() {
               <button 
                 key={filter}
                 onClick={() => setActiveFilter(filter)}
-                className={`flex h-8 shrink-0 items-center justify-center px-4 rounded-full text-xs font-bold transition-all ${
+                className={`flex h-8 shrink-0 items-center justify-center px-4 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${
                     activeFilter === filter 
                     ? 'bg-primary text-white shadow-md' 
-                    : 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
+                    : 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-slate-600 dark:text-slate-300'
                 }`}
               >
                 {filter}
@@ -71,33 +70,52 @@ export default function PhysioList() {
       </div>
 
       {/* Main Content List */}
-      <div className="flex flex-col gap-4 p-4">
+      <div className="flex flex-col gap-4 p-4 max-w-2xl mx-auto">
         {filteredServices.map(service => (
-          <div key={service.id} className="flex flex-col rounded-2xl bg-white dark:bg-gray-800 shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden transition-all hover:shadow-md cursor-pointer active:scale-[0.99]" onClick={() => navigate(`/physiotherapy/${service.id}`)}>
-            <div className="w-full h-48 bg-cover bg-center relative" style={{backgroundImage: `url('${service.image}')`}}>
-              {service.subCategory && (
-                <div className="absolute top-3 left-3 bg-secondary/90 backdrop-blur text-white px-2 py-1 rounded-md text-[10px] font-bold shadow-sm uppercase tracking-wide">
-                  {service.subCategory}
+          <div 
+            key={service.id} 
+            className="flex flex-col rounded-3xl bg-white dark:bg-gray-800 shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden transition-all hover:shadow-lg cursor-pointer active:scale-[0.99]" 
+            onClick={() => navigate(`/physiotherapy/${service.id}`)}
+          >
+            <div className="w-full h-44 bg-cover bg-center relative" style={{backgroundImage: `url('${service.image}')`}}>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+              
+              <div className="absolute top-3 left-3 flex flex-col gap-2">
+                <div className="bg-secondary/90 backdrop-blur text-white px-2 py-1 rounded-md text-[9px] font-black shadow-sm uppercase tracking-widest w-fit">
+                    {service.subCategory}
                 </div>
-              )}
+                {service.isVerified && (
+                    <div className="bg-emerald-500/90 backdrop-blur text-white px-2 py-1 rounded-md text-[9px] font-black shadow-sm uppercase tracking-widest w-fit flex items-center gap-1">
+                        <span className="material-symbols-outlined text-[10px] filled">verified</span> Certified
+                    </div>
+                )}
+              </div>
+
+              <div className="absolute bottom-3 left-3 text-white">
+                <div className="flex items-center gap-1 bg-black/30 backdrop-blur-sm px-2 py-0.5 rounded-lg text-xs font-bold w-fit mb-1">
+                   <span className="material-symbols-outlined text-xs filled text-amber-400">star</span> {service.rating}
+                   <span className="text-[10px] opacity-80 font-medium">({service.reviews})</span>
+                </div>
+              </div>
+
               {service.homeVisitAvailable && (
                 <div className="absolute top-3 right-3 bg-white/90 dark:bg-black/70 backdrop-blur-sm px-2 py-1 rounded-lg flex items-center gap-1">
-                  <span className="material-symbols-outlined text-secondary text-sm">home_health</span>
-                  <span className="text-xs font-bold text-slate-900 dark:text-white">Home Visit</span>
+                  <span className="material-symbols-outlined text-primary text-sm">home_health</span>
+                  <span className="text-[9px] font-black uppercase text-slate-900 dark:text-white">Home Visit</span>
                 </div>
               )}
             </div>
             
-            <div className="flex flex-col p-4 gap-3">
+            <div className="flex flex-col p-5 gap-3">
               <div className="flex flex-col gap-1">
-                <h3 className="text-xl font-bold leading-tight">{service.title}</h3>
-                <p className="text-gray-500 dark:text-gray-400 text-sm leading-normal line-clamp-2">{service.description}</p>
+                <h3 className="text-xl font-black leading-tight text-slate-900 dark:text-white tracking-tight">{service.title}</h3>
+                <p className="text-gray-500 dark:text-gray-400 text-xs leading-relaxed line-clamp-2 font-medium">{service.description}</p>
                 
                 {/* Conditions Tags */}
                 {service.conditions && (
-                    <div className="flex gap-2 mt-1 overflow-hidden">
+                    <div className="flex gap-2 mt-2 overflow-hidden">
                         {service.conditions.slice(0, 3).map(c => (
-                            <span key={c} className="text-[9px] bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 px-2 py-0.5 rounded border border-slate-200 dark:border-slate-600 truncate">
+                            <span key={c} className="text-[9px] bg-slate-50 dark:bg-slate-700 text-slate-500 dark:text-slate-400 px-2 py-0.5 rounded border border-slate-100 dark:border-slate-600 font-bold uppercase tracking-tighter truncate">
                                 {c}
                             </span>
                         ))}
@@ -105,35 +123,23 @@ export default function PhysioList() {
                 )}
               </div>
               
-              <div className="flex items-center gap-4 py-2 border-t border-b border-gray-100 dark:border-gray-700 my-1">
-                <div className="flex items-center gap-1.5 text-secondary dark:text-teal-400">
-                  <span className="material-symbols-outlined text-lg">schedule</span>
-                  <span className="text-sm font-semibold">{service.visitDuration}</span>
-                </div>
-                <div className="w-px h-4 bg-gray-300 dark:bg-gray-600"></div>
-                <div className="flex items-center gap-1.5 text-primary dark:text-blue-400">
-                  <span className="material-symbols-outlined text-lg">sell</span>
-                  <span className="text-sm font-semibold">Starts ₹{service.price}</span>
-                </div>
+              <div className="flex items-center justify-between mt-2 pt-3 border-t border-gray-100 dark:border-gray-700">
+                 <div className="flex flex-col">
+                    <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Starting @</span>
+                    <div className="flex items-baseline gap-1">
+                        <span className="text-xl font-black text-primary">₹{service.price}</span>
+                        <span className="text-[10px] font-bold text-gray-400">/ {service.priceUnit}</span>
+                    </div>
+                 </div>
+                 <button 
+                   className="h-11 px-6 rounded-2xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-black text-xs uppercase tracking-widest shadow-xl active:scale-95 transition-all"
+                 >
+                   View Details
+                 </button>
               </div>
-              
-              <button 
-                className="w-full h-12 rounded-xl bg-primary text-white font-bold text-base shadow-lg shadow-blue-500/30 hover:bg-blue-600 active:scale-95 transition-all"
-              >
-                Book Session
-              </button>
             </div>
           </div>
         ))}
-
-        {filteredServices.length === 0 && (
-          <div className="text-center py-16 flex flex-col items-center gap-4">
-            <div className="size-20 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-400">
-               <span className="material-symbols-outlined text-4xl">person_search</span>
-            </div>
-            <p className="text-gray-500 font-medium italic">No physiotherapy services found.</p>
-          </div>
-        )}
       </div>
     </div>
   );

@@ -61,7 +61,7 @@ export default function DoctorProfile() {
             <p className="text-gray-500 dark:text-gray-400 text-base font-normal mt-1">{doctor.specialty}, {doctor.qualification}</p>
             <div className="flex items-center gap-2 mt-2">
               <span className="px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-900/30 text-primary text-xs font-bold border border-blue-100 dark:border-blue-800">Reg: {doctor.registrationNumber || 'APMC-48291'}</span>
-              <span className="px-2 py-0.5 rounded-full bg-green-50 dark:bg-green-900/30 text-secondary text-xs font-bold border border-green-100 dark:border-green-800 flex items-center gap-1">
+              <span className="px-2 py-0.5 rounded-full bg-green-50 dark:bg-green-900/30 text-secondary text-xs font-bold border border-green-100 dark:border-blue-800 flex items-center gap-1">
                 <span className="size-1.5 rounded-full bg-secondary animate-pulse"></span>
                 Available Now
               </span>
@@ -102,6 +102,50 @@ export default function DoctorProfile() {
             <p className="text-gray-500 dark:text-gray-400 text-xs font-medium">Rating</p>
           </div>
         </div>
+      </div>
+
+      {/* Enhanced About Section */}
+      <div className="px-4 py-2">
+        <section className="flex flex-col gap-5 rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-6 shadow-sm">
+          <div className="flex items-center gap-2 text-primary border-b border-gray-100 dark:border-gray-800 pb-3">
+            <span className="material-symbols-outlined filled">info</span>
+            <h3 className="text-lg font-black uppercase tracking-tight">Biography</h3>
+          </div>
+          
+          <div className="space-y-4">
+            <div>
+              <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed font-medium">
+                {doctor.about || `${doctor.name} is a renowned ${doctor.specialty} based in Kurnool. With over ${doctor.experience} of clinical practice, they have successfully treated thousands of patients, focusing on evidence-based medicine and personalized care protocols.`}
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 gap-4">
+              <div className="flex items-start gap-3">
+                <div className="size-8 rounded-lg bg-teal-50 dark:bg-teal-900/20 flex items-center justify-center text-primary shrink-0">
+                  <span className="material-symbols-outlined text-lg">school</span>
+                </div>
+                <div>
+                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1">Education</p>
+                  <p className="text-sm font-bold text-slate-800 dark:text-gray-200">{doctor.qualification} from Top Medical University</p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <div className="size-8 rounded-lg bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-secondary shrink-0">
+                  <span className="material-symbols-outlined text-lg">workspace_premium</span>
+                </div>
+                <div>
+                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1">Specialization</p>
+                  <div className="flex flex-wrap gap-1 mt-1">
+                    <span className="bg-gray-100 dark:bg-gray-800 text-[10px] font-bold px-2 py-0.5 rounded-md text-gray-600 dark:text-gray-400">{doctor.specialty}</span>
+                    <span className="bg-gray-100 dark:bg-gray-800 text-[10px] font-bold px-2 py-0.5 rounded-md text-gray-600 dark:text-gray-400">Clinical Diagnosis</span>
+                    <span className="bg-gray-100 dark:bg-gray-800 text-[10px] font-bold px-2 py-0.5 rounded-md text-gray-600 dark:text-gray-400">Patient Care</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
       </div>
 
       {/* Consultation Type Selector */}
@@ -147,19 +191,6 @@ export default function DoctorProfile() {
              onUpload={setPrescription}
              initialUrl={prescription}
            />
-        </div>
-      </div>
-
-      {/* About Section */}
-      <div className="px-4 py-2">
-        <div className="flex flex-col gap-3 rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-5 shadow-sm">
-          <div className="flex justify-between items-center">
-            <h3 className="text-lg font-bold leading-tight">About {doctor.name}</h3>
-            <button className="text-primary text-sm font-bold">Read More</button>
-          </div>
-          <p className="text-gray-500 dark:text-gray-300 text-sm leading-relaxed">
-            {doctor.about || `${doctor.name} is a senior specialist in Kurnool with over ${doctor.experience} years of experience. Specialists in ${doctor.specialty} and preventive care. Dedicated to providing comprehensive care to patients.`}
-          </p>
         </div>
       </div>
 

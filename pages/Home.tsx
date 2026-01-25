@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MEDICINES, DOCTORS, LAB_TESTS, MEDICAL_SCANS, SKIN_HAIR_SERVICES, HOME_CARE_SERVICES } from '../constants';
-import AdvancedSearch from '../components/ui/AdvancedSearch';
+import GlobalSearchBar from '../components/ui/GlobalSearchBar';
 import { useLocationStore } from '../store/locationStore';
 import LocationModal from '../components/ui/LocationModal';
 import { PrescriptionPromo } from '../components/ui/PrescriptionPromo';
@@ -112,7 +112,7 @@ export default function Home() {
           </div>
         </div>
         <div className="px-5 pb-5">
-          <AdvancedSearch />
+          <GlobalSearchBar />
         </div>
       </header>
 

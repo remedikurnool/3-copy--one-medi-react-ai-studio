@@ -1,3 +1,4 @@
+
 export interface Medicine {
   id: string;
   name: string;
@@ -29,6 +30,12 @@ export interface Medicine {
     sellingPrice: number;
     mrp: number;
   }[];
+  // Added properties for Skin & Hair enhancement
+  verifiedByDoctor?: string;
+  images?: string[];
+  activeIngredients?: string[];
+  doctorRecommended?: boolean;
+  brandTrust?: string;
 }
 
 export interface LabTest {
@@ -145,6 +152,15 @@ export interface HomeCareService {
     label?: string;
   }[];
   conditions?: string[];
+  certifications?: string[];
+  reviewsList?: {
+    id: string;
+    author: string;
+    rating: number;
+    comment: string;
+    date: string;
+    isVerified: boolean;
+  }[];
 }
 
 export interface DiabetesProgram {
@@ -259,6 +275,10 @@ export interface SkinTreatment {
   price: number;
   rating: number;
   treatment: string;
+  // Added properties for Skin & Hair enhancement
+  activeIngredients?: string[];
+  benefits?: string[];
+  expertNote?: string;
 }
 
 export interface WellnessPlan {
@@ -296,4 +316,20 @@ export interface VaccinationRecord {
   protectsAgainst: string;
   status: 'completed' | 'pending';
   dueDate?: string;
+}
+
+export interface VendorInfo {
+  name: string;
+  location: string;
+  image: string;
+  type: string;
+}
+
+export interface Product {
+  id: string;
+  name: string;
+  category: string;
+  price: number;
+  mrp: number;
+  image: string;
 }

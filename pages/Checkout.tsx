@@ -27,6 +27,9 @@ export default function Checkout() {
     return null;
   }
 
+  const hasMedicines = items.some(item => item.type === 'medicine');
+  const hasLabs = items.some(item => item.type === 'lab');
+
   return (
     <div className="relative flex h-full min-h-screen w-full flex-col overflow-x-hidden pb-24 bg-bg-light dark:bg-bg-dark font-sans text-slate-900 dark:text-white">
       {/* Top App Bar */}
@@ -136,17 +139,27 @@ export default function Checkout() {
           </div>
         </section>
 
-        {/* Offers & Coupons */}
-        <section>
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-100 dark:border-gray-700">
-            <div className="flex items-center gap-3">
-              <span className="material-symbols-outlined text-secondary">local_offer</span>
-              <div className="flex-1">
-                <h4 className="font-bold text-sm">Apply Coupon</h4>
-                <p className="text-xs text-gray-500">Save more on your order</p>
-              </div>
-              <span className="material-symbols-outlined text-gray-400">chevron_right</span>
+        {/* Trust Badges */}
+        <section className="bg-emerald-50 dark:bg-emerald-900/10 rounded-2xl p-4 border border-emerald-100 dark:border-emerald-800/30 flex flex-col gap-4">
+          <div className="flex items-center gap-3">
+            <div className="size-10 rounded-full bg-white dark:bg-gray-800 flex items-center justify-center text-emerald-600 shadow-sm shrink-0">
+              <span className="material-symbols-outlined filled">verified_user</span>
             </div>
+            <div>
+              <p className="text-xs font-black uppercase tracking-widest text-emerald-800 dark:text-emerald-300">One Medi Trust Lock</p>
+              <p className="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium">Your health and safety are our top priorities.</p>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-2 gap-3">
+             <div className="bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm flex items-center gap-2 border border-emerald-100 dark:border-emerald-900/40">
+                <span className="material-symbols-outlined text-primary text-xl">pill</span>
+                <span className="text-[10px] font-bold text-slate-700 dark:text-gray-300 leading-tight">100% Genuine Medicine</span>
+             </div>
+             <div className="bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm flex items-center gap-2 border border-emerald-100 dark:border-emerald-900/40">
+                <span className="material-symbols-outlined text-primary text-xl">biotech</span>
+                <span className="text-[10px] font-bold text-slate-700 dark:text-gray-300 leading-tight">NABL Certified Labs</span>
+             </div>
           </div>
         </section>
 
