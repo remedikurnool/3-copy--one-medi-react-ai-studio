@@ -60,12 +60,19 @@ export default function DoctorProfile() {
             <h1 className="text-2xl font-bold leading-tight tracking-tight">{doctor.name}</h1>
             <p className="text-gray-500 dark:text-gray-400 text-base font-normal mt-1">{doctor.specialty}, {doctor.qualification}</p>
             <div className="flex items-center gap-2 mt-2">
-              <span className="px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-900/30 text-primary text-xs font-bold border border-blue-100 dark:border-blue-800">Reg: 48291</span>
+              <span className="px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-900/30 text-primary text-xs font-bold border border-blue-100 dark:border-blue-800">Reg: {doctor.registrationNumber || 'APMC-48291'}</span>
               <span className="px-2 py-0.5 rounded-full bg-green-50 dark:bg-green-900/30 text-secondary text-xs font-bold border border-green-100 dark:border-green-800 flex items-center gap-1">
                 <span className="size-1.5 rounded-full bg-secondary animate-pulse"></span>
                 Available Now
               </span>
             </div>
+            {doctor.languages && (
+                <div className="flex gap-2 mt-2">
+                    {doctor.languages.map(lang => (
+                        <span key={lang} className="text-[10px] text-gray-400 font-bold uppercase">{lang}</span>
+                    ))}
+                </div>
+            )}
           </div>
         </div>
       </div>
@@ -78,7 +85,7 @@ export default function DoctorProfile() {
               <span className="material-symbols-outlined text-xl">medical_services</span>
             </div>
             <p className="text-xl font-bold">{doctor.experience}</p>
-            <p className="text-gray-500 dark:text-gray-400 text-xs font-medium">Experience</p>
+            <p className="text-gray-500 dark:text-gray-400 text-xs font-medium">Years Exp.</p>
           </div>
           <div className="flex min-w-[100px] flex-1 flex-col gap-1 rounded-xl bg-gray-50 dark:bg-gray-800 p-4 items-center text-center border border-gray-100 dark:border-gray-700">
             <div className="bg-teal-100 dark:bg-teal-900/50 p-2 rounded-full mb-1 text-secondary">
@@ -151,7 +158,7 @@ export default function DoctorProfile() {
             <button className="text-primary text-sm font-bold">Read More</button>
           </div>
           <p className="text-gray-500 dark:text-gray-300 text-sm leading-relaxed">
-            {doctor.name} is a senior specialist in Kurnool with over {doctor.experience} of experience. Specialists in {doctor.specialty} and preventive care. Dedicated to providing comprehensive care to patients.
+            {doctor.about || `${doctor.name} is a senior specialist in Kurnool with over ${doctor.experience} years of experience. Specialists in ${doctor.specialty} and preventive care. Dedicated to providing comprehensive care to patients.`}
           </p>
         </div>
       </div>
@@ -177,10 +184,10 @@ export default function DoctorProfile() {
           <div className="p-5 flex flex-col gap-4">
             <div className="flex justify-between items-start">
               <div className="flex flex-col gap-1">
-                <p className="text-lg font-bold leading-tight">Sunrise Multi-Specialty Hospital</p>
+                <p className="text-lg font-bold leading-tight">{doctor.hospitalAffiliation || 'Sunrise Multi-Specialty Hospital'}</p>
                 <p className="text-gray-500 dark:text-gray-400 text-sm font-normal flex items-center gap-1">
                   <span className="material-symbols-outlined text-[16px]">location_on</span>
-                  N.R. Peta, Kurnool, Andhra Pradesh
+                  {doctor.location || 'N.R. Peta, Kurnool, Andhra Pradesh'}
                 </p>
               </div>
             </div>

@@ -57,6 +57,13 @@ export default function CareGuides() {
                      </div>
                      <h4 className="text-base font-black text-slate-900 dark:text-white leading-tight mb-2">{article.title}</h4>
                      <p className="text-[10px] text-slate-400 font-medium line-clamp-2">{article.summary}</p>
+                     
+                     <div className="flex items-center gap-2 mt-3 pt-3 border-t border-rose-50 dark:border-slate-800">
+                        <div className="size-5 rounded-full bg-rose-100 flex items-center justify-center text-rose-500">
+                           <span className="material-symbols-outlined text-[14px]">person</span>
+                        </div>
+                        <p className="text-[9px] font-bold text-slate-500">By {article.author} • {article.publishDate}</p>
+                     </div>
                   </div>
                </div>
             ))}

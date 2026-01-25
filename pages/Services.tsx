@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -73,6 +74,16 @@ const SERVICE_LIST = [
     bgColor: 'bg-sky-50 dark:bg-sky-900/20'
   },
   {
+    id: 'feed',
+    title: 'Health Feed',
+    subtitle: 'Expert blogs, tips & videos for better health',
+    icon: 'feed',
+    path: '/health-feed',
+    color: 'from-pink-500 to-red-500',
+    iconColor: 'text-pink-500',
+    bgColor: 'bg-pink-50 dark:bg-pink-900/20'
+  },
+  {
     id: 'diabetes',
     title: 'Diabetes Care',
     subtitle: 'Specialized kits and management plans',
@@ -91,6 +102,56 @@ const SERVICE_LIST = [
     color: 'from-emerald-500 to-teal-700',
     iconColor: 'text-emerald-500',
     bgColor: 'bg-emerald-50 dark:bg-emerald-900/20'
+  },
+  {
+    id: 'blood',
+    title: 'Blood Banks',
+    subtitle: 'Find plasma and blood donors nearby',
+    icon: 'bloodtype',
+    path: '/blood-banks',
+    color: 'from-red-500 to-red-700',
+    iconColor: 'text-red-600',
+    bgColor: 'bg-red-50 dark:bg-red-900/20'
+  },
+  {
+    id: 'insurance',
+    title: 'Insurance',
+    subtitle: 'Compare family health plans',
+    icon: 'security',
+    path: '/insurance',
+    color: 'from-blue-600 to-cyan-600',
+    iconColor: 'text-cyan-600',
+    bgColor: 'bg-cyan-50 dark:bg-cyan-900/20'
+  },
+  {
+    id: 'surgery',
+    title: 'Surgeries',
+    subtitle: 'Estimates & second opinions',
+    icon: 'medical_services',
+    path: '/surgeries',
+    color: 'from-slate-600 to-gray-700',
+    iconColor: 'text-slate-600',
+    bgColor: 'bg-gray-100 dark:bg-gray-800'
+  },
+  {
+    id: 'wellness',
+    title: 'Diet & Wellness',
+    subtitle: 'Weight loss, yoga & mental health',
+    icon: 'self_improvement',
+    path: '/wellness',
+    color: 'from-lime-500 to-green-600',
+    iconColor: 'text-lime-600',
+    bgColor: 'bg-lime-50 dark:bg-lime-900/20'
+  },
+  {
+    id: 'skinhair',
+    title: 'Skin & Hair',
+    subtitle: 'Dermatology & aesthetic treatments',
+    icon: 'face',
+    path: '/skin-hair',
+    color: 'from-amber-400 to-orange-500',
+    iconColor: 'text-amber-500',
+    bgColor: 'bg-amber-50 dark:bg-amber-900/20'
   }
 ];
 
@@ -175,7 +236,7 @@ export default function Services() {
           ))}
           
           <div 
-            onClick={() => alert('Dialing Emergency Services...')}
+            onClick={() => navigate('/ambulance')}
             className="group relative col-span-1 md:col-span-2 p-8 rounded-[2.5rem] bg-rose-500 shadow-[0_20px_40px_-10px_rgba(244,63,94,0.4)] cursor-pointer active:scale-[0.99] transition-all overflow-hidden"
           >
             <div className="absolute top-0 right-0 size-64 bg-white/10 rounded-full -mr-20 -mt-20 blur-3xl animate-pulse"></div>

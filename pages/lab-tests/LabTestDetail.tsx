@@ -32,14 +32,13 @@ const DetailsAccordion = ({ title, children, defaultOpen, badge }: any) => (
   </details>
 );
 
-const ParameterItem = ({ name, sub }: any) => (
+const ParameterItem = ({ name }: any) => (
   <li className="flex items-start gap-3">
-     <span className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-300">
-        <span className="material-symbols-outlined text-[14px]">check</span>
+     <span className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400">
+        <span className="material-symbols-outlined text-[14px] font-bold">check</span>
      </span>
      <div>
         <p className="text-sm font-semibold text-slate-900 dark:text-white">{name}</p>
-        <p className="text-xs text-gray-500 dark:text-gray-400">{sub}</p>
      </div>
   </li>
 );
@@ -121,9 +120,9 @@ export default function LabTestDetail() {
           <div className="px-4 mb-4">
              <div className="grid grid-cols-2 gap-3">
                 <InfoCard icon="schedule" label="Report in" value={currentReportTime || "24 Hours"} color="bg-blue-50 text-primary" darkColor="dark:bg-blue-900/20 dark:text-blue-400" />
-                <InfoCard icon="bloodtype" label="Sample" value="Blood" color="bg-red-50 text-red-500" darkColor="dark:bg-red-900/20 dark:text-red-400" />
-                <InfoCard icon="no_food" label="Fasting" value={test.fasting || "Not Required"} color="bg-amber-50 text-amber-600" darkColor="dark:bg-amber-900/20 dark:text-amber-400" />
-                <InfoCard icon="description" label="Report Type" value="E-Report" color="bg-emerald-50 text-emerald-600" darkColor="dark:bg-emerald-900/20 dark:text-emerald-400" />
+                <InfoCard icon="bloodtype" label="Sample" value={test.sampleType || "Blood"} color="bg-red-50 text-red-500" darkColor="dark:bg-red-900/20 dark:text-red-400" />
+                <InfoCard icon="no_food" label="Fasting" value={test.fastingRequired ? "Required" : "Not Required"} color="bg-amber-50 text-amber-600" darkColor="dark:bg-amber-900/20 dark:text-amber-400" />
+                <InfoCard icon="science" label="Department" value={test.department} color="bg-emerald-50 text-emerald-600" darkColor="dark:bg-emerald-900/20 dark:text-emerald-400" />
              </div>
           </div>
 
@@ -141,14 +140,14 @@ export default function LabTestDetail() {
                     : 'border-gray-100 dark:border-gray-700 opacity-80'
                   }`}
                 >
-                  <div className="size-14 rounded-lg bg-gray-50 dark:bg-gray-700 p-1 shrink-0 flex items-center justify-center">
-                    <img src={variant.centerImage} alt={variant.centerName} className="max-w-full max-h-full object-contain" />
+                  <div className="size-14 rounded-lg bg-gray-50 dark:bg-gray-700 p-1 shrink-0 flex items-center justify-center overflow-hidden">
+                    <img src={variant.centerImage} alt={variant.centerName} className="size-full object-cover rounded-lg" />
                   </div>
                   <div className="flex-1 flex flex-col justify-center">
                     <div className="flex justify-between items-start">
                       <h4 className="font-bold text-sm text-slate-900 dark:text-white leading-tight">{variant.centerName}</h4>
                       <span className="text-xs font-bold bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 px-1.5 py-0.5 rounded flex items-center gap-0.5">
-                        {variant.rating} <span className="material-symbols-outlined text-[10px] filled">star</span>
+                        {variant.rating || 4.5} <span className="material-symbols-outlined text-[10px] filled">star</span>
                       </span>
                     </div>
                     <div className="flex justify-between items-end mt-1">
@@ -189,27 +188,22 @@ export default function LabTestDetail() {
 
           {/* Accordions */}
           <div className="flex flex-col gap-3 px-4 pb-4">
-             <DetailsAccordion title="Why is this test needed?" defaultOpen>
-                <p>This comprehensive package screens for critical organ functions. It is recommended for annual screening to detect early signs of lifestyle diseases and ensure overall well-being.</p>
+             {test.parameters && test.parameters.length > 0 && (
+                <DetailsAccordion title={`Parameters Included (${test.parameters.length})`} defaultOpen badge="DETAILED">
+                    <ul className="space-y-3">
+                        {test.parameters.map((param, idx) => (
+                            <ParameterItem key={idx} name={param} />
+                        ))}
+                    </ul>
+                </DetailsAccordion>
+             )}
+
+             <DetailsAccordion title="Preparation Instructions" defaultOpen={!test.parameters}>
+                <p className="whitespace-pre-line">{test.preparationInstructions}</p>
              </DetailsAccordion>
              
-             <DetailsAccordion title={`${test.parameterCount} Parameters Included`} badge="DETAILED">
-                <ul className="space-y-3">
-                   <ParameterItem name="Detailed Analysis" sub="Complete breakdown of all parameters included in this test." />
-                   <li className="pt-2">
-                     <button className="w-full rounded-lg border border-gray-200 dark:border-gray-700 py-2 text-sm font-medium text-primary hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
-                        View all parameters
-                     </button>
-                   </li>
-                </ul>
-             </DetailsAccordion>
-
-             <DetailsAccordion title="Preparation Instructions">
-                <ul className="list-disc pl-4 space-y-1">
-                   <li>Do not eat or drink anything other than water if fasting is required ({test.fasting}).</li>
-                   <li>Avoid alcohol 24 hours prior.</li>
-                   <li>Wear loose clothing for easy sample collection.</li>
-                </ul>
+             <DetailsAccordion title="About this Test">
+                <p>This package is designed to screen for common health conditions. It includes detailed analysis of parameters to help diagnose or monitor your health status effectively.</p>
              </DetailsAccordion>
           </div>
        </main>

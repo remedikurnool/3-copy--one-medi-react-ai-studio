@@ -1,11 +1,151 @@
 
-export interface ConsultationVariant {
-  type: 'Clinic Visit' | 'Video Consult' | 'Home Visit';
+export type AppLanguage = 'en' | 'te';
+
+export interface VendorInfo {
+  name: string;
+  location: string;
+  image: string;
+  type: 'Pharmacy' | 'Lab' | 'Hospital';
+}
+
+export interface ProductVariant {
+  id: string;
+  label: string;
   price: number;
-  duration: string;
-  available: boolean;
-  nextSlot: string;
-  icon: string;
+  mrp: number;
+  inStock: boolean;
+}
+
+export interface Product {
+  id: string;
+  name: string;
+  brand: string;
+  category: string;
+  subCategory: string;
+  image: string;
+  images: string[];
+  rating: number;
+  reviews: number;
+  description: string;
+  price: number;
+  mrp: number;
+  discount: string;
+  variants?: ProductVariant[];
+  specifications?: Record<string, string>;
+  whatsInTheBox?: string[];
+  features?: string[];
+  howToUse?: string;
+  isReturnable: boolean;
+  warranty?: string;
+  isAuthorized: boolean;
+  isPregnancySafe?: boolean;
+  isBabySafe?: boolean;
+  fulfilledBy?: VendorInfo;
+  verifiedByDoctor?: string;
+}
+
+export interface Review {
+  id: string;
+  author: string;
+  rating: number;
+  comment: string;
+  date: string;
+  isVerified: boolean;
+}
+
+export interface Medicine {
+  id: string;
+  name: string;
+  genericName: string;
+  category: string;
+  price: number;
+  mrp: number;
+  discount: string;
+  image: string;
+  images?: string[];
+  packSize: string;
+  prescriptionRequired: boolean;
+  manufacturer: string;
+  composition: string;
+  dosageForm: string;
+  therapeuticClass: string;
+  indications: string[];
+  dosageInstructions: string;
+  routeOfAdministration: string;
+  sideEffects: string[];
+  warnings: string[];
+  safetyAdvice: {
+    pregnancy: string;
+    alcohol: string;
+    driving: string;
+  };
+  variants: {
+    id: string;
+    packSize: string;
+    sellingPrice: number;
+    mrp: number;
+  }[];
+  fulfilledBy?: VendorInfo;
+  verifiedByDoctor?: string;
+  crossSellIds?: string[];
+}
+
+export interface LabTest {
+  id: string;
+  name: string;
+  category: string;
+  price: number;
+  mrp: number;
+  discount: string;
+  parameterCount: number;
+  reportTime: string;
+  description: string;
+  preparationInstructions: string;
+  parameters: string[];
+  sampleType?: string;
+  fastingRequired?: boolean;
+  department?: string;
+  fulfilledBy?: VendorInfo;
+  isNablCertified?: boolean;
+  variants?: {
+    centerId: string;
+    centerName: string;
+    centerImage: string;
+    distance: string;
+    rating: number;
+    reportTime: string;
+    price: number;
+    mrp: number;
+    nextSlot: string;
+    nabl?: boolean;
+  }[];
+}
+
+export interface MedicalScan {
+  id: string;
+  name: string;
+  category: string;
+  bodyPart: string;
+  price: number;
+  mrp: number;
+  discount: string;
+  image: string;
+  description: string;
+  scanDuration: string;
+  contrastRequired: boolean;
+  preparationNotes: string;
+  variants: {
+    centerId: string;
+    centerName: string;
+    centerImage: string;
+    distance: string;
+    price: number;
+    mrp: number;
+    nextSlot: string;
+    nabl: boolean;
+    rating?: number;
+    reportTime?: string;
+  }[];
 }
 
 export interface Doctor {
@@ -14,117 +154,80 @@ export interface Doctor {
   specialty: string;
   qualification: string;
   experience: string;
-  languages: string[];
-  rating: number;
-  reviews: number;
+  hospital: string;
+  location: string;
   fee: number;
-  image: string;
-  available: boolean;
-  hospital?: string;
-  location?: string;
-  about?: string;
-  variants?: ConsultationVariant[];
-}
-
-export interface Medicine {
-  id: string;
-  name: string;
-  category: string;
-  manufacturer: string;
-  packSize: string;
-  price: number;
-  mrp: number;
-  image: string;
-  discount?: string;
-  deliveryTime?: string;
-  isPrescriptionRequired?: boolean;
-  description?: string;
-  uses?: string[];
-  sideEffects?: string[];
-}
-
-export interface TestVariant {
-  centerId: string;
-  centerName: string;
-  centerImage: string;
-  price: number;
-  mrp: number;
-  reportTime: string;
   rating: number;
-  nabl: boolean;
-  distance?: string;
-  nextSlot?: string;
-}
-
-export interface LabTest {
-  id: string;
-  name: string;
-  parameterCount: number;
-  description: string;
-  price: number;
-  mrp: number;
-  discount: string;
-  tags?: string[];
-  category?: string;
-  reportTime?: string;
-  fasting?: string;
-  variants?: TestVariant[];
-}
-
-export interface MedicalScan {
-  id: string;
-  name: string;
-  category: string;
-  description: string;
-  bodyPart: string;
-  price: number;
-  mrp: number;
-  discount: string;
   image: string;
-  variants: TestVariant[];
-}
-
-export interface ServicePlan {
-  id: string;
-  title: string;
-  price: number;
-  originalPrice: number;
-  duration: string;
-  label?: string;
-  savings?: number;
+  about?: string;
+  registrationNumber?: string;
+  hospitalAffiliation?: string;
+  languages?: string[];
+  variants?: {
+    type: string;
+    icon: string;
+    price: number;
+    duration: string;
+    nextSlot: string;
+  }[];
 }
 
 export interface HomeCareService {
   id: string;
   title: string;
-  localTitle?: string;
-  category: 'Nursing' | 'Physiotherapy' | 'Doctor Visit' | 'Elderly Care' | 'Lab' | 'Maternal Care';
+  category: string;
+  subCategory?: string;
+  type?: string;
   description: string;
+  image: string;
+  rating: number;
   price: number;
   priceUnit: string;
-  rating: number;
-  reviews: number;
-  image: string;
-  features: string[];
-  isVerified?: boolean;
-  available?: boolean;
-  plans?: ServicePlan[];
+  visitDuration?: string;
+  homeVisitAvailable?: boolean;
+  homeVisitFee?: number;
+  genderPreferenceAvailable?: boolean;
+  staffQualification?: string;
+  expertBio?: string;
+  specializations?: string[];
+  certifications?: string[];
+  reviewsList?: Review[];
+  equipmentRequired?: boolean;
+  features?: string[];
+  reviews?: number;
   whatsappBooking?: boolean;
+  localTitle?: string;
+  isVerified?: boolean;
+  plans?: {
+    id: string;
+    name: string;
+    title?: string;
+    duration: string;
+    price: number;
+    originalPrice?: number;
+    savings?: number;
+    type?: string;
+    label?: string;
+  }[];
+  conditions?: string[];
 }
 
-export interface PhysioService {
+export interface DiabetesProgram {
   id: string;
   title: string;
   description: string;
-  price: number;
+  diabetesType?: string;
+  careLevel?: string;
   duration: string;
-  rating: number;
-  reviews: number;
-  image: string;
-  conditions: string[];
-  homeVisitAvailable: boolean;
-  homeVisitFee?: number;
-  plans?: ServicePlan[];
+  monitoringFrequency: string;
+  supportChannel: string;
+  includedServices: string[];
+  pricing: {
+    mrp: number;
+    offerPrice: number;
+    billingCycle: string;
+  };
+  isPopular?: boolean;
 }
 
 export interface Hospital {
@@ -136,37 +239,126 @@ export interface Hospital {
   rating: number;
   reviews: number;
   image: string;
+  facilities: string[];
   open24x7: boolean;
   insuranceAccepted: boolean;
-  specialties: string[];
+}
+
+export interface BloodBank {
+  id: string;
+  name: string;
+  location: string;
+  distance: string;
+  phone: string;
+  availableGroups: string[];
+  isOpen: boolean;
+  address: string;
+  contactPhone: string;
+  isOpen24x7: boolean;
+}
+
+export interface AmbulanceService {
+  id: string;
+  type: string;
+  baseCharge: number;
+  pricePerKm: number;
+  image: string;
+  equipment: string[];
+  responseTime: string;
+}
+
+export interface InsurancePlan {
+  id: string;
+  planName: string;
+  provider: string;
+  logo: string;
+  category: string;
+  coverAmount: number;
+  premium: number;
+  monthlyEmi?: number;
+  cashless: boolean;
+  networkHospitals: number;
+  claimSettlementRatio: string;
+  features: string[];
+  copay?: string;
+  waitingPeriod?: string;
+}
+
+export interface SurgeryPackage {
+  id: string;
+  procedureName: string;
+  category: string;
+  approxCost: string;
+  hospital: string;
+  image: string;
+  recoveryTime: string;
+  stayDuration: string;
+  description?: string;
+  inclusions?: string[];
+  symptoms?: string[];
+  risks?: string[];
+  procedure?: string;
+  department?: string;
 }
 
 export interface MotherBabyPackage {
   id: string;
+  tag: string;
   title: string;
   subtitle: string;
-  price: number;
-  mrp: number;
-  image: string;
   features: string[];
-  tag?: string;
+  mrp: number;
+  price: number;
+  image: string;
 }
 
-export interface VaccinationRecord {
+export interface SkinTreatment {
   id: string;
-  age: string;
-  vaccine: string;
-  protectsAgainst: string;
-  status: 'pending' | 'completed' | 'overdue';
-  dueDate?: string;
+  name: string;
+  concern: string;
+  clinic: string;
+  image: string;
+  technologyUsed: string;
+  sessionsRequired: string;
+  downtime: string;
+  price: number;
+  rating: number;
+  treatment: string;
+}
+
+export interface WellnessPlan {
+  id: string;
+  title: string;
+  category: string;
+  duration: string;
+  price: number;
+  expertName: string;
+  image: string;
+  consultations: number;
+  dietChartFrequency: string;
+  expert: string;
 }
 
 export interface HealthArticle {
   id: string;
   title: string;
   category: string;
-  readTime: string;
-  image: string;
+  readTime?: string;
+  videoDuration?: string;
   summary: string;
-  content?: string;
+  image: string;
+  author: string;
+  authorRole?: string;
+  publishDate: string;
+  isFeatured?: boolean;
+  type: 'article' | 'video';
+}
+
+export interface VaccinationRecord {
+  id: string;
+  vaccine: string;
+  age: string;
+  protectsAgainst: string;
+  status: 'completed' | 'pending';
+  dueDate?: string;
 }

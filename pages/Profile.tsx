@@ -18,8 +18,14 @@ const MenuLink = ({ icon, label, sub, onClick, color = "text-slate-600" }: any) 
 
 export default function Profile() {
   const navigate = useNavigate();
-  const { profile } = useUserStore();
+  const { profile, isAuthenticated, logout } = useUserStore();
   const [isDark, setIsDark] = useState(false);
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+        navigate('/login');
+    }
+  }, [isAuthenticated, navigate]);
 
   useEffect(() => {
     const isDarkMode = document.documentElement.classList.contains('dark');
@@ -40,9 +46,12 @@ export default function Profile() {
 
   const handleLogout = () => {
     if (confirm('Are you sure you want to log out?')) {
-      navigate('/');
+      logout();
+      navigate('/login');
     }
   };
+
+  if (!isAuthenticated) return null;
 
   return (
     <div className="min-h-screen bg-bg-light dark:bg-bg-dark pb-32 animate-fade-in">
@@ -76,15 +85,15 @@ export default function Profile() {
           {/* Quick Stats */}
           <div className="grid grid-cols-3 gap-3 mt-8">
              <div className="bg-blue-50/50 dark:bg-gray-700/50 p-4 rounded-2xl text-center border border-blue-100/20 dark:border-gray-600">
-                <span className="block text-xl font-black text-primary">{profile.bloodGroup}</span>
+                <span className="block text-xl font-black text-primary">{profile.bloodGroup || 'O+'}</span>
                 <span className="text-[10px] font-bold text-gray-400 uppercase mt-0.5">Blood</span>
              </div>
              <div className="bg-purple-50/50 dark:bg-gray-700/50 p-4 rounded-2xl text-center border border-purple-100/20 dark:border-gray-600">
-                <span className="block text-xl font-black text-purple-600">{profile.height}</span>
+                <span className="block text-xl font-black text-purple-600">{profile.height || '175'}</span>
                 <span className="text-[10px] font-bold text-gray-400 uppercase mt-0.5">Height</span>
              </div>
              <div className="bg-orange-50/50 dark:bg-gray-700/50 p-4 rounded-2xl text-center border border-orange-100/20 dark:border-gray-600">
-                <span className="block text-xl font-black text-orange-600">{profile.weight}</span>
+                <span className="block text-xl font-black text-orange-600">{profile.weight || '72'}</span>
                 <span className="text-[10px] font-bold text-gray-400 uppercase mt-0.5">Weight</span>
              </div>
           </div>

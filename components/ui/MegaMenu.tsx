@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -20,25 +21,6 @@ const MENU_DATA = [
         subtitle: 'On First Medicine Order',
         image: 'https://cdn-icons-png.flaticon.com/512/3004/3004458.png',
         bg: 'bg-blue-50'
-    }
-  },
-  {
-    id: 'motherbaby',
-    label: 'Mother & Baby',
-    icon: 'pregnant_woman',
-    color: 'text-rose-500',
-    subCategories: [
-      { name: 'Pregnancy Care', link: '/mother-baby', icon: 'pregnant_woman' },
-      { name: 'Newborn Wellness', link: '/mother-baby', icon: 'child_care' },
-      { name: 'Lactation Help', link: '/mother-baby', icon: 'stomach' },
-      { name: 'Home Nursing', link: '/mother-baby', icon: 'home_health' },
-      { name: 'Growth Monitoring', link: '/mother-baby', icon: 'monitoring' },
-    ],
-    featured: {
-        title: '9-Month Package',
-        subtitle: 'Comprehensive Care Plan',
-        image: 'https://cdn-icons-png.flaticon.com/512/3021/3021870.png',
-        bg: 'bg-rose-50'
     }
   },
   {
@@ -77,6 +59,50 @@ const MENU_DATA = [
     featured: null
   },
   {
+    id: 'motherbaby',
+    label: 'Mother & Baby',
+    icon: 'pregnant_woman',
+    color: 'text-rose-500',
+    subCategories: [
+      { name: 'Pregnancy Care', link: '/mother-baby', icon: 'pregnant_woman' },
+      { name: 'Vaccination Tracker', link: '/mother-baby/vaccination-tracker', icon: 'vaccines' },
+      { name: 'Care Guides', link: '/mother-baby/guides', icon: 'auto_stories' },
+      { name: 'Home Nursing', link: '/mother-baby', icon: 'home_health' },
+    ],
+    featured: {
+        title: 'Mom Club',
+        subtitle: 'Join for priority consults',
+        image: 'https://cdn-icons-png.flaticon.com/512/3021/3021870.png',
+        bg: 'bg-rose-50'
+    }
+  },
+  {
+    id: 'surgeries',
+    label: 'Surgeries',
+    icon: 'medical_services',
+    color: 'text-slate-500',
+    subCategories: [
+      { name: 'All Surgeries', link: '/surgeries', icon: 'grid_view' },
+      { name: 'Second Opinion', link: '/surgeries/second-opinion', icon: 'rate_review' },
+      { name: 'Knee Replacement', link: '/surgeries/detail/sp1', icon: 'accessibility' },
+      { name: 'Cataract', link: '/surgeries', icon: 'visibility' },
+    ],
+    featured: null
+  },
+  {
+    id: 'wellness',
+    label: 'Wellness & Aesthetics',
+    icon: 'self_improvement',
+    color: 'text-lime-500',
+    subCategories: [
+      { name: 'Diet & Nutrition', link: '/wellness', icon: 'restaurant_menu' },
+      { name: 'Skin & Hair Clinic', link: '/skin-hair', icon: 'face' },
+      { name: 'Mental Health', link: '/wellness', icon: 'psychology' },
+      { name: 'Yoga & Fitness', link: '/wellness', icon: 'fitness_center' },
+    ],
+    featured: null
+  },
+  {
     id: 'scans',
     label: 'Scans & MRI',
     icon: 'radiology',
@@ -86,20 +112,20 @@ const MENU_DATA = [
       { name: 'CT Scan', link: '/scans', icon: 'scanner' },
       { name: 'Ultrasound', link: '/scans', icon: 'baby_changing_station' },
       { name: 'X-Ray', link: '/scans', icon: 'skeleton' },
-      { name: 'PET Scan', link: '/scans', icon: 'grid_view' },
     ],
     featured: null
   },
   {
-    id: 'homecare',
-    label: 'Home Care',
-    icon: 'home_health',
-    color: 'text-pink-500',
+    id: 'emergency',
+    label: 'Emergency & More',
+    icon: 'emergency',
+    color: 'text-red-500',
     subCategories: [
-      { name: 'Physiotherapy', link: '/physiotherapy', icon: 'directions_walk' },
-      { name: 'Nursing', link: '/home-care', icon: 'vaccines' },
-      { name: 'Elderly Care', link: '/home-care', icon: 'elderly' },
-      { name: 'Medical Equipment', link: '/home-care', icon: 'bed' },
+      { name: 'Book Ambulance', link: '/ambulance', icon: 'ambulance' },
+      { name: 'Blood Banks', link: '/blood-banks', icon: 'bloodtype' },
+      { name: 'Health Insurance', link: '/insurance', icon: 'security' },
+      { name: 'Hospitals', link: '/hospitals', icon: 'apartment' },
+      { name: 'Health Feed', link: '/health-feed', icon: 'feed' },
     ],
     featured: null
   }
@@ -116,7 +142,7 @@ export default function MegaMenu({ onClose }: { onClose: () => void }) {
 
   return (
     <div 
-        className="absolute top-full left-0 w-[800px] bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-800 overflow-hidden flex z-[60] animate-in fade-in slide-in-from-top-2 duration-200 mt-2"
+        className="absolute top-full left-0 w-[850px] bg-white dark:bg-gray-900 rounded-3xl shadow-2xl border border-gray-100 dark:border-gray-800 overflow-hidden flex z-[60] animate-in fade-in slide-in-from-top-2 duration-200 mt-2"
         onMouseLeave={onClose}
     >
       <div className="w-64 bg-gray-50 dark:bg-gray-800/50 border-r border-gray-100 dark:border-gray-800 p-2 flex flex-col gap-1">
@@ -139,30 +165,30 @@ export default function MegaMenu({ onClose }: { onClose: () => void }) {
       </div>
 
       <div className="flex-1 p-6">
-        <div className="flex justify-between items-center mb-4">
-            <h3 className="font-bold text-lg text-slate-900 dark:text-white flex items-center gap-2">
-                <span className={`material-symbols-outlined ${activeCategory.color}`}>{activeCategory.icon}</span>
+        <div className="flex justify-between items-center mb-6">
+            <h3 className="font-bold text-xl text-slate-900 dark:text-white flex items-center gap-2">
+                <span className={`material-symbols-outlined text-2xl ${activeCategory.color}`}>{activeCategory.icon}</span>
                 {activeCategory.label}
             </h3>
             <button 
                 onClick={() => handleNavigate(activeCategory.subCategories[0].link)}
-                className="text-xs font-bold text-primary hover:underline"
+                className="text-xs font-bold text-primary hover:underline uppercase tracking-widest"
             >
-                View All
+                View Hub
             </button>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-x-8 gap-y-4">
             {activeCategory.subCategories.map((sub, idx) => (
                 <button
                     key={idx}
                     onClick={() => handleNavigate(sub.link)}
-                    className="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors border border-transparent hover:border-gray-100 dark:hover:border-gray-700 group"
+                    className="flex items-center gap-4 p-2 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-all text-left group"
                 >
-                    <div className="size-10 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-gray-500 group-hover:text-primary group-hover:bg-primary/10 transition-colors">
+                    <div className="size-10 rounded-xl bg-white dark:bg-gray-700 shadow-sm border border-gray-100 dark:border-gray-600 flex items-center justify-center text-gray-400 group-hover:text-primary group-hover:border-primary/20 transition-colors">
                         <span className="material-symbols-outlined">{sub.icon}</span>
                     </div>
-                    <span className="text-sm font-medium text-slate-700 dark:text-gray-300 group-hover:text-primary transition-colors">
+                    <span className="text-sm font-semibold text-slate-700 dark:text-gray-300 group-hover:text-primary transition-colors">
                         {sub.name}
                     </span>
                 </button>
@@ -170,13 +196,13 @@ export default function MegaMenu({ onClose }: { onClose: () => void }) {
         </div>
 
         {activeCategory.featured && (
-            <div className={`mt-6 p-4 rounded-xl flex items-center justify-between ${activeCategory.featured.bg} dark:bg-gray-800 border border-transparent dark:border-gray-700`}>
+            <div className={`mt-8 p-5 rounded-2xl flex items-center justify-between ${activeCategory.featured.bg} dark:bg-gray-800/80 border border-white dark:border-gray-700 shadow-inner`}>
                 <div>
-                    <p className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">Featured Offer</p>
-                    <h4 className="font-bold text-slate-900 dark:text-white">{activeCategory.featured.title}</h4>
-                    <p className="text-xs text-slate-600 dark:text-slate-400">{activeCategory.featured.subtitle}</p>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-1">Exclusive</p>
+                    <h4 className="font-black text-lg text-slate-900 dark:text-white">{activeCategory.featured.title}</h4>
+                    <p className="text-xs text-slate-600 dark:text-slate-400 font-bold">{activeCategory.featured.subtitle}</p>
                 </div>
-                <img src={activeCategory.featured.image} alt="Promo" className="h-12 w-12 object-contain" />
+                <img src={activeCategory.featured.image} alt="Promo" className="h-14 w-14 object-contain drop-shadow-lg" />
             </div>
         )}
       </div>

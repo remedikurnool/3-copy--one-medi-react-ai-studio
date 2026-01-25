@@ -92,6 +92,18 @@ export default function HospitalList() {
                 <span className="material-symbols-outlined text-[18px] shrink-0 mt-0.5">location_on</span>
                 <p className="leading-snug">{hospital.location} <span className="text-gray-400">• {hospital.distance} away</span></p>
               </div>
+              
+              {hospital.facilities && (
+                <div className="flex flex-wrap gap-2 mt-1">
+                    {hospital.facilities.slice(0, 3).map((fac, i) => (
+                        <span key={i} className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-slate-600 dark:text-slate-300 text-[10px] font-bold uppercase rounded border border-gray-200 dark:border-gray-600">{fac}</span>
+                    ))}
+                    {hospital.facilities.length > 3 && (
+                        <span className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-slate-500 dark:text-slate-400 text-[10px] font-bold uppercase rounded">+{hospital.facilities.length - 3}</span>
+                    )}
+                </div>
+              )}
+
               <div className="h-px bg-gray-100 dark:bg-gray-700 my-1"></div>
               <div className="flex gap-3 mt-1">
                 <button className="flex-1 h-12 rounded-xl bg-primary text-white font-bold text-base flex items-center justify-center gap-2 shadow-md shadow-primary/20 active:scale-[0.98] transition-all">

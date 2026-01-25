@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MOTHER_BABY_SERVICES, MOTHER_BABY_PACKAGES, CARE_GUIDES } from '../../constants';
+import { MOTHER_BABY_SERVICES, MOTHER_BABY_PACKAGES, CARE_GUIDES, PRODUCTS } from '../../constants';
 
 const STAGES = [
   { id: 'preg', label: 'Pregnancy', icon: 'pregnant_woman', sub: 'Weeks 1-40' },
@@ -15,13 +15,11 @@ export default function MotherBabyHome() {
   const [selectedStage, setSelectedStage] = useState('preg');
   const [search, setSearch] = useState('');
 
+  const babyProducts = PRODUCTS.filter(p => p.category === 'Mother & Baby' || p.category === 'Skin & Hair');
+
   const filteredServices = MOTHER_BABY_SERVICES.filter(s => {
     const matchesSearch = s.title.toLowerCase().includes(search.toLowerCase()) || 
                          s.description.toLowerCase().includes(search.toLowerCase());
-    
-    if (selectedStage === 'preg') return matchesSearch && (s.id.includes('preg') || s.id.includes('lac'));
-    if (selectedStage === 'newborn') return matchesSearch && (s.id.includes('baby') || s.id.includes('post') || s.id.includes('nurse'));
-    if (selectedStage === 'toddler') return matchesSearch && (s.id.includes('growth'));
     return matchesSearch;
   });
 
@@ -54,7 +52,6 @@ export default function MotherBabyHome() {
 
       <main className="max-w-7xl mx-auto p-4 lg:p-8 flex flex-col gap-8 animate-fade-in">
         
-        {/* Baby Profile & Tool Shortcuts (New) */}
         <section className="bg-gradient-to-br from-rose-50 to-indigo-50 dark:from-slate-900 dark:to-slate-800 rounded-[2.5rem] p-6 shadow-sm border border-white dark:border-slate-800">
            <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-4">
@@ -66,8 +63,8 @@ export default function MotherBabyHome() {
                     <p className="text-[10px] font-black text-rose-500 uppercase tracking-widest mt-1">8 Months Old</p>
                  </div>
               </div>
-              <button onClick={() => navigate('/mother-baby/growth-tracker')} className="size-10 rounded-full bg-white dark:bg-gray-700 flex items-center justify-center text-slate-400 shadow-sm">
-                 <span className="material-symbols-outlined text-xl">monitoring</span>
+              <button className="size-10 rounded-full bg-white dark:bg-gray-700 flex items-center justify-center text-slate-400 shadow-sm">
+                 <span className="material-symbols-outlined text-xl">edit</span>
               </button>
            </div>
            
@@ -85,7 +82,6 @@ export default function MotherBabyHome() {
                  </div>
               </button>
               <button 
-                onClick={() => navigate('/mother-baby/growth-tracker')}
                 className="bg-white dark:bg-gray-800 p-4 rounded-3xl flex flex-col gap-2 items-start shadow-sm hover:shadow-md transition-all active:scale-[0.98]"
               >
                  <div className="size-8 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
@@ -121,6 +117,45 @@ export default function MotherBabyHome() {
           </div>
         </section>
 
+        {/* Baby Care Products Row */}
+        <section>
+            <div className="flex justify-between items-end mb-4 px-1">
+                <h3 className="text-xl font-black text-slate-900 dark:text-white leading-none tracking-tighter">Essentials Store</h3>
+                <button className="text-xs font-black text-rose-500 uppercase tracking-widest">Shop All</button>
+            </div>
+            <div className="flex gap-4 overflow-x-auto no-scrollbar pb-2">
+                {babyProducts.map(product => (
+                    <div 
+                        key={product.id}
+                        onClick={() => navigate(`/product/${product.id}`)}
+                        className="min-w-[170px] bg-white dark:bg-gray-800 p-4 rounded-[2rem] shadow-sm border border-rose-50 dark:border-slate-800 group cursor-pointer active:scale-95 transition-all"
+                    >
+                        <div className="h-28 rounded-2xl bg-rose-50/30 dark:bg-gray-900 mb-3 flex items-center justify-center p-3 relative overflow-hidden">
+                            <img src={product.image} className="max-h-full object-contain group-hover:scale-110 transition-transform" alt="" />
+                            <div className="absolute top-2 right-2 bg-rose-500 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full">{product.discount}</div>
+                            
+                            {/* Product Safety Tag */}
+                            {(product.isBabySafe || product.isPregnancySafe) && (
+                                <div className="absolute bottom-2 left-2 flex gap-1">
+                                    <div className="bg-white/80 dark:bg-black/60 backdrop-blur-md size-5 rounded-full flex items-center justify-center text-rose-500 border border-white/20 shadow-sm" title={product.isBabySafe ? "Baby Safe" : "Pregnancy Safe"}>
+                                        <span className="material-symbols-outlined text-[12px] font-black filled">{product.isBabySafe ? 'child_care' : 'pregnant_woman'}</span>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                        <p className="text-[8px] font-black text-rose-400 uppercase tracking-widest mb-1">{product.brand}</p>
+                        <h4 className="text-xs font-bold leading-tight mb-2 line-clamp-2 h-8">{product.name}</h4>
+                        <div className="flex justify-between items-center mt-auto">
+                            <span className="font-black text-sm">₹{product.price}</span>
+                            <div className="size-8 rounded-full bg-rose-50 dark:bg-gray-700 flex items-center justify-center group-hover:bg-rose-500 group-hover:text-white transition-colors">
+                                <span className="material-symbols-outlined text-lg">add</span>
+                            </div>
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </section>
+
         {/* Dynamic Services Grid */}
         <section>
           <div className="flex justify-between items-end mb-4 px-1">
@@ -143,17 +178,7 @@ export default function MotherBabyHome() {
                     <p className="text-[11px] text-slate-400 font-medium line-clamp-2 leading-relaxed mb-4">{service.description}</p>
                     <div className="flex items-center justify-between">
                        <span className="text-xl font-black text-slate-900 dark:text-white tracking-tighter">₹{service.price} <span className="text-[10px] text-slate-400 font-bold uppercase tracking-tight">/ {service.priceUnit}</span></span>
-                       {service.whatsappBooking ? (
-                         <button 
-                          onClick={(e) => { e.stopPropagation(); alert('Redirecting to specialized Mother & Baby Care concierge on WhatsApp...'); }}
-                          className="flex items-center gap-2 bg-emerald-500 text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-emerald-200 active:scale-95 transition-all"
-                         >
-                            <span className="material-symbols-outlined text-lg">chat</span>
-                            WhatsApp
-                         </button>
-                       ) : (
-                         <button className="bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg active:scale-95 transition-all">Book</button>
-                       )}
+                       <button className="bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg active:scale-95 transition-all">Book</button>
                     </div>
                   </div>
                   {service.isVerified && (
@@ -166,7 +191,7 @@ export default function MotherBabyHome() {
           </div>
         </section>
 
-        {/* Education Section (Spec H) */}
+        {/* Education Section */}
         <section>
           <div className="flex justify-between items-end mb-4 px-1">
              <h3 className="text-xl font-black text-slate-900 dark:text-white leading-none">Education Hub</h3>
@@ -230,7 +255,6 @@ export default function MotherBabyHome() {
         </section>
       </main>
       
-      {/* WhatsApp Action (Spec Rule: WhatsApp first for high touch) */}
       <button 
         onClick={() => alert('Opening ONE MEDI Mother & Baby Care Expert Support on WhatsApp...')}
         className="fixed bottom-28 right-6 size-14 rounded-full bg-emerald-500 text-white flex items-center justify-center shadow-2xl shadow-emerald-500/40 z-40 active:scale-90 transition-transform group"

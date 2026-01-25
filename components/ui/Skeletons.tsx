@@ -47,18 +47,91 @@ export const GlobalLoadingSkeleton = () => (
   </div>
 );
 
-// Card Skeleton for lists
-export const CardSkeleton = () => (
-  <div className="min-w-[160px] w-[160px] bg-white dark:bg-gray-800 rounded-2xl p-3 shadow-soft border border-gray-100 dark:border-gray-700 flex flex-col h-full snap-start">
-    <Skeleton className="h-32 w-full rounded-xl mb-3" />
-    <Skeleton className="h-4 w-3/4 mb-2" />
-    <Skeleton className="h-3 w-1/2 mb-auto" />
-    <div className="flex justify-between items-end mt-3">
-      <div className="flex flex-col gap-1">
-        <Skeleton className="h-3 w-8" />
-        <Skeleton className="h-4 w-12" />
+// 1. Medicine Card Skeleton (Grid Layout)
+export const MedicineCardSkeleton = () => (
+  <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] p-5 shadow-glass border border-white dark:border-slate-800/50 flex gap-5 relative h-40">
+    <Skeleton className="size-28 rounded-3xl shrink-0" />
+    <div className="flex-1 flex flex-col justify-between py-1">
+      <div className="flex flex-col gap-2">
+        <Skeleton className="h-4 w-3/4" />
+        <Skeleton className="h-3 w-1/2" />
       </div>
-      <Skeleton className="size-8 rounded-full" />
+      <div className="flex justify-between items-end">
+        <div className="flex flex-col gap-1">
+          <Skeleton className="h-5 w-16" />
+          <Skeleton className="h-3 w-10" />
+        </div>
+        <Skeleton className="size-11 rounded-2xl" />
+      </div>
+    </div>
+  </div>
+);
+
+// 2. Doctor Card Skeleton (Vertical List)
+export const DoctorCardSkeleton = () => (
+  <div className="flex flex-col gap-3 rounded-2xl bg-white dark:bg-gray-800 p-4 shadow-sm border border-gray-100 dark:border-gray-700">
+    <div className="flex items-start gap-4">
+      <Skeleton className="size-20 rounded-xl shrink-0" />
+      <div className="flex flex-col flex-1 gap-2">
+        <div className="flex justify-between">
+          <Skeleton className="h-5 w-32" />
+          <Skeleton className="h-5 w-12 rounded-md" />
+        </div>
+        <Skeleton className="h-4 w-24" />
+        <Skeleton className="h-3 w-40" />
+      </div>
+    </div>
+    <div className="h-px bg-gray-100 dark:bg-gray-700 w-full my-1"></div>
+    <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-1">
+        <Skeleton className="h-3 w-20" />
+        <Skeleton className="h-5 w-16" />
+      </div>
+      <Skeleton className="h-11 w-[180px] rounded-xl" />
+    </div>
+  </div>
+);
+
+// 3. Lab Test/Scan Skeleton (Horizontal Card)
+export const ServiceCardSkeleton = () => (
+  <div className="bg-white dark:bg-gray-800 rounded-[2rem] p-5 border border-slate-100 dark:border-slate-700 shadow-sm relative h-auto">
+    <div className="flex justify-between items-start mb-4">
+      <Skeleton className="size-12 rounded-2xl" />
+      <Skeleton className="h-6 w-20 rounded-lg" />
+    </div>
+    <Skeleton className="h-6 w-3/4 mb-2" />
+    <Skeleton className="h-3 w-full mb-4" />
+    <div className="flex gap-2 mb-5">
+      <Skeleton className="h-6 w-24 rounded-lg" />
+      <Skeleton className="h-6 w-24 rounded-lg" />
+    </div>
+    <div className="pt-4 border-t border-slate-50 dark:border-slate-700 flex items-center justify-between">
+      <div className="flex flex-col gap-1">
+        <Skeleton className="h-3 w-10" />
+        <Skeleton className="h-6 w-20" />
+      </div>
+      <Skeleton className="h-11 w-24 rounded-xl" />
+    </div>
+  </div>
+);
+
+// 4. Scan Center Skeleton
+export const ScanCenterSkeleton = () => (
+  <div className="bg-white dark:bg-gray-800 rounded-[2.5rem] p-6 shadow-glass border border-gray-100 dark:border-gray-700 flex gap-6">
+    <Skeleton className="size-24 rounded-3xl shrink-0" />
+    <div className="flex-1 flex flex-col gap-3">
+      <div className="flex justify-between">
+        <Skeleton className="h-5 w-40" />
+        <Skeleton className="h-5 w-16 rounded-full" />
+      </div>
+      <div className="h-px bg-slate-50 dark:bg-slate-700/50 w-full my-1"></div>
+      <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-1">
+          <Skeleton className="h-3 w-12" />
+          <Skeleton className="h-5 w-20" />
+        </div>
+        <Skeleton className="h-10 w-24 rounded-2xl" />
+      </div>
     </div>
   </div>
 );

@@ -1,5 +1,6 @@
+
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { MEDICAL_SCANS } from '../../constants';
 import { useCartStore } from '../../store/cartStore';
 
@@ -12,26 +13,34 @@ const SCAN_GALLERY = [
 
 export default function ScanDetail() {
   const navigate = useNavigate();
-  const location = useLocation();
-  const state = location.state as { scanId?: string } | null;
-  const scanId = state?.scanId || 'ms1';
-  const scan = MEDICAL_SCANS.find(s => s.id === scanId) || MEDICAL_SCANS[0];
+  const { id } = useParams();
+  const scan = MEDICAL_SCANS.find(s => s.id === id);
 
-  const [selectedVariant, setSelectedVariant] = useState(scan.variants[0]);
-  const [selectedSlot, setSelectedSlot] = useState(scan.variants[0].nextSlot?.split(', ')[1] || '10:30 AM');
+  const [selectedVariant, setSelectedVariant] = useState(scan?.variants[0]);
+  const [selectedSlot, setSelectedSlot] = useState(scan?.variants[0].nextSlot?.split(', ')[1] || '10:30 AM');
   const addToCart = useCartStore((state) => state.addToCart);
 
   // Update slots if variant changes
   useEffect(() => {
-     if(selectedVariant.nextSlot) {
+     if(selectedVariant?.nextSlot) {
         setSelectedSlot(selectedVariant.nextSlot.split(', ')[1]);
      }
   }, [selectedVariant]);
 
+  if (!scan || !selectedVariant) {
+    return (
+        <div className="min-h-screen flex flex-col items-center justify-center bg-bg-light dark:bg-bg-dark p-6">
+            <span className="material-symbols-outlined text-6xl text-gray-400 mb-4">search_off</span>
+            <h2 className="text-xl font-bold">Scan Not Found</h2>
+            <button onClick={() => navigate('/scans')} className="mt-4 bg-primary text-white px-6 py-2 rounded-xl">Back to List</button>
+        </div>
+    );
+  }
+
   const slots = ['10:30 AM', '11:00 AM', '02:15 PM', '04:30 PM'];
 
   const handleBook = () => {
-    navigate('/scans/booking');
+    navigate('/scans/booking', { state: { scanId: scan.id, variantId: selectedVariant.centerId, slot: selectedSlot } });
   };
 
   return (
@@ -60,6 +69,18 @@ export default function ScanDetail() {
           <p className="text-slate-500 dark:text-slate-400 text-sm font-bold leading-relaxed mt-2 uppercase tracking-wide">
             {scan.description}
           </p>
+          <div className="flex gap-4 mt-4">
+             <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700">
+                <span className="material-symbols-outlined text-slate-400 text-lg">timer</span>
+                <span className="text-xs font-bold">{scan.scanDuration}</span>
+             </div>
+             {scan.contrastRequired && (
+                <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-orange-50 dark:bg-orange-900/20 border border-orange-100 dark:border-orange-900/30">
+                   <span className="material-symbols-outlined text-orange-500 text-lg">contrast</span>
+                   <span className="text-xs font-bold text-orange-600 dark:text-orange-400">Contrast Required</span>
+                </div>
+             )}
+          </div>
         </section>
 
         {/* FACILITY IMAGES GALLERY SECTION */}
@@ -86,13 +107,6 @@ export default function ScanDetail() {
                 </div>
               </div>
             ))}
-            {/* 360 View Placeholder */}
-            <div className="relative min-w-[150px] h-44 rounded-[2rem] bg-slate-900 dark:bg-slate-800 flex flex-col items-center justify-center gap-2 snap-center border border-white/10 cursor-pointer group active:scale-95 transition-all">
-               <div className="size-14 rounded-full bg-primary/20 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
-                  <span className="material-symbols-outlined text-3xl">360</span>
-               </div>
-               <span className="text-[10px] font-black text-white uppercase tracking-widest">Virtual Tour</span>
-            </div>
           </div>
         </section>
 
@@ -105,21 +119,30 @@ export default function ScanDetail() {
             Preparation Guide
           </h3>
           <div className="flex flex-col gap-5">
-            {[
-              { icon: 'no_food', title: 'Fasting', sub: 'Ask doctor (Usually 4h)', color: 'bg-orange-50 text-orange-600' },
-              { icon: 'checkroom', title: 'Clothing', sub: 'Wear loose, cotton clothes', color: 'bg-purple-50 text-purple-600' },
-              { icon: 'watch_off', title: 'No Metal', sub: 'Remove jewelry & accessories', color: 'bg-red-50 text-red-600' }
-            ].map((item, idx) => (
-              <div key={idx} className="flex items-center gap-4 group">
-                <div className={`flex items-center justify-center rounded-2xl ${item.color} dark:bg-opacity-10 shrink-0 size-12 shadow-sm group-hover:scale-110 transition-transform`}>
-                  <span className="material-symbols-outlined">{item.icon}</span>
+            <div className="flex items-start gap-4 group">
+                <div className={`flex items-center justify-center rounded-2xl bg-orange-50 dark:bg-orange-900/20 shrink-0 size-12 shadow-sm`}>
+                  <span className="material-symbols-outlined text-orange-600 dark:text-orange-400">info</span>
                 </div>
                 <div className="flex-1">
-                  <p className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-tight">{item.title}</p>
-                  <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">{item.sub}</p>
+                  <p className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-tight">Instructions</p>
+                  <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mt-1 leading-relaxed">
+                    {scan.preparationNotes || "No specific preparation required. Wear loose comfortable clothing."}
+                  </p>
                 </div>
-              </div>
-            ))}
+            </div>
+            {scan.contrastRequired && (
+                <div className="flex items-start gap-4 group">
+                    <div className={`flex items-center justify-center rounded-2xl bg-purple-50 dark:bg-purple-900/20 shrink-0 size-12 shadow-sm`}>
+                        <span className="material-symbols-outlined text-purple-600 dark:text-purple-400">bloodtype</span>
+                    </div>
+                    <div className="flex-1">
+                        <p className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-tight">Creatinine Test</p>
+                        <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mt-1 leading-relaxed">
+                            A recent Serum Creatinine report is mandatory for contrast studies.
+                        </p>
+                    </div>
+                </div>
+            )}
           </div>
         </section>
 

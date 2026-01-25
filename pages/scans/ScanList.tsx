@@ -1,9 +1,10 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MEDICAL_SCANS } from '../../constants';
 import { useLocationStore } from '../../store/locationStore';
 import LocationModal from '../../components/ui/LocationModal';
+import { ScanCenterSkeleton } from '../../components/ui/Skeletons';
 
 export default function ScanList() {
   const navigate = useNavigate();
@@ -11,6 +12,14 @@ export default function ScanList() {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [search, setSearch] = useState('');
   const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Simulate loading
+  useEffect(() => {
+    setIsLoading(true);
+    const timer = setTimeout(() => setIsLoading(false), 900);
+    return () => clearTimeout(timer);
+  }, [selectedCategory, search]);
 
   const filteredScans = MEDICAL_SCANS.filter(scan => {
     const matchesCategory = selectedCategory === 'All' || scan.category === selectedCategory;
@@ -103,69 +112,73 @@ export default function ScanList() {
           </button>
         </div>
 
-        {filteredScans.map((scan, index) => (
-          <React.Fragment key={scan.id}>
-             {/* Render Promo Banner after first item */}
-             {index === 1 && (
-               <div className="bg-gradient-to-br from-[#101922] to-[#137fec] rounded-3xl shadow-xl overflow-hidden p-6 relative min-h-[200px] border border-white/10">
-                 <div className="absolute right-0 top-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -mr-20 -mt-20"></div>
-                 <div className="relative z-10 flex flex-row items-center justify-between gap-6 h-full">
-                   <div className="flex flex-col justify-center flex-1">
-                     <div className="bg-secondary/40 backdrop-blur-md w-fit px-3 py-1 rounded-full mb-3">
-                       <p className="text-white font-black text-[9px] uppercase tracking-[0.2em]">Health Exclusive</p>
+        {isLoading ? (
+          Array(4).fill(0).map((_, i) => <ScanCenterSkeleton key={i} />)
+        ) : (
+          filteredScans.map((scan, index) => (
+            <React.Fragment key={scan.id}>
+               {/* Render Promo Banner after first item */}
+               {index === 1 && (
+                 <div className="bg-gradient-to-br from-[#101922] to-[#137fec] rounded-3xl shadow-xl overflow-hidden p-6 relative min-h-[200px] border border-white/10 animate-slide-up">
+                   <div className="absolute right-0 top-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -mr-20 -mt-20"></div>
+                   <div className="relative z-10 flex flex-row items-center justify-between gap-6 h-full">
+                     <div className="flex flex-col justify-center flex-1">
+                       <div className="bg-secondary/40 backdrop-blur-md w-fit px-3 py-1 rounded-full mb-3">
+                         <p className="text-white font-black text-[9px] uppercase tracking-[0.2em]">Health Exclusive</p>
+                       </div>
+                       <h3 className="text-white text-2xl font-black mb-1 leading-tight tracking-tight">Full Body<br/>Diagnostic</h3>
+                       <p className="text-blue-100 text-xs mb-5 font-bold opacity-90 uppercase tracking-widest">65+ Critical Markers</p>
+                       <div className="flex items-baseline gap-3">
+                         <span className="text-white font-black text-3xl tracking-tighter">₹999</span>
+                         <span className="text-white/40 line-through text-lg font-bold">₹2,499</span>
+                       </div>
                      </div>
-                     <h3 className="text-white text-2xl font-black mb-1 leading-tight tracking-tight">Full Body<br/>Diagnostic</h3>
-                     <p className="text-blue-100 text-xs mb-5 font-bold opacity-90 uppercase tracking-widest">65+ Critical Markers</p>
-                     <div className="flex items-baseline gap-3">
-                       <span className="text-white font-black text-3xl tracking-tighter">₹999</span>
-                       <span className="text-white/40 line-through text-lg font-bold">₹2,499</span>
+                     <div className="w-36 h-36 bg-white rounded-3xl shadow-2xl shrink-0 overflow-hidden group">
+                        <img src="https://images.unsplash.com/photo-1579152276506-44439679bb4c?auto=format&fit=crop&q=80&w=400" alt="Lab Test" className="size-full object-cover transition-transform duration-700 group-hover:scale-110" />
                      </div>
                    </div>
-                   <div className="w-36 h-36 bg-white rounded-3xl shadow-2xl shrink-0 overflow-hidden group">
-                      <img src="https://images.unsplash.com/photo-1579152276506-44439679bb4c?auto=format&fit=crop&q=80&w=400" alt="Lab Test" className="size-full object-cover transition-transform duration-700 group-hover:scale-110" />
-                   </div>
+                   <button 
+                     onClick={() => navigate('/lab-tests')}
+                     className="w-full mt-6 bg-white text-slate-900 hover:bg-blue-50 active:scale-95 transition-all font-black h-14 rounded-2xl text-xs uppercase tracking-widest shadow-xl flex items-center justify-center gap-2"
+                   >
+                     Claim Package Now
+                     <span className="material-symbols-outlined text-lg">arrow_forward</span>
+                   </button>
                  </div>
-                 <button 
-                   onClick={() => navigate('/lab-tests')}
-                   className="w-full mt-6 bg-white text-slate-900 hover:bg-blue-50 active:scale-95 transition-all font-black h-14 rounded-2xl text-xs uppercase tracking-widest shadow-xl flex items-center justify-center gap-2"
-                 >
-                   Claim Package Now
-                   <span className="material-symbols-outlined text-lg">arrow_forward</span>
-                 </button>
-               </div>
-             )}
+               )}
 
-            <div 
-              onClick={() => navigate('/scans/detail', { state: { scanId: scan.id } })}
-              className="bg-white dark:bg-gray-800 rounded-[2.5rem] shadow-glass border border-gray-100 dark:border-gray-700 overflow-hidden hover:shadow-float transition-all duration-300 cursor-pointer active:scale-[0.99]"
-            >
-              <div className="p-6 flex gap-6">
-                 <div className="size-24 rounded-3xl bg-slate-50 dark:bg-gray-700 flex items-center justify-center shrink-0 shadow-inner p-4 overflow-hidden">
-                    <img src={scan.image} alt={scan.name} className="size-full object-cover transition-transform duration-500 hover:scale-110" />
-                 </div>
-                 <div className="flex-1 min-w-0">
-                    <div className="flex justify-between items-start mb-1">
-                       <div className="min-w-0">
-                          <h3 className="text-lg font-black text-slate-900 dark:text-white leading-tight mb-1 truncate tracking-tight">{scan.name}</h3>
-                          <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest">{scan.bodyPart} • {scan.variants.length} Centers</p>
-                       </div>
-                       <span className="shrink-0 bg-emerald-100 text-emerald-700 text-[9px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider border border-emerald-200">{scan.discount}</span>
-                    </div>
-                    <div className="h-px bg-slate-50 dark:bg-slate-700/50 w-full my-4"></div>
-                    <div className="flex items-center justify-between">
-                       <div>
-                          <p className="text-[10px] text-slate-400 line-through font-bold">₹{scan.mrp}</p>
-                          <p className="text-xl font-black text-slate-900 dark:text-white tracking-tighter">₹{scan.price}<span className="text-[10px] font-bold text-slate-400 ml-1 uppercase">onwards</span></p>
-                       </div>
-                       <button className="bg-primary/10 text-primary hover:bg-primary hover:text-white transition-all px-6 h-10 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-sm active:scale-95">
-                          Book Now
-                       </button>
-                    </div>
-                 </div>
+              <div 
+                onClick={() => navigate(`/scans/${scan.id}`)}
+                className="bg-white dark:bg-gray-800 rounded-[2.5rem] shadow-glass border border-gray-100 dark:border-gray-700 overflow-hidden hover:shadow-float transition-all duration-300 cursor-pointer active:scale-[0.99]"
+              >
+                <div className="p-6 flex gap-6">
+                   <div className="size-24 rounded-3xl bg-slate-50 dark:bg-gray-700 flex items-center justify-center shrink-0 shadow-inner p-4 overflow-hidden">
+                      <img src={scan.image} alt={scan.name} className="size-full object-cover transition-transform duration-500 hover:scale-110" />
+                   </div>
+                   <div className="flex-1 min-w-0">
+                      <div className="flex justify-between items-start mb-1">
+                         <div className="min-w-0">
+                            <h3 className="text-lg font-black text-slate-900 dark:text-white leading-tight mb-1 truncate tracking-tight">{scan.name}</h3>
+                            <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest">{scan.bodyPart} • {scan.variants.length} Centers</p>
+                         </div>
+                         <span className="shrink-0 bg-emerald-100 text-emerald-700 text-[9px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider border border-emerald-200">{scan.discount}</span>
+                      </div>
+                      <div className="h-px bg-slate-50 dark:bg-slate-700/50 w-full my-4"></div>
+                      <div className="flex items-center justify-between">
+                         <div>
+                            <p className="text-[10px] text-slate-400 line-through font-bold">₹{scan.mrp}</p>
+                            <p className="text-xl font-black text-slate-900 dark:text-white tracking-tighter">₹{scan.price}<span className="text-[10px] font-bold text-slate-400 ml-1 uppercase">onwards</span></p>
+                         </div>
+                         <button className="bg-primary/10 text-primary hover:bg-primary hover:text-white transition-all px-6 h-10 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-sm active:scale-95">
+                            Book Now
+                         </button>
+                      </div>
+                   </div>
+                </div>
               </div>
-            </div>
-          </React.Fragment>
-        ))}
+            </React.Fragment>
+          ))
+        )}
       </main>
 
       {/* Floating Filter Button (FAB) */}

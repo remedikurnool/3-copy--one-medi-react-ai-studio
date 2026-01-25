@@ -1,9 +1,10 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { DOCTORS } from '../../constants';
 import { useLocationStore } from '../../store/locationStore';
 import LocationModal from '../../components/ui/LocationModal';
+import { DoctorCardSkeleton } from '../../components/ui/Skeletons';
 
 export default function DoctorList() {
   const navigate = useNavigate();
@@ -11,8 +12,16 @@ export default function DoctorList() {
   const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
   const [selectedSpecialty, setSelectedSpecialty] = useState('All');
   const [search, setSearch] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
 
-  const specialties = ['All', 'General Physician', 'Cardiologist', 'Dentist', 'Orthopedic'];
+  const specialties = ['All', 'General Physician', 'Cardiologist', 'Dentist', 'Gynecologist', 'Pediatrician', 'Dermatologist'];
+
+  // Simulate loading
+  useEffect(() => {
+    setIsLoading(true);
+    const timer = setTimeout(() => setIsLoading(false), 1000);
+    return () => clearTimeout(timer);
+  }, [selectedSpecialty, search]);
 
   const filteredDoctors = DOCTORS.filter(doc => {
     const matchesSpecialty = selectedSpecialty === 'All' || doc.specialty === selectedSpecialty;
@@ -87,49 +96,54 @@ export default function DoctorList() {
 
       {/* Doctor Listing */}
       <div className="flex flex-col gap-4 p-4">
-        {filteredDoctors.map((doc) => (
-          <div 
-            key={doc.id}
-            onClick={() => navigate(`/doctors/${doc.id}`)}
-            className="flex flex-col gap-3 rounded-2xl bg-white dark:bg-gray-800 p-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-gray-100 dark:border-gray-700 transition-colors cursor-pointer active:scale-[0.99]"
-          >
-            <div className="flex items-start gap-4">
-              <div className="relative shrink-0">
-                <div 
-                  className="w-20 h-20 rounded-xl bg-gray-200 bg-center bg-cover border border-gray-100 dark:border-gray-700" 
-                  style={{backgroundImage: `url("${doc.image}")`}}
-                ></div>
-                <div className="absolute -bottom-2 -right-2 bg-white dark:bg-gray-800 p-1 rounded-full shadow-sm">
-                  <span className="material-symbols-outlined filled text-green-500 text-[20px] bg-green-50 dark:bg-green-900/30 rounded-full p-0.5">verified</span>
-                </div>
-              </div>
-              <div className="flex flex-col flex-1 gap-1">
-                <div className="flex justify-between items-start">
-                  <h3 className="text-slate-900 dark:text-white text-lg font-bold leading-tight">{doc.name}</h3>
-                  <div className="flex items-center gap-1 bg-yellow-50 dark:bg-yellow-900/20 px-1.5 py-0.5 rounded-md text-xs font-bold text-yellow-700 dark:text-yellow-400 border border-yellow-100 dark:border-yellow-800/30">
-                    <span className="material-symbols-outlined text-[14px] filled">star</span>
-                    {doc.rating}
+        {isLoading ? (
+          Array(4).fill(0).map((_, i) => <DoctorCardSkeleton key={i} />)
+        ) : (
+          filteredDoctors.map((doc) => (
+            <div 
+              key={doc.id}
+              onClick={() => navigate(`/doctors/${doc.id}`)}
+              className="flex flex-col gap-3 rounded-2xl bg-white dark:bg-gray-800 p-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-gray-100 dark:border-gray-700 transition-colors cursor-pointer active:scale-[0.99]"
+            >
+              <div className="flex items-start gap-4">
+                <div className="relative shrink-0">
+                  <div 
+                    className="w-20 h-20 rounded-xl bg-gray-200 bg-center bg-cover border border-gray-100 dark:border-gray-700" 
+                    style={{backgroundImage: `url("${doc.image}")`}}
+                  ></div>
+                  <div className="absolute -bottom-2 -right-2 bg-white dark:bg-gray-800 p-1 rounded-full shadow-sm">
+                    <span className="material-symbols-outlined filled text-green-500 text-[20px] bg-green-50 dark:bg-green-900/30 rounded-full p-0.5">verified</span>
                   </div>
                 </div>
-                <p className="text-secondary text-sm font-bold">{doc.specialty}</p>
-                <p className="text-gray-500 dark:text-gray-400 text-xs font-normal">{doc.qualification} • {doc.experience}</p>
-                <p className="text-gray-500 dark:text-gray-400 text-xs font-normal mt-1">{doc.hospital}</p>
+                <div className="flex flex-col flex-1 gap-1">
+                  <div className="flex justify-between items-start">
+                    <h3 className="text-slate-900 dark:text-white text-lg font-bold leading-tight">{doc.name}</h3>
+                    <div className="flex items-center gap-1 bg-yellow-50 dark:bg-yellow-900/20 px-1.5 py-0.5 rounded-md text-xs font-bold text-yellow-700 dark:text-yellow-400 border border-yellow-100 dark:border-yellow-800/30">
+                      <span className="material-symbols-outlined text-[14px] filled">star</span>
+                      {doc.rating}
+                    </div>
+                  </div>
+                  <p className="text-secondary text-sm font-bold">{doc.specialty}</p>
+                  <p className="text-gray-500 dark:text-gray-400 text-xs font-normal">{doc.qualification} • {doc.experience}</p>
+                  <p className="text-gray-500 dark:text-gray-400 text-xs font-normal mt-1">{doc.hospital}</p>
+                </div>
+              </div>
+              <div className="h-px bg-gray-100 dark:bg-gray-700 w-full my-1"></div>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-gray-500 dark:text-gray-400 text-xs font-medium">Consultation Fee</p>
+                  <p className="text-slate-900 dark:text-white text-lg font-bold">₹{doc.fee}</p>
+                </div>
+                <button className="flex flex-1 max-w-[180px] cursor-pointer items-center justify-center rounded-xl h-11 bg-primary hover:bg-primary-dark active:bg-blue-700 text-white gap-2 text-sm font-bold leading-normal shadow-lg shadow-blue-500/30 transition-all active:scale-[0.98]">
+                  <span className="material-symbols-outlined text-[18px]">calendar_add_on</span>
+                  Book Now
+                </button>
               </div>
             </div>
-            <div className="h-px bg-gray-100 dark:bg-gray-700 w-full my-1"></div>
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-500 dark:text-gray-400 text-xs font-medium">Consultation Fee</p>
-                <p className="text-slate-900 dark:text-white text-lg font-bold">₹{doc.fee}</p>
-              </div>
-              <button className="flex flex-1 max-w-[180px] cursor-pointer items-center justify-center rounded-xl h-11 bg-primary hover:bg-primary-dark active:bg-blue-700 text-white gap-2 text-sm font-bold leading-normal shadow-lg shadow-blue-500/30 transition-all active:scale-[0.98]">
-                <span className="material-symbols-outlined text-[18px]">calendar_add_on</span>
-                Book Now
-              </button>
-            </div>
-          </div>
-        ))}
-        {filteredDoctors.length === 0 && (
+          ))
+        )}
+        
+        {!isLoading && filteredDoctors.length === 0 && (
           <div className="text-center py-10 text-gray-400">
             <span className="material-symbols-outlined text-4xl mb-2">person_search</span>
             <p>No doctors found.</p>

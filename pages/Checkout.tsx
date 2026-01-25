@@ -8,7 +8,9 @@ export default function Checkout() {
   const navigate = useNavigate();
   const [paymentMethod, setPaymentMethod] = useState('upi');
   const { items, totalPrice, totalMrp, clearCart } = useCartStore();
-  const { profile } = useUserStore();
+  const { profile, language } = useUserStore();
+
+  const t = (en: string, te: string) => language === 'te' ? te : en;
 
   const finalTotal = totalPrice();
   const finalMrp = totalMrp();
@@ -17,7 +19,6 @@ export default function Checkout() {
   const grandTotal = finalTotal + deliveryFee;
 
   const handlePlaceOrder = () => {
-    // Simulate order placement
     clearCart();
     navigate('/order-success');
   };
@@ -29,228 +30,115 @@ export default function Checkout() {
 
   return (
     <div className="relative flex h-full min-h-screen w-full flex-col overflow-x-hidden pb-24 bg-bg-light dark:bg-bg-dark font-sans text-slate-900 dark:text-white">
-      {/* Top App Bar */}
       <div className="sticky top-0 z-50 flex items-center bg-white dark:bg-gray-900 p-4 shadow-sm border-b border-gray-100 dark:border-gray-800">
-        <button 
-          onClick={() => navigate(-1)}
-          className="flex size-10 shrink-0 items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-        >
+        <button onClick={() => navigate(-1)} className="size-10 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors">
           <span className="material-symbols-outlined">arrow_back</span>
         </button>
-        <h2 className="text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center pr-10">Checkout</h2>
+        <h2 className="text-lg font-black uppercase tracking-tight flex-1 text-center pr-10">{t('Checkout', 'చెక్‌అవుట్')}</h2>
       </div>
 
-      {/* Progress Stepper */}
-      <div className="bg-white dark:bg-gray-900 pb-6 pt-2 px-6">
-        <div className="flex items-center justify-between relative">
-          <div className="absolute top-1/2 left-0 w-full h-1 bg-gray-100 dark:bg-gray-800 -z-0 rounded-full"></div>
-          <div className="absolute top-1/2 left-0 w-1/2 h-1 bg-primary -z-0 rounded-full"></div>
-          
-          <div className="flex flex-col items-center gap-2 z-10">
-            <div className="size-8 rounded-full bg-primary flex items-center justify-center text-white shadow-md ring-4 ring-white dark:ring-gray-900">
-              <span className="material-symbols-outlined text-[16px] font-bold">check</span>
+      <div className="p-4 flex flex-col gap-6">
+        {/* Localized Estimate */}
+        <section className="bg-gradient-to-r from-emerald-500 to-teal-600 rounded-[2.5rem] p-6 text-white shadow-lg relative overflow-hidden">
+            <div className="absolute top-0 right-0 size-32 bg-white/10 rounded-full blur-2xl -mr-10 -mt-10"></div>
+            <div className="relative z-10 flex items-center gap-4">
+                <div className="size-14 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center shadow-inner border border-white/20">
+                    <span className="material-symbols-outlined text-3xl filled">local_shipping</span>
+                </div>
+                <div>
+                    <h3 className="text-[10px] font-black uppercase tracking-[0.2em] opacity-80 mb-1">{t('Estimated Delivery', 'అంచనా డెలివరీ సమయం')}</h3>
+                    <p className="text-xl font-black leading-tight">
+                        {t('By 6:00 PM Today to C-Camp, Kurnool', 'ఈరోజు సాయంత్రం 6:00 గంటలకు సి-క్యాంప్, కర్నూలు')}
+                    </p>
+                </div>
             </div>
-            <span className="text-xs font-semibold text-primary">Address</span>
-          </div>
-          
-          <div className="flex flex-col items-center gap-2 z-10">
-            <div className="size-8 rounded-full bg-primary flex items-center justify-center text-white shadow-md ring-4 ring-white dark:ring-gray-900">
-              <span className="text-xs font-bold">2</span>
-            </div>
-            <span className="text-xs font-bold text-primary">Payment</span>
-          </div>
-          
-          <div className="flex flex-col items-center gap-2 z-10">
-            <div className="size-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-400 ring-4 ring-white dark:ring-gray-900">
-              <span className="text-xs font-bold">3</span>
-            </div>
-            <span className="text-xs font-medium text-gray-400">Confirm</span>
-          </div>
-        </div>
-      </div>
+        </section>
 
-      <div className="p-4 flex flex-col gap-5">
-        {/* Delivery Address Section */}
+        {/* Deliver To */}
         <section>
           <div className="flex items-center justify-between mb-3 px-1">
-            <h3 className="text-lg font-bold flex items-center gap-2">
-              <span className="material-symbols-outlined text-primary">location_on</span>
-              Delivery Address
+            <h3 className="text-base font-black uppercase tracking-widest text-slate-400 flex items-center gap-2">
+              <span className="material-symbols-outlined text-primary text-sm">location_on</span>
+              {t('Delivering to', 'ఇక్కడకు డెలివరీ అవుతుంది')}
             </h3>
           </div>
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-100 dark:border-gray-700 relative overflow-hidden group">
-            <div className="absolute top-0 right-0 w-24 h-24 opacity-10 pointer-events-none">
-              <span className="material-symbols-outlined text-9xl text-gray-500">map</span>
-            </div>
-            <div className="relative z-10">
-              <div className="flex justify-between items-start">
-                <div className="bg-blue-50 dark:bg-blue-900/30 text-primary px-3 py-1 rounded-full text-xs font-bold inline-block mb-3">
-                  HOME
-                </div>
-                <button className="text-primary text-sm font-bold px-3 py-1 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors">
-                  Change
-                </button>
-              </div>
-              <h4 className="font-bold text-lg mb-1">{profile.name}</h4>
-              <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed mb-4 max-w-[85%]">
-                Flat No. 402, Sai Residency,<br/>
-                M.G. Road, Near Government Hospital,<br/>
-                Kurnool, Andhra Pradesh - 518002
+          <div className="bg-white dark:bg-gray-800 rounded-3xl p-5 shadow-sm border border-gray-100 dark:border-gray-700">
+              <h4 className="font-black text-lg mb-1">{profile.name}</h4>
+              <p className="text-slate-500 dark:text-gray-400 text-sm leading-relaxed mb-4">
+                Flat No. 402, Sai Residency, M.G. Road, Near Govt Hospital, Kurnool - 518002
               </p>
-              <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
-                <span className="material-symbols-outlined text-[18px]">phone</span>
-                <span>{profile.phone}</span>
-              </div>
-            </div>
+              <button onClick={() => navigate('/profile/addresses')} className="text-primary font-black text-xs uppercase tracking-widest border border-primary/20 px-4 py-2 rounded-xl hover:bg-primary hover:text-white transition-all">
+                {t('Change Address', 'చిరునామా మార్చండి')}
+              </button>
           </div>
         </section>
 
-        {/* Order Summary */}
+        {/* Payment Selection */}
         <section>
-          <h3 className="text-lg font-bold mb-3 flex items-center gap-2 px-1">
-            <span className="material-symbols-outlined text-primary">shopping_bag</span>
-            Order Summary
-          </h3>
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 divide-y divide-gray-100 dark:divide-gray-700">
-            {items.map((item) => (
-              <div key={item.id} className="p-4 flex gap-4">
-                <div className="size-16 bg-gray-50 dark:bg-gray-700 rounded-lg flex items-center justify-center shrink-0 p-1">
-                  {item.type === 'medicine' ? (
-                     <img className="size-full object-contain mix-blend-multiply dark:mix-blend-normal rounded-md" src={item.image} alt={item.name} />
-                  ) : (
-                     <span className="material-symbols-outlined text-2xl text-blue-500">science</span>
-                  )}
-                </div>
-                <div className="flex-1">
-                  <div className="flex justify-between items-start">
-                    <h4 className="font-semibold text-sm">{item.name}</h4>
-                    <span className="font-bold text-sm">₹{item.price * item.qty}</span>
-                  </div>
-                  <p className="text-xs text-gray-500 mt-1">{item.packSize || 'Lab Test'}</p>
-                  <div className="flex items-center gap-2 mt-2">
-                    <span className="text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded text-gray-600 dark:text-gray-300">Qty: {item.qty}</span>
-                  </div>
-                </div>
-              </div>
+          <h3 className="text-base font-black uppercase tracking-widest text-slate-400 mb-3 px-1">{t('Payment Method', 'చెల్లింపు విధానం')}</h3>
+          <div className="flex flex-col gap-3">
+            {[
+                {id: 'upi', label: 'UPI (PhonePe / GPay)', sub: 'Extra 5% Saving', icon: 'account_balance_wallet'},
+                {id: 'cod', label: 'Cash on Delivery', sub: 'Pay at Doorstep', icon: 'payments'}
+            ].map(method => (
+                <label key={method.id} className="cursor-pointer">
+                    <input type="radio" name="payment" className="peer sr-only" checked={paymentMethod === method.id} onChange={() => setPaymentMethod(method.id)} />
+                    <div className="bg-white dark:bg-gray-800 p-5 rounded-3xl border-2 border-transparent peer-checked:border-primary peer-checked:bg-primary/5 flex items-center justify-between shadow-sm transition-all">
+                        <div className="flex items-center gap-4">
+                            <div className="size-12 bg-gray-50 dark:bg-gray-700 rounded-2xl flex items-center justify-center text-slate-500">
+                                <span className="material-symbols-outlined text-3xl">{method.icon}</span>
+                            </div>
+                            <div>
+                                <p className="font-black text-sm uppercase tracking-wider">{method.label}</p>
+                                <p className={`text-[10px] font-bold uppercase tracking-widest mt-1 ${method.id === 'upi' ? 'text-emerald-600' : 'text-slate-400'}`}>{method.sub}</p>
+                            </div>
+                        </div>
+                        <div className={`size-6 rounded-full border-2 flex items-center justify-center ${paymentMethod === method.id ? 'border-primary bg-primary' : 'border-gray-200'}`}>
+                            {paymentMethod === method.id && <div className="size-2 bg-white rounded-full"></div>}
+                        </div>
+                    </div>
+                </label>
             ))}
           </div>
         </section>
 
-        {/* Offers & Coupons */}
-        <section>
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-100 dark:border-gray-700">
-            <div className="flex items-center gap-3">
-              <span className="material-symbols-outlined text-secondary">local_offer</span>
-              <div className="flex-1">
-                <h4 className="font-bold text-sm">Apply Coupon</h4>
-                <p className="text-xs text-gray-500">Save more on your order</p>
-              </div>
-              <span className="material-symbols-outlined text-gray-400">chevron_right</span>
+        {/* Trust Seals Section */}
+        <section className="bg-white dark:bg-gray-800 rounded-3xl p-6 border border-gray-100 dark:border-gray-700 grid grid-cols-3 gap-4">
+            <div className="flex flex-col items-center text-center gap-2">
+                <div className="size-10 rounded-full bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center text-blue-600">
+                    <span className="material-symbols-outlined text-xl filled">verified</span>
+                </div>
+                <span className="text-[8px] font-black uppercase tracking-widest text-slate-500">100% Genuine Medicine</span>
             </div>
-          </div>
+            <div className="flex flex-col items-center text-center gap-2">
+                <div className="size-10 rounded-full bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-600">
+                    <span className="material-symbols-outlined text-xl filled">security</span>
+                </div>
+                <span className="text-[8px] font-black uppercase tracking-widest text-slate-500">Secure Payments</span>
+            </div>
+            <div className="flex flex-col items-center text-center gap-2">
+                <div className="size-10 rounded-full bg-teal-50 dark:bg-teal-900/30 flex items-center justify-center text-teal-600">
+                    <span className="material-symbols-outlined text-xl filled">biotech</span>
+                </div>
+                <span className="text-[8px] font-black uppercase tracking-widest text-slate-500">NABL Certified Labs</span>
+            </div>
         </section>
+      </div>
 
-        {/* Payment Options */}
-        <section>
-          <h3 className="text-lg font-bold mb-3 flex items-center gap-2 px-1">
-            <span className="material-symbols-outlined text-primary">payments</span>
-            Payment Options
-          </h3>
-          <div className="flex flex-col gap-3">
-            {/* UPI */}
-            <label className="cursor-pointer relative">
-              <input 
-                className="peer sr-only" 
-                name="payment_method" 
-                type="radio" 
-                checked={paymentMethod === 'upi'}
-                onChange={() => setPaymentMethod('upi')}
-              />
-              <div className="bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm flex items-center justify-between peer-checked:border-primary peer-checked:ring-1 peer-checked:ring-primary peer-checked:bg-blue-50/30 dark:peer-checked:bg-blue-900/10 transition-all">
-                <div className="flex items-center gap-4">
-                  <div className="size-10 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-gray-600 dark:text-gray-300">
-                    <span className="material-symbols-outlined">account_balance_wallet</span>
-                  </div>
-                  <div>
-                    <p className="font-bold text-sm">UPI / Net Banking</p>
-                    <p className="text-xs text-secondary">Extra 5% off via UPI</p>
-                  </div>
-                </div>
-                <div className="size-5 rounded-full border-2 border-gray-300 dark:border-gray-600 flex items-center justify-center peer-checked:border-primary peer-checked:bg-primary">
-                  <div className="size-2 rounded-full bg-white opacity-0 peer-checked:opacity-100"></div>
-                </div>
-              </div>
-            </label>
-            {/* COD */}
-            <label className="cursor-pointer relative">
-              <input 
-                className="peer sr-only" 
-                name="payment_method" 
-                type="radio" 
-                checked={paymentMethod === 'cod'}
-                onChange={() => setPaymentMethod('cod')}
-              />
-              <div className="bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm flex items-center justify-between peer-checked:border-primary peer-checked:ring-1 peer-checked:ring-primary peer-checked:bg-blue-50/30 dark:peer-checked:bg-blue-900/10 transition-all">
-                <div className="flex items-center gap-4">
-                  <div className="size-10 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-gray-600 dark:text-gray-300">
-                    <span className="material-symbols-outlined">payments</span>
-                  </div>
-                  <div>
-                    <p className="font-bold text-sm">Cash on Delivery</p>
-                    <p className="text-xs text-gray-500">Pay when you receive</p>
-                  </div>
-                </div>
-                <div className="size-5 rounded-full border-2 border-gray-300 dark:border-gray-600 flex items-center justify-center peer-checked:border-primary peer-checked:bg-primary">
-                  <div className="size-2 rounded-full bg-white opacity-0 peer-checked:opacity-100"></div>
-                </div>
-              </div>
-            </label>
-          </div>
-        </section>
-
-        {/* Bill Details */}
-        <section className="pb-6">
-          <h3 className="text-lg font-bold mb-3 flex items-center gap-2 px-1">
-            <span className="material-symbols-outlined text-primary">receipt_long</span>
-            Bill Details
-          </h3>
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-100 dark:border-gray-700">
-            <div className="flex justify-between py-2 text-sm text-gray-600 dark:text-gray-400">
-              <span>Item Total</span>
-              <span className="font-medium text-slate-900 dark:text-white">₹{finalMrp}</span>
-            </div>
-            <div className="flex justify-between py-2 text-sm text-secondary font-medium">
-              <span>Savings</span>
-              <span>-₹{savings}</span>
-            </div>
-            <div className="flex justify-between py-2 text-sm text-gray-600 dark:text-gray-400 border-b border-dashed border-gray-200 dark:border-gray-700 pb-4">
-              <span>Delivery Fee</span>
-              <span className={deliveryFee === 0 ? "text-secondary font-bold" : ""}>{deliveryFee === 0 ? 'FREE' : `₹${deliveryFee}`}</span>
-            </div>
-            <div className="flex justify-between pt-4 text-base font-bold text-slate-900 dark:text-white items-end">
-              <span>Grand Total</span>
-              <span className="text-xl">₹{grandTotal}</span>
-            </div>
-          </div>
-        </section>
-
-        <div className="h-20"></div>
-
-        {/* Sticky Footer */}
-        <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800 p-4 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-50">
-          <div className="flex items-center gap-4 max-w-md mx-auto">
+      <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800 p-4 pb-10 z-40 shadow-glass">
+        <div className="max-w-md mx-auto flex items-center gap-6">
             <div className="flex flex-col">
-              <span className="text-xs text-gray-500 font-medium">Total Payable</span>
-              <span className="text-xl font-bold">₹{grandTotal}</span>
+                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('Total Payable', 'మొత్తం బిల్లు')}</span>
+                <span className="text-2xl font-black text-slate-900 dark:text-white tracking-tighter">₹{grandTotal}</span>
+                <button className="text-[10px] font-bold text-emerald-600 uppercase text-left underline">{t('View Savings Detail', 'పొదుపు వివరాలు')}</button>
             </div>
             <button 
-              onClick={handlePlaceOrder}
-              className="flex-1 bg-primary hover:bg-primary-dark text-white h-12 rounded-xl font-bold text-base shadow-lg shadow-blue-500/30 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+                onClick={handlePlaceOrder}
+                className="flex-1 h-14 bg-primary hover:bg-primary-dark text-white rounded-2xl font-black text-lg shadow-xl shadow-primary/30 flex items-center justify-center gap-2 active:scale-95 transition-all"
             >
-              Place Order
-              <span className="material-symbols-outlined text-[20px]">arrow_forward</span>
+                {t('Place Order', 'ఆర్డర్ చేయండి')}
+                <span className="material-symbols-outlined">check_circle</span>
             </button>
-          </div>
         </div>
       </div>
     </div>

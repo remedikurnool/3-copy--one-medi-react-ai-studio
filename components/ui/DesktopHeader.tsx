@@ -1,46 +1,21 @@
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useCartStore } from '../../store/cartStore';
 import { useLocationStore } from '../../store/locationStore';
+import { useUserStore } from '../../store/userStore';
 import MegaMenu from './MegaMenu';
 import LocationModal from './LocationModal';
-import { MEDICINES, DOCTORS, LAB_TESTS } from '../../constants';
+import GlobalSearchBar from './GlobalSearchBar';
 
 export default function DesktopHeader() {
   const navigate = useNavigate();
   const cartItemsCount = useCartStore((state) => state.items.length);
   const { city } = useLocationStore();
+  const { isAuthenticated, profile } = useUserStore();
   
   const [isMegaMenuOpen, setIsMegaMenuOpen] = useState(false);
   const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [isSearchFocused, setIsSearchFocused] = useState(false);
-  const searchRef = useRef<HTMLDivElement>(null);
-
-  // Simple search logic for header
-  const getSuggestions = () => {
-    if (searchQuery.length < 2) return [];
-    const q = searchQuery.toLowerCase();
-    const results = [
-      ...MEDICINES.filter(m => m.name.toLowerCase().includes(q)).map(m => ({ ...m, type: 'Medicine', url: `/medicines/${m.id}` })),
-      ...DOCTORS.filter(d => d.name.toLowerCase().includes(q)).map(d => ({ ...d, type: 'Doctor', url: `/doctors/${d.id}` })),
-      ...LAB_TESTS.filter(l => l.name.toLowerCase().includes(q)).map(l => ({ ...l, type: 'Lab Test', url: `/lab-tests/${l.id}` }))
-    ];
-    return results.slice(0, 5);
-  };
-
-  const suggestions = getSuggestions();
-
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
-        setIsSearchFocused(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
 
   return (
     <>
@@ -80,36 +55,8 @@ export default function DesktopHeader() {
               {isMegaMenuOpen && <MegaMenu onClose={() => setIsMegaMenuOpen(false)} />}
             </div>
 
-            <div ref={searchRef} className="flex-1 relative">
-              <div className={`flex items-center w-full h-12 bg-gray-50 dark:bg-gray-800 border rounded-xl px-4 transition-all ${isSearchFocused ? 'border-primary ring-2 ring-primary/10 shadow-lg' : 'border-gray-200 dark:border-gray-700'}`}>
-                <span className="material-symbols-outlined text-gray-400">search</span>
-                <input 
-                  type="text" 
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  onFocus={() => setIsSearchFocused(true)}
-                  placeholder="Search medicines, doctors, labs..." 
-                  className="w-full bg-transparent border-none focus:ring-0 text-sm ml-2 placeholder:text-gray-400 dark:text-white"
-                />
-              </div>
-
-              {isSearchFocused && suggestions.length > 0 && (
-                <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-100 dark:border-gray-700 overflow-hidden animate-in fade-in slide-in-from-top-1 duration-200">
-                  {suggestions.map((s, i) => (
-                    <div 
-                      key={i} 
-                      onClick={() => { navigate(s.url); setIsSearchFocused(false); setSearchQuery(''); }}
-                      className="px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer flex justify-between items-center border-b last:border-0 dark:border-gray-700"
-                    >
-                      <div className="flex flex-col">
-                        <span className="text-sm font-bold">{s.name}</span>
-                        <span className="text-[10px] text-gray-400 uppercase font-bold">{s.type}</span>
-                      </div>
-                      <span className="material-symbols-outlined text-gray-300 text-sm">arrow_outward</span>
-                    </div>
-                  ))}
-                </div>
-              )}
+            <div className="flex-1 relative">
+               <GlobalSearchBar />
             </div>
 
             <button 
@@ -128,9 +75,21 @@ export default function DesktopHeader() {
             <Link to="/notifications" className="size-11 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center justify-center text-slate-600 dark:text-gray-300 transition-all active:scale-95">
               <span className="material-symbols-outlined">notifications</span>
             </Link>
-            <Link to="/profile" className="size-11 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center justify-center text-slate-600 dark:text-gray-300 transition-all active:scale-95">
-              <span className="material-symbols-outlined">person</span>
-            </Link>
+            
+            {isAuthenticated ? (
+              <Link to="/profile" className="flex items-center gap-3 pl-1 pr-3 py-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-all cursor-pointer border border-transparent hover:border-gray-200">
+                <div className="size-9 rounded-full bg-cover bg-center border border-gray-200" style={{backgroundImage: `url("${profile.image}")`}}></div>
+                <div className="flex flex-col">
+                   <span className="text-xs font-bold leading-tight">{profile.name.split(' ')[0]}</span>
+                   <span className="text-[9px] font-bold text-primary">Pro Member</span>
+                </div>
+              </Link>
+            ) : (
+              <Link to="/login" className="px-5 py-2.5 rounded-xl text-sm font-bold text-primary bg-primary/10 hover:bg-primary hover:text-white transition-all">
+                Login
+              </Link>
+            )}
+
             <Link 
               to="/cart"
               className="flex items-center gap-2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-6 py-3 rounded-xl font-black text-sm shadow-xl shadow-black/10 hover:shadow-2xl hover:-translate-y-0.5 transition-all"

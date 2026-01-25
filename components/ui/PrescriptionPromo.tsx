@@ -1,7 +1,6 @@
 
-import React, { useRef, useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useCartStore } from '../../store/cartStore';
 
 interface PrescriptionPromoProps {
   compact?: boolean;
@@ -10,27 +9,6 @@ interface PrescriptionPromoProps {
 
 export const PrescriptionPromo: React.FC<PrescriptionPromoProps> = ({ compact = false, className = '' }) => {
   const navigate = useNavigate();
-  const setPrescription = useCartStore((state) => state.setPrescription);
-  const [isUploading, setIsUploading] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setIsUploading(true);
-      // Simulate upload delay
-      setTimeout(() => {
-        const url = URL.createObjectURL(file);
-        setPrescription(url);
-        setIsUploading(false);
-        navigate('/cart');
-      }, 1500);
-    }
-  };
-
-  const handleClick = () => {
-    inputRef.current?.click();
-  };
 
   return (
     <div className={`relative overflow-hidden rounded-2xl bg-gradient-to-r from-teal-500 to-blue-600 shadow-lg text-white ${compact ? 'p-4' : 'p-5'} ${className}`}>
@@ -55,26 +33,12 @@ export const PrescriptionPromo: React.FC<PrescriptionPromoProps> = ({ compact = 
         </div>
 
         <div className="shrink-0">
-          <input 
-            type="file" 
-            ref={inputRef} 
-            accept="image/*,application/pdf" 
-            className="hidden" 
-            onChange={handleFileChange}
-          />
           <button 
-            onClick={handleClick}
-            disabled={isUploading}
-            className="flex flex-col items-center justify-center bg-white text-teal-600 rounded-xl px-4 py-2 shadow-md hover:bg-blue-50 active:scale-95 transition-all disabled:opacity-80 disabled:scale-100"
+            onClick={() => navigate('/upload-rx')}
+            className="flex flex-col items-center justify-center bg-white text-teal-600 rounded-xl px-4 py-2 shadow-md hover:bg-blue-50 active:scale-95 transition-all"
           >
-            {isUploading ? (
-              <span className="material-symbols-outlined animate-spin text-2xl">progress_activity</span>
-            ) : (
-              <>
-                <span className="material-symbols-outlined text-2xl mb-0.5">upload_file</span>
-                <span className="text-[10px] font-bold uppercase">Upload Now</span>
-              </>
-            )}
+            <span className="material-symbols-outlined text-2xl mb-0.5">upload_file</span>
+            <span className="text-[10px] font-bold uppercase">Upload Now</span>
           </button>
         </div>
       </div>

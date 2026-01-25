@@ -8,6 +8,10 @@ import { GlobalLoadingSkeleton } from './components/ui/Skeletons';
 
 // -- Lazy Load Pages for Performance --
 
+// Auth Pages
+const Login = lazy(() => import('./pages/auth/Login'));
+const OTP = lazy(() => import('./pages/auth/OTP'));
+
 // Core Pages
 const Home = lazy(() => import('./pages/Home'));
 const Bookings = lazy(() => import('./pages/Bookings'));
@@ -18,6 +22,10 @@ const Checkout = lazy(() => import('./pages/Checkout'));
 const OrderSuccess = lazy(() => import('./pages/OrderSuccess'));
 const Notifications = lazy(() => import('./pages/Notifications'));
 const Services = lazy(() => import('./pages/Services'));
+const UploadRx = lazy(() => import('./pages/UploadRx'));
+
+// Feature: Products (Generic E-com)
+const ProductDetail = lazy(() => import('./pages/products/ProductDetail'));
 
 // Feature: Medicines
 const MedicineList = lazy(() => import('./pages/medicines/MedicineList'));
@@ -32,6 +40,7 @@ const DoctorBooking = lazy(() => import('./pages/doctors/DoctorBooking'));
 const ScanList = lazy(() => import('./pages/scans/ScanList'));
 const ScanDetail = lazy(() => import('./pages/scans/ScanDetail'));
 const ScanBooking = lazy(() => import('./pages/scans/ScanBooking'));
+const PregnancyScans = lazy(() => import('./pages/scans/PregnancyScans'));
 
 // Feature: Lab Tests
 const LabTestList = lazy(() => import('./pages/lab-tests/LabTestList'));
@@ -41,10 +50,23 @@ const LabBooking = lazy(() => import('./pages/lab-tests/LabBooking'));
 // Feature: Specialized Care
 const HomeCareList = lazy(() => import('./pages/home-care/HomeCareList'));
 const HomeCareDetail = lazy(() => import('./pages/home-care/HomeCareDetail'));
+const HomeCareBooking = lazy(() => import('./pages/home-care/HomeCareBooking'));
+const ICUCalculator = lazy(() => import('./pages/home-care/ICUCalculator'));
 const PhysioList = lazy(() => import('./pages/physiotherapy/PhysioList'));
 const PhysioDetail = lazy(() => import('./pages/physiotherapy/PhysioDetail'));
 const DiabetesCare = lazy(() => import('./pages/diabetes/DiabetesCare'));
 const HospitalList = lazy(() => import('./pages/hospitals/HospitalList'));
+
+// Feature: New Services (Expanded)
+const AmbulanceBooking = lazy(() => import('./pages/ambulance/AmbulanceBooking'));
+const BloodBankList = lazy(() => import('./pages/blood-bank/BloodBankList'));
+const InsuranceList = lazy(() => import('./pages/insurance/InsuranceList'));
+const SurgeryList = lazy(() => import('./pages/surgeries/SurgeryList'));
+const SurgeryDetail = lazy(() => import('./pages/surgeries/SurgeryDetail'));
+const SurgerySecondOpinion = lazy(() => import('./pages/surgeries/SurgerySecondOpinion'));
+const WellnessCenter = lazy(() => import('./pages/wellness/WellnessCenter'));
+const SkinHairCare = lazy(() => import('./pages/skin-hair/SkinHairCare'));
+const HealthFeed = lazy(() => import('./pages/feed/HealthFeed'));
 
 // Feature: Mother & Baby (Vertical)
 const MotherBabyHome = lazy(() => import('./pages/mother-baby/MotherBabyHome'));
@@ -67,6 +89,10 @@ const App = () => {
       <FlyingCartAnimation />
       <Suspense fallback={<GlobalLoadingSkeleton />}>
         <Routes>
+          {/* Auth Routes */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/otp" element={<OTP />} />
+
           {/* Main Layout Routes */}
           <Route path="/" element={<Layout><Home /></Layout>} />
           <Route path="/bookings" element={<Layout><Bookings /></Layout>} />
@@ -76,17 +102,43 @@ const App = () => {
           
           <Route path="/medicines" element={<Layout><MedicineList /></Layout>} />
           <Route path="/doctors" element={<Layout><DoctorList /></Layout>} />
+          
           <Route path="/scans" element={<Layout><ScanList /></Layout>} />
+          <Route path="/scans/pregnancy" element={<Layout><PregnancyScans /></Layout>} />
+          
           <Route path="/lab-tests" element={<Layout><LabTestList /></Layout>} />
+          
           <Route path="/home-care" element={<Layout><HomeCareList /></Layout>} />
+          <Route path="/home-care/icu-calculator" element={<Layout><ICUCalculator /></Layout>} />
+          <Route path="/home-care/booking" element={<Layout><HomeCareBooking /></Layout>} />
+          
           <Route path="/physiotherapy" element={<Layout><PhysioList /></Layout>} />
           <Route path="/diabetes-care" element={<Layout><DiabetesCare /></Layout>} />
           <Route path="/hospitals" element={<Layout><HospitalList /></Layout>} />
+
+          {/* New Routes */}
+          <Route path="/ambulance" element={<Layout><AmbulanceBooking /></Layout>} />
+          <Route path="/blood-banks" element={<Layout><BloodBankList /></Layout>} />
+          <Route path="/insurance" element={<Layout><InsuranceList /></Layout>} />
+          
+          <Route path="/surgeries" element={<Layout><SurgeryList /></Layout>} />
+          <Route path="/surgeries/detail/:id" element={<SurgeryDetail />} />
+          <Route path="/surgeries/second-opinion" element={<Layout><SurgerySecondOpinion /></Layout>} />
+          
+          <Route path="/wellness" element={<Layout><WellnessCenter /></Layout>} />
+          <Route path="/skin-hair" element={<Layout><SkinHairCare /></Layout>} />
+          <Route path="/health-feed" element={<Layout><HealthFeed /></Layout>} />
+
+          {/* Generic Product Route */}
+          <Route path="/product/:id" element={<ProductDetail />} />
 
           {/* Mother & Baby Routes */}
           <Route path="/mother-baby" element={<Layout><MotherBabyHome /></Layout>} />
           <Route path="/mother-baby/vaccination-tracker" element={<Layout><VaccinationTracker /></Layout>} />
           <Route path="/mother-baby/guides" element={<Layout><CareGuides /></Layout>} />
+
+          {/* Utilities */}
+          <Route path="/upload-rx" element={<UploadRx />} />
 
           {/* Full Screen Pages */}
           <Route path="/medicines/:id" element={<MedicineDetail />} />
@@ -98,7 +150,7 @@ const App = () => {
           <Route path="/doctors/:id" element={<DoctorProfile />} />
           <Route path="/doctors/booking" element={<DoctorBooking />} />
           
-          <Route path="/scans/detail" element={<ScanDetail />} />
+          <Route path="/scans/:id" element={<ScanDetail />} />
           <Route path="/scans/booking" element={<ScanBooking />} />
           
           <Route path="/lab-tests/:id" element={<LabTestDetail />} />
