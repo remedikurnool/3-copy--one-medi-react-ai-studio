@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { MEDICAL_SCANS } from '../../constants';
 import { useCartStore } from '../../store/cartStore';
 
@@ -13,34 +13,26 @@ const SCAN_GALLERY = [
 
 export default function ScanDetail() {
   const navigate = useNavigate();
-  const { id } = useParams();
-  const scan = MEDICAL_SCANS.find(s => s.id === id);
+  const location = useLocation();
+  const state = location.state as { scanId?: string } | null;
+  const scanId = state?.scanId || 'ms1';
+  const scan = MEDICAL_SCANS.find(s => s.id === scanId) || MEDICAL_SCANS[0];
 
-  const [selectedVariant, setSelectedVariant] = useState(scan?.variants[0]);
-  const [selectedSlot, setSelectedSlot] = useState(scan?.variants[0].nextSlot?.split(', ')[1] || '10:30 AM');
+  const [selectedVariant, setSelectedVariant] = useState(scan.variants[0]);
+  const [selectedSlot, setSelectedSlot] = useState(scan.variants[0].nextSlot?.split(', ')[1] || '10:30 AM');
   const addToCart = useCartStore((state) => state.addToCart);
 
   // Update slots if variant changes
   useEffect(() => {
-     if(selectedVariant?.nextSlot) {
+     if(selectedVariant.nextSlot) {
         setSelectedSlot(selectedVariant.nextSlot.split(', ')[1]);
      }
   }, [selectedVariant]);
 
-  if (!scan || !selectedVariant) {
-    return (
-        <div className="min-h-screen flex flex-col items-center justify-center bg-bg-light dark:bg-bg-dark p-6">
-            <span className="material-symbols-outlined text-6xl text-gray-400 mb-4">search_off</span>
-            <h2 className="text-xl font-bold">Scan Not Found</h2>
-            <button onClick={() => navigate('/scans')} className="mt-4 bg-primary text-white px-6 py-2 rounded-xl">Back to List</button>
-        </div>
-    );
-  }
-
   const slots = ['10:30 AM', '11:00 AM', '02:15 PM', '04:30 PM'];
 
   const handleBook = () => {
-    navigate('/scans/booking', { state: { scanId: scan.id, variantId: selectedVariant.centerId, slot: selectedSlot } });
+    navigate('/scans/booking');
   };
 
   return (

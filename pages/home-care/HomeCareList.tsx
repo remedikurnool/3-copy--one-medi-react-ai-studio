@@ -9,12 +9,12 @@ export default function HomeCareList() {
   const [filter, setFilter] = useState('All');
   const [search, setSearch] = useState('');
 
-  const serviceFilters = ['All', 'Nursing', 'Nutrition', 'Elderly Care', 'Baby Care', 'Doctor'];
+  const serviceFilters = ['All', 'Nursing', 'Elderly Care', 'Baby Care', 'Doctor'];
   const equipmentFilters = ['All', 'Respiratory', 'Furniture', 'Mobility', 'ICU'];
 
   const filteredItems = HOME_CARE_SERVICES.filter(item => {
     // 1. Tab Filter (Service vs Equipment)
-    const isEquipment = item.category === 'Medical Equipment' || item.category === 'Critical Care'; 
+    const isEquipment = item.category === 'Medical Equipment' || item.category === 'Critical Care'; // Basic check based on data
     const matchesTab = activeTab === 'Equipment' ? isEquipment : !isEquipment;
 
     // 2. Category Filter
@@ -48,6 +48,7 @@ export default function HomeCareList() {
           </div>
         </div>
 
+        {/* Search Bar Section */}
         <div className="px-4 pb-3">
           <div className="flex items-center bg-gray-100 dark:bg-gray-800 rounded-2xl px-4 py-2 border border-transparent focus-within:border-primary/30 focus-within:ring-2 focus-within:ring-primary/10 transition-all">
             <span className="material-symbols-outlined text-gray-400 text-xl">search</span>
@@ -55,12 +56,13 @@ export default function HomeCareList() {
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder={activeTab === 'Services' ? "Search Nursing, Diet, Dressing..." : "Search Beds, Oxygen..."}
+              placeholder={activeTab === 'Services' ? "Search Nursing, Dressing..." : "Search Beds, Oxygen..."}
               className="bg-transparent border-none focus:ring-0 w-full text-sm font-medium ml-2 placeholder:text-gray-400"
             />
           </div>
         </div>
 
+        {/* Top Tabs */}
         <div className="flex px-4 pb-2">
             <button 
               onClick={() => { setActiveTab('Services'); setFilter('All'); }}
@@ -76,6 +78,7 @@ export default function HomeCareList() {
             </button>
         </div>
 
+        {/* Chips */}
         <div className="flex gap-2 px-4 py-3 overflow-x-auto no-scrollbar border-t border-gray-100 dark:border-gray-800">
           {(activeTab === 'Services' ? serviceFilters : equipmentFilters).map(f => (
             <button 
@@ -120,18 +123,11 @@ export default function HomeCareList() {
                   </div>
                   <p className="text-gray-500 dark:text-gray-400 text-xs font-medium mb-1">{service.subCategory || service.category}</p>
                   
-                  <div className="flex flex-wrap gap-1.5 mb-2">
-                    {service.isVerified && (
-                      <span className="inline-flex items-center gap-0.5 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-wider border border-emerald-100 dark:border-emerald-800">
-                        <span className="material-symbols-outlined text-[10px] filled">verified</span> Certified Caretaker
-                      </span>
-                    )}
-                    {service.certifications && service.certifications.includes('Police Background Verified') && (
-                      <span className="inline-flex items-center gap-0.5 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-300 px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-wider border border-blue-100 dark:border-blue-800">
-                        <span className="material-symbols-outlined text-[10px] filled">security</span> Police Verified
-                      </span>
-                    )}
-                  </div>
+                  {service.genderPreferenceAvailable && (
+                    <div className="inline-flex items-center gap-1 bg-pink-50 dark:bg-pink-900/20 text-pink-600 dark:text-pink-300 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider mb-1 w-fit border border-pink-100 dark:border-pink-800">
+                        <span className="material-symbols-outlined text-[10px]">female</span> Female Staff
+                    </div>
+                  )}
 
                   <p className="text-gray-600 dark:text-gray-300 text-xs leading-relaxed line-clamp-2">
                     {service.description}
@@ -150,6 +146,15 @@ export default function HomeCareList() {
             </div>
           </div>
         ))}
+
+        {filteredItems.length === 0 && (
+          <div className="text-center py-12 flex flex-col items-center gap-4">
+            <div className="size-20 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-400">
+               <span className="material-symbols-outlined text-4xl">search_off</span>
+            </div>
+            <p className="text-gray-500 font-medium italic">No services match your filters.</p>
+          </div>
+        )}
       </main>
     </div>
   );

@@ -24,9 +24,6 @@ const Notifications = lazy(() => import('./pages/Notifications'));
 const Services = lazy(() => import('./pages/Services'));
 const UploadRx = lazy(() => import('./pages/UploadRx'));
 
-// Feature: Products (Generic E-com)
-const ProductDetail = lazy(() => import('./pages/products/ProductDetail'));
-
 // Feature: Medicines
 const MedicineList = lazy(() => import('./pages/medicines/MedicineList'));
 const MedicineDetail = lazy(() => import('./pages/medicines/MedicineDetail'));
@@ -129,9 +126,6 @@ const App = () => {
           <Route path="/skin-hair" element={<Layout><SkinHairCare /></Layout>} />
           <Route path="/health-feed" element={<Layout><HealthFeed /></Layout>} />
 
-          {/* Generic Product Route */}
-          <Route path="/product/:id" element={<ProductDetail />} />
-
           {/* Mother & Baby Routes */}
           <Route path="/mother-baby" element={<Layout><MotherBabyHome /></Layout>} />
           <Route path="/mother-baby/vaccination-tracker" element={<Layout><VaccinationTracker /></Layout>} />
@@ -150,7 +144,7 @@ const App = () => {
           <Route path="/doctors/:id" element={<DoctorProfile />} />
           <Route path="/doctors/booking" element={<DoctorBooking />} />
           
-          <Route path="/scans/:id" element={<ScanDetail />} />
+          <Route path="/scans/detail" element={<ScanDetail />} />
           <Route path="/scans/booking" element={<ScanBooking />} />
           
           <Route path="/lab-tests/:id" element={<LabTestDetail />} />

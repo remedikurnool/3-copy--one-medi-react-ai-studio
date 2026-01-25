@@ -13,18 +13,17 @@ const SIDEBAR_SERVICES = [
   { label: 'Lab Tests', icon: 'biotech', path: '/lab-tests', color: 'bg-teal-500' },
   { label: 'Doctors', icon: 'stethoscope', path: '/doctors', color: 'bg-purple-500' },
   { label: 'Scans', icon: 'radiology', path: '/scans', color: 'bg-indigo-500' },
-  { label: 'Diabetes', icon: 'bloodtype', path: '/diabetes-care', color: 'bg-orange-500' },
-  { label: 'Mother & Baby', icon: 'pregnant_woman', path: '/mother-baby', color: 'bg-rose-500' },
   { label: 'Hospitals', icon: 'local_hospital', path: '/hospitals', color: 'bg-emerald-500' },
-  { label: 'Surgeries', icon: 'medical_services', path: '/surgeries', color: 'bg-slate-500' },
-  { label: 'Wellness', icon: 'self_improvement', path: '/wellness', color: 'bg-lime-500' },
-  { label: 'Skin & Hair', icon: 'face', path: '/skin-hair', color: 'bg-amber-500' },
-  { label: 'Home Care', icon: 'home_health', path: '/home-care', color: 'bg-pink-500' },
-  { label: 'Physio', icon: 'accessibility_new', path: '/physiotherapy', color: 'bg-sky-500' },
   { label: 'Ambulance', icon: 'ambulance', path: '/ambulance', color: 'bg-red-500' },
   { label: 'Blood Bank', icon: 'bloodtype', path: '/blood-banks', color: 'bg-red-600' },
   { label: 'Insurance', icon: 'security', path: '/insurance', color: 'bg-blue-600' },
+  { label: 'Surgeries', icon: 'medical_services', path: '/surgeries', color: 'bg-slate-500' },
+  { label: 'Wellness', icon: 'self_improvement', path: '/wellness', color: 'bg-lime-500' },
   { label: 'Health Feed', icon: 'feed', path: '/health-feed', color: 'bg-pink-600' },
+  { label: 'Skin & Hair', icon: 'face', path: '/skin-hair', color: 'bg-amber-500' },
+  { label: 'Mother & Baby', icon: 'pregnant_woman', path: '/mother-baby', color: 'bg-rose-500' },
+  { label: 'Home Care', icon: 'home_health', path: '/home-care', color: 'bg-pink-500' },
+  { label: 'Physio', icon: 'accessibility_new', path: '/physiotherapy', color: 'bg-sky-500' },
 ];
 
 export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
@@ -92,9 +91,9 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
            <section>
               <div className="flex justify-between items-center mb-4">
                  <h3 className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">Our Services</h3>
-                 <button onClick={() => handleNav('/services')} className="text-[10px] font-black text-primary uppercase">View Hub</button>
+                 <button onClick={() => handleNav('/services')} className="text-[10px] font-black text-primary uppercase">View All</button>
               </div>
-              <div className="grid grid-cols-3 gap-y-6 gap-x-3">
+              <div className="grid grid-cols-3 gap-3">
                  {SIDEBAR_SERVICES.map((s) => (
                     <button 
                       key={s.label}

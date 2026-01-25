@@ -148,7 +148,7 @@ export default function ScanList() {
                )}
 
               <div 
-                onClick={() => navigate(`/scans/${scan.id}`)}
+                onClick={() => navigate('/scans/detail', { state: { scanId: scan.id } })}
                 className="bg-white dark:bg-gray-800 rounded-[2.5rem] shadow-glass border border-gray-100 dark:border-gray-700 overflow-hidden hover:shadow-float transition-all duration-300 cursor-pointer active:scale-[0.99]"
               >
                 <div className="p-6 flex gap-6">

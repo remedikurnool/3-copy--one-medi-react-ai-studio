@@ -1,58 +1,3 @@
-
-export type AppLanguage = 'en' | 'te';
-
-export interface VendorInfo {
-  name: string;
-  location: string;
-  image: string;
-  type: 'Pharmacy' | 'Lab' | 'Hospital';
-}
-
-export interface ProductVariant {
-  id: string;
-  label: string;
-  price: number;
-  mrp: number;
-  inStock: boolean;
-}
-
-export interface Product {
-  id: string;
-  name: string;
-  brand: string;
-  category: string;
-  subCategory: string;
-  image: string;
-  images: string[];
-  rating: number;
-  reviews: number;
-  description: string;
-  price: number;
-  mrp: number;
-  discount: string;
-  variants?: ProductVariant[];
-  specifications?: Record<string, string>;
-  whatsInTheBox?: string[];
-  features?: string[];
-  howToUse?: string;
-  isReturnable: boolean;
-  warranty?: string;
-  isAuthorized: boolean;
-  isPregnancySafe?: boolean;
-  isBabySafe?: boolean;
-  fulfilledBy?: VendorInfo;
-  verifiedByDoctor?: string;
-}
-
-export interface Review {
-  id: string;
-  author: string;
-  rating: number;
-  comment: string;
-  date: string;
-  isVerified: boolean;
-}
-
 export interface Medicine {
   id: string;
   name: string;
@@ -62,7 +7,6 @@ export interface Medicine {
   mrp: number;
   discount: string;
   image: string;
-  images?: string[];
   packSize: string;
   prescriptionRequired: boolean;
   manufacturer: string;
@@ -85,9 +29,6 @@ export interface Medicine {
     sellingPrice: number;
     mrp: number;
   }[];
-  fulfilledBy?: VendorInfo;
-  verifiedByDoctor?: string;
-  crossSellIds?: string[];
 }
 
 export interface LabTest {
@@ -105,8 +46,6 @@ export interface LabTest {
   sampleType?: string;
   fastingRequired?: boolean;
   department?: string;
-  fulfilledBy?: VendorInfo;
-  isNablCertified?: boolean;
   variants?: {
     centerId: string;
     centerName: string;
@@ -188,10 +127,6 @@ export interface HomeCareService {
   homeVisitFee?: number;
   genderPreferenceAvailable?: boolean;
   staffQualification?: string;
-  expertBio?: string;
-  specializations?: string[];
-  certifications?: string[];
-  reviewsList?: Review[];
   equipmentRequired?: boolean;
   features?: string[];
   reviews?: number;
@@ -206,7 +141,7 @@ export interface HomeCareService {
     price: number;
     originalPrice?: number;
     savings?: number;
-    type?: string;
+    type?: string; // Rental or Purchase
     label?: string;
   }[];
   conditions?: string[];

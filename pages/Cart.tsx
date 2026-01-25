@@ -1,49 +1,37 @@
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCartStore } from '../store/cartStore';
-import { useUserStore } from '../store/userStore';
 import PrescriptionUpload from '../components/ui/PrescriptionUpload';
 
 export default function Cart() {
   const navigate = useNavigate();
   const { items, updateQuantity, removeFromCart, totalPrice, totalMrp, prescription, setPrescription } = useCartStore();
-  const { language } = useUserStore();
   
   const finalTotal = totalPrice();
   const finalMrp = totalMrp();
   const savings = finalMrp - finalTotal;
   
-  const t = (en: string, te: string) => language === 'te' ? te : en;
+  // Logic: Cart is "active" if it has items OR a prescription is uploaded (Concierge Mode)
+  const isConciergeMode = items.length === 0 && !!prescription;
+  const isCartEmpty = items.length === 0 && !prescription;
 
   const isPrescriptionNeeded = items.some(item => item.isPrescriptionRequired);
-  const canCheckout = (!isPrescriptionNeeded || (isPrescriptionNeeded && !!prescription));
+  const canCheckout = (!isPrescriptionNeeded || (isPrescriptionNeeded && !!prescription)) || isConciergeMode;
 
-  const [showExitModal, setShowExitModal] = useState(false);
-
-  useEffect(() => {
-    const handlePopState = () => {
-        if (items.length > 0) {
-            setShowExitModal(true);
-            window.history.pushState(null, '', window.location.href);
-        }
-    };
-    window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
-  }, [items.length]);
-
-  if (items.length === 0 && !prescription) {
+  if (isCartEmpty) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-bg-light dark:bg-bg-dark text-slate-900 dark:text-white p-6">
         <div className="size-24 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mb-4">
           <span className="material-symbols-outlined text-4xl text-gray-400">shopping_cart_off</span>
         </div>
-        <h2 className="text-xl font-black mb-2">{t('Your cart is empty', 'మీ కార్ట్ ఖాళీగా ఉంది')}</h2>
+        <h2 className="text-xl font-bold mb-2">Your cart is empty</h2>
+        <p className="text-gray-500 text-center mb-6">Looks like you haven't added anything yet.</p>
         <button 
           onClick={() => navigate('/')} 
-          className="bg-primary text-white px-8 py-3 rounded-2xl font-black uppercase tracking-widest shadow-lg"
+          className="bg-primary text-white px-6 py-3 rounded-xl font-bold"
         >
-          {t('Order Medicines', 'మందులు ఆర్డర్ చేయండి')}
+          Explore Medicines
         </button>
       </div>
     );
@@ -51,150 +39,200 @@ export default function Cart() {
 
   return (
     <div className="relative flex flex-col min-h-screen mx-auto w-full bg-bg-light dark:bg-bg-dark pb-36 font-sans text-slate-900 dark:text-white">
-      <header className="sticky top-0 z-40 bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 px-4 py-3 flex items-center justify-between">
-        <button onClick={() => navigate(-1)} className="size-10 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors">
+      {/* Header */}
+      <header className="sticky top-0 z-40 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-4 py-3 flex items-center justify-between shadow-sm">
+        <button onClick={() => navigate(-1)} className="p-2 -ml-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-slate-700 dark:text-slate-200">
           <span className="material-symbols-outlined">arrow_back</span>
         </button>
-        <h1 className="text-lg font-black uppercase tracking-tight">{t('My Cart', 'నా కార్ట్')}</h1>
-        <button onClick={() => alert('Connecting to Pharmacist in Kurnool...')} className="text-primary font-black text-[10px] uppercase tracking-widest bg-primary/10 px-3 py-1.5 rounded-lg border border-primary/20">
-          {t('Chat with Pharmacist', 'ఫార్మసిస్ట్‌తో చాట్')}
-        </button>
+        <div className="flex-1 text-center pr-8">
+          <h1 className="text-lg font-bold">My Cart</h1>
+          <p className="text-xs text-gray-500 font-medium">
+            {isConciergeMode ? 'Prescription Order' : `${items.length} Items`}
+          </p>
+        </div>
       </header>
 
-      {/* Threshold Nudges */}
-      <section className="px-4 py-4 space-y-3">
-          {finalTotal < 500 && (
-              <div className="bg-white dark:bg-gray-800 p-4 rounded-3xl shadow-sm border border-secondary/20 flex flex-col gap-3">
-                  <div className="flex justify-between items-center">
-                    <p className="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-2">
-                        <span className="material-symbols-outlined text-secondary filled">local_shipping</span>
-                        {t('Add ₹', 'ఇంకా ₹')}{500 - finalTotal} {t('more for Free Express Delivery in Kurnool', 'మరిన్ని జోడిస్తే కర్నూలులో ఉచిత ఎక్స్‌ప్రెస్ డెలివరీ వస్తుంది')}
-                    </p>
-                  </div>
-                  <div className="h-1.5 w-full bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
-                      <div className="h-full bg-secondary rounded-full transition-all duration-500" style={{ width: `${(finalTotal/500)*100}%` }}></div>
-                  </div>
-              </div>
-          )}
+      {/* Progress Stepper */}
+      <div className="bg-white dark:bg-gray-900 pt-4 pb-6 px-6">
+        <div className="flex items-center justify-between relative">
+          <div className="absolute top-1/2 left-0 w-full h-0.5 bg-gray-200 dark:bg-gray-700 -z-10 -translate-y-1/2"></div>
+          
+          <div className="flex flex-col items-center gap-1 bg-white dark:bg-gray-900 px-2">
+            <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold text-sm shadow-lg shadow-primary/30">1</div>
+            <span className="text-xs font-bold text-primary">Cart</span>
+          </div>
+          
+          <div className="flex flex-col items-center gap-1 bg-white dark:bg-gray-900 px-2">
+            <div className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-800 text-gray-400 dark:text-gray-500 flex items-center justify-center font-bold text-sm">2</div>
+            <span className="text-xs font-medium text-gray-500">Address</span>
+          </div>
+          
+          <div className="flex flex-col items-center gap-1 bg-white dark:bg-gray-900 px-2">
+            <div className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-800 text-gray-400 dark:text-gray-500 flex items-center justify-center font-bold text-sm">3</div>
+            <span className="text-xs font-medium text-gray-500">Payment</span>
+          </div>
+        </div>
+      </div>
 
-          {finalTotal >= 1000 ? (
-              <div className="bg-emerald-50 dark:bg-emerald-900/20 p-3 rounded-2xl border border-emerald-100 dark:border-emerald-800 flex items-center gap-3">
-                  <span className="material-symbols-outlined text-emerald-600">verified</span>
-                  <p className="text-xs font-black text-emerald-700 dark:text-emerald-400 uppercase tracking-widest">{t('Gold Discount Unlocked: Extra 5% Off!', 'గోల్డ్ డిస్కౌంట్ అన్‌లాక్ చేయబడింది: అదనపు 5% తగ్గింపు!')}</p>
-              </div>
-          ) : (
-             <div className="bg-amber-50 dark:bg-amber-900/20 p-3 rounded-2xl border border-amber-100 dark:border-amber-800 flex items-center gap-3">
-                <span className="material-symbols-outlined text-amber-600">lock_open</span>
-                <p className="text-[10px] font-bold text-amber-700 dark:text-amber-400 uppercase tracking-widest">
-                    {t('Spend ₹', 'మరో ₹')}{1000 - finalTotal} {t('more to unlock Gold Discount', 'ఖర్చు చేస్తే గోల్డ్ డిస్కౌంట్ వస్తుంది')}
-                </p>
-             </div>
-          )}
-      </section>
+      {/* Concierge Mode Alert */}
+      {isConciergeMode && (
+        <div className="mx-4 mt-4 bg-teal-50 dark:bg-teal-900/20 p-4 rounded-xl border border-teal-100 dark:border-teal-800 flex gap-3">
+          <div className="size-10 rounded-full bg-teal-100 dark:bg-teal-800 flex items-center justify-center shrink-0 text-teal-600 dark:text-teal-300">
+            <span className="material-symbols-outlined">support_agent</span>
+          </div>
+          <div>
+            <h3 className="text-sm font-bold text-teal-800 dark:text-teal-200">Pharmacist Review</h3>
+            <p className="text-xs text-teal-600 dark:text-teal-400 mt-1">
+              You've uploaded a prescription. Our pharmacist will review it, add the medicines to your order, and call you for confirmation.
+            </p>
+          </div>
+        </div>
+      )}
 
-      <section className="px-4 flex flex-col gap-4">
-          {items.map((item) => (
-             <div key={item.id} className="bg-white dark:bg-gray-800 p-4 rounded-[2rem] shadow-sm border border-gray-50 dark:border-gray-700 flex gap-4">
-                <div className="size-20 shrink-0 bg-slate-50 dark:bg-gray-700 rounded-2xl overflow-hidden p-2">
-                    <img src={item.image} className="size-full object-contain" alt="" />
+      {/* Free Delivery Nudge (Only for regular orders) */}
+      {!isConciergeMode && finalTotal < 500 && (
+        <div className="mx-4 mt-4 p-4 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+          <div className="flex justify-between items-center mb-2">
+            <div className="flex items-center gap-2">
+              <div className="bg-secondary/10 p-1.5 rounded-full text-secondary">
+                <span className="material-symbols-outlined text-xl">local_shipping</span>
+              </div>
+              <p className="text-sm font-semibold">Free Delivery</p>
+            </div>
+            <p className="text-xs font-medium text-gray-500">₹{500 - finalTotal} more to unlock</p>
+          </div>
+          <div className="h-2.5 w-full bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+            <div className="h-full bg-secondary rounded-full" style={{ width: `${(finalTotal / 500) * 100}%` }}></div>
+          </div>
+          <p className="text-xs text-secondary mt-2 font-medium">You're almost there! Add more items.</p>
+        </div>
+      )}
+
+      {/* Cart Items */}
+      {!isConciergeMode && (
+        <section className="mt-6 px-4 flex flex-col gap-4">
+            {items.map((item) => (
+               <div key={item.id} className="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 flex gap-4">
+                <div className="shrink-0">
+                  {item.type === 'medicine' ? (
+                     <div 
+                      className="w-20 h-20 rounded-lg bg-gray-100 dark:bg-gray-700 bg-cover bg-center" 
+                      style={{backgroundImage: `url('${item.image}')`}}
+                    ></div>
+                  ) : (
+                    <div className="w-20 h-20 rounded-lg bg-blue-50 dark:bg-gray-700 flex items-center justify-center text-primary dark:text-blue-400">
+                      <span className="material-symbols-outlined text-4xl">science</span>
+                    </div>
+                  )}
                 </div>
-                <div className="flex-1 flex flex-col justify-between py-1">
+                <div className="flex-1 flex flex-col justify-between">
+                  <div>
+                    <div className="flex justify-between items-start">
+                      <h3 className="text-base font-bold leading-tight line-clamp-2">{item.name}</h3>
+                      <button onClick={() => removeFromCart(item.id)} className="text-gray-400 hover:text-red-500">
+                        <span className="material-symbols-outlined text-lg">delete</span>
+                      </button>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-0.5">{item.packSize || 'Package'}</p>
+                    {item.isPrescriptionRequired && (
+                      <div className="flex items-center gap-1 mt-1">
+                        <span className="material-symbols-outlined text-red-500 text-[14px]">prescription</span>
+                        <span className="text-[10px] text-red-500 font-bold uppercase">Prescription Required</span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex justify-between items-end mt-2">
                     <div>
-                        <div className="flex justify-between items-start">
-                            <h3 className="font-bold text-sm leading-tight line-clamp-2">{item.name}</h3>
-                            <button onClick={() => removeFromCart(item.id)} className="text-gray-300 hover:text-red-500 transition-colors">
-                                <span className="material-symbols-outlined text-lg">close</span>
-                            </button>
-                        </div>
-                        <p className="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-widest">{item.packSize}</p>
+                      <div className="flex items-center gap-2">
+                        <span className="text-lg font-bold">₹{item.price * item.qty}</span>
+                        {item.mrp > item.price && <span className="text-xs text-gray-400 line-through">₹{item.mrp * item.qty}</span>}
+                      </div>
                     </div>
-                    <div className="flex justify-between items-end mt-2">
-                        <span className="font-black text-base">₹{item.price * item.qty}</span>
-                        <div className="flex items-center bg-slate-100 dark:bg-gray-700 rounded-lg p-1 gap-3">
-                            <button onClick={() => updateQuantity(item.id, item.qty - 1)} className="size-6 bg-white dark:bg-gray-600 rounded flex items-center justify-center text-slate-900 dark:text-white shadow-sm"><span className="material-symbols-outlined text-xs">remove</span></button>
-                            <span className="text-xs font-black">{item.qty}</span>
-                            <button onClick={() => updateQuantity(item.id, item.qty + 1)} className="size-6 bg-primary text-white rounded flex items-center justify-center shadow-md"><span className="material-symbols-outlined text-xs">add</span></button>
-                        </div>
+                    {/* Large Stepper */}
+                    <div className="flex items-center bg-gray-100 dark:bg-gray-900 rounded-lg p-1">
+                      <button 
+                        onClick={() => updateQuantity(item.id, item.qty - 1)}
+                        className="w-8 h-8 flex items-center justify-center rounded-md bg-white dark:bg-gray-800 shadow-sm text-slate-900 dark:text-white"
+                      >
+                        <span className="material-symbols-outlined text-base">remove</span>
+                      </button>
+                      <input className="w-8 text-center bg-transparent border-none p-0 text-sm font-bold focus:ring-0" readOnly type="text" value={item.qty}/>
+                      <button 
+                        onClick={() => updateQuantity(item.id, item.qty + 1)}
+                        className="w-8 h-8 flex items-center justify-center rounded-md bg-primary text-white shadow-sm shadow-primary/30"
+                      >
+                        <span className="material-symbols-outlined text-base">add</span>
+                      </button>
                     </div>
+                  </div>
                 </div>
-             </div>
-          ))}
-      </section>
+              </div>
+            ))}
+        </section>
+      )}
       
-      <section className="mx-4 mt-6">
+      {/* Prescription Upload Section */}
+      <section className="mx-4 mt-6 bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-100 dark:border-gray-700">
         <PrescriptionUpload 
           required={isPrescriptionNeeded}
-          onUpload={setPrescription}
+          label="Upload Prescription"
           initialUrl={prescription}
+          onUpload={setPrescription}
+          subLabel={isPrescriptionNeeded ? "Required for items marked with Rx" : "Optional for concierge order"}
         />
       </section>
 
-      <section className="mx-4 mt-6 bg-white dark:bg-gray-800 rounded-3xl p-5 shadow-sm border border-gray-100 dark:border-gray-700">
-          <div className="flex justify-between items-center mb-4">
-              <h3 className="font-black text-lg tracking-tighter uppercase">{t('Bill Summary', 'బిల్లు సారాంశం')}</h3>
-              <div className="bg-emerald-50 dark:bg-emerald-900/40 px-3 py-1 rounded-full text-[10px] font-black text-emerald-600 tracking-widest">
-                  {t('SAVED ₹', 'మీరు ₹')}{savings} {t('ON THIS ORDER!', 'ఆదా చేశారు!')}
-              </div>
+      {/* Bill Details (Hidden for Concierge Mode until pharmacist adds items) */}
+      {!isConciergeMode && (
+        <section className="mx-4 mb-6 mt-6 bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-100 dark:border-gray-700">
+          <h3 className="text-base font-bold mb-4 border-b border-gray-100 dark:border-gray-700 pb-2">Bill Details</h3>
+          <div className="flex justify-between items-center mb-2 text-sm text-gray-600 dark:text-gray-300">
+            <span>Item Total</span>
+            <span>₹{finalMrp}</span>
           </div>
-          <div className="space-y-2 text-sm">
-             <div className="flex justify-between text-gray-500">
-                <span>{t('Item Total', 'వస్తువుల మొత్తం')}</span>
-                <span className="font-bold">₹{finalMrp}</span>
-             </div>
-             <div className="flex justify-between text-emerald-600 font-bold">
-                <span>{t('Discount', 'తగ్గింపు')}</span>
-                <span>-₹{savings}</span>
-             </div>
-             <div className="flex justify-between text-gray-500">
-                <span>{t('Delivery Fee', 'డెలివరీ ఛార్జీ')}</span>
-                <span>{finalTotal >= 500 ? <span className="text-emerald-600 uppercase font-black tracking-widest">Free</span> : '₹40'}</span>
-             </div>
-             <div className="h-px bg-gray-100 dark:bg-gray-700 my-4"></div>
-             <div className="flex justify-between items-end">
-                <span className="font-black text-xl">{t('To Pay', 'చెల్లించాల్సిన మొత్తం')}</span>
-                <span className="font-black text-2xl text-primary tracking-tighter">₹{finalTotal + (finalTotal >= 500 ? 0 : 40)}</span>
-             </div>
+          <div className="flex justify-between items-center mb-2 text-sm text-gray-600 dark:text-gray-300">
+            <span className="flex items-center gap-1">Delivery Fee <span className="material-symbols-outlined text-[16px] text-gray-400">info</span></span>
+            <span>{finalTotal >= 500 ? <span className="text-green-600 font-bold">FREE</span> : '₹40'}</span>
           </div>
-      </section>
+          <div className="flex justify-between items-center mb-4 text-sm text-secondary font-medium">
+            <span>Total Savings</span>
+            <span>- ₹{savings}</span>
+          </div>
+          <div className="border-t border-dashed border-gray-300 dark:border-gray-600 pt-3 flex justify-between items-center">
+            <span className="font-bold text-lg">To Pay</span>
+            <span className="font-bold text-lg">₹{finalTotal + (finalTotal >= 500 ? 0 : 40)}</span>
+          </div>
+        </section>
+      )}
 
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800 z-40 pb-10 shadow-glass">
-         <button 
-           disabled={!canCheckout}
-           onClick={() => navigate('/checkout')}
-           className="w-full max-w-md mx-auto h-14 bg-primary hover:bg-primary-dark disabled:bg-gray-300 text-white rounded-2xl font-black text-lg shadow-xl shadow-primary/30 flex items-center justify-center gap-3 transition-all active:scale-95"
-         >
-            {t('Proceed to Checkout', 'చెక్‌అవుట్‌కు వెళ్లండి')}
-            <span className="material-symbols-outlined">arrow_forward</span>
-         </button>
+      {/* Trust Badge */}
+      <div className="flex items-center justify-center gap-2 mb-8 text-gray-400">
+        <span className="material-symbols-outlined text-lg">verified_user</span>
+        <span className="text-xs font-medium">100% Secure Payments & Verified Pharmacy</span>
       </div>
 
-      {/* Exit Intent Modal */}
-      {showExitModal && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
-              <div className="absolute inset-0 bg-black/80 backdrop-blur-md" onClick={() => setShowExitModal(false)}></div>
-              <div className="relative w-full max-w-sm bg-white dark:bg-gray-900 rounded-[2.5rem] p-8 shadow-2xl text-center animate-slide-up overflow-hidden">
-                  <div className="absolute top-0 right-0 p-8 opacity-5">
-                      <span className="material-symbols-outlined text-9xl">help_center</span>
-                  </div>
-                  <div className="size-20 bg-blue-50 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-6 text-primary">
-                    <span className="material-symbols-outlined text-5xl">support_agent</span>
-                  </div>
-                  <h3 className="text-2xl font-black mb-2 leading-tight">{t('Wait! Have a Question?', 'ఆగండి! ఏవైనా సందేహాలు ఉన్నాయా?')}</h3>
-                  <p className="text-slate-500 dark:text-gray-400 font-bold text-sm mb-8">
-                    {t('Our Kurnool pharmacist is ready to help you with your order for free.', 'మా కర్నూలు ఫార్మసిస్ట్ మీ ఆర్డర్ గురించి మీకు సహాయం చేస్తారు.')}
-                  </p>
-                  <div className="flex flex-col gap-3">
-                    <button onClick={() => alert('Connecting...')} className="h-14 bg-emerald-500 hover:bg-emerald-600 text-white rounded-2xl font-black text-sm uppercase tracking-widest shadow-lg shadow-emerald-500/30 flex items-center justify-center gap-2">
-                        <span className="material-symbols-outlined">chat</span>
-                        {t('Chat with Pharmacist', 'ఫార్మసిస్ట్‌తో చాట్')}
-                    </button>
-                    <button onClick={() => setShowExitModal(false)} className="h-14 text-slate-500 dark:text-gray-400 font-black text-xs uppercase tracking-widest hover:bg-gray-50 dark:hover:bg-gray-800 rounded-2xl transition-colors">
-                        {t('I\'ll decide later', 'తర్వాత చూస్తాను')}
-                    </button>
-                  </div>
-              </div>
+      {/* Sticky Footer Action Bar */}
+      <div className="fixed bottom-0 left-0 w-full z-50 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] p-4">
+        <div className="max-w-md mx-auto flex gap-4 items-center">
+          <div className="flex flex-col">
+            <span className="text-xs text-gray-500 font-medium">Total</span>
+            <span className="text-xl font-bold leading-tight">
+              {isConciergeMode ? 'TBD' : `₹${finalTotal + (finalTotal >= 500 ? 0 : 40)}`}
+            </span>
+            {!isConciergeMode && <button className="text-[10px] text-primary underline text-left">View Details</button>}
           </div>
-      )}
+          <button 
+            disabled={!canCheckout}
+            onClick={() => navigate('/checkout')}
+            className="flex-1 bg-primary hover:bg-primary-dark disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-bold py-3.5 px-6 rounded-xl shadow-lg shadow-primary/30 flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
+          >
+            {canCheckout 
+              ? (isConciergeMode ? 'Submit Prescription' : 'Select Address') 
+              : 'Upload Rx to Continue'}
+            <span className="material-symbols-outlined">arrow_forward</span>
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

@@ -54,14 +54,14 @@ const getSmartResults = (query: string): SearchResult[] => {
   // 4. Scans
   MEDICAL_SCANS.forEach(s => {
     if (s.name.toLowerCase().includes(q) || s.bodyPart.toLowerCase().includes(q)) {
-        results.push({ id: s.id, name: s.name, type: 'Scan', detail: `Scan for ${s.bodyPart}`, url: `/scans/${s.id}`, matchType: 'name' });
+        results.push({ id: s.id, name: s.name, type: 'Scan', detail: `Scan for ${s.bodyPart}`, url: '/scans', matchType: 'name' });
     }
   });
 
   // 5. Pages
   PAGES.forEach(p => {
       if (p.name.toLowerCase().includes(q) || p.detail.toLowerCase().includes(q)) {
-          results.push({ ...p, type: 'Page' } as any);
+          results.push({ ...p, type: 'Page' });
       }
   });
 
@@ -93,7 +93,11 @@ export default function GlobalSearchBar() {
   const handleSelect = (res: SearchResult) => {
       setQuery('');
       setIsOpen(false);
-      navigate(res.url);
+      if (res.type === 'Scan') {
+          navigate('/scans'); // Simplify scan nav for demo
+      } else {
+          navigate(res.url);
+      }
   };
 
   const getTypeIcon = (type: string) => {
