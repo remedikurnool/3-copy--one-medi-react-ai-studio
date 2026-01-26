@@ -34,7 +34,7 @@ export default function Checkout() {
     <div className="relative flex h-full min-h-screen w-full flex-col overflow-x-hidden pb-24 bg-bg-light dark:bg-bg-dark font-sans text-slate-900 dark:text-white">
       {/* Top App Bar */}
       <div className="sticky top-0 z-50 flex items-center bg-white dark:bg-gray-900 p-4 shadow-sm border-b border-gray-100 dark:border-gray-800">
-        <button 
+        <button
           onClick={() => navigate(-1)}
           className="flex size-10 shrink-0 items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
         >
@@ -48,21 +48,21 @@ export default function Checkout() {
         <div className="flex items-center justify-between relative">
           <div className="absolute top-1/2 left-0 w-full h-1 bg-gray-100 dark:bg-gray-800 -z-0 rounded-full"></div>
           <div className="absolute top-1/2 left-0 w-1/2 h-1 bg-primary -z-0 rounded-full"></div>
-          
+
           <div className="flex flex-col items-center gap-2 z-10">
             <div className="size-8 rounded-full bg-primary flex items-center justify-center text-white shadow-md ring-4 ring-white dark:ring-gray-900">
               <span className="material-symbols-outlined text-[16px] font-bold">check</span>
             </div>
             <span className="text-xs font-semibold text-primary">Address</span>
           </div>
-          
+
           <div className="flex flex-col items-center gap-2 z-10">
             <div className="size-8 rounded-full bg-primary flex items-center justify-center text-white shadow-md ring-4 ring-white dark:ring-gray-900">
               <span className="text-xs font-bold">2</span>
             </div>
             <span className="text-xs font-bold text-primary">Payment</span>
           </div>
-          
+
           <div className="flex flex-col items-center gap-2 z-10">
             <div className="size-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-400 ring-4 ring-white dark:ring-gray-900">
               <span className="text-xs font-bold">3</span>
@@ -96,8 +96,8 @@ export default function Checkout() {
               </div>
               <h4 className="font-bold text-lg mb-1">{profile.name}</h4>
               <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed mb-4 max-w-[85%]">
-                Flat No. 402, Sai Residency,<br/>
-                M.G. Road, Near Government Hospital,<br/>
+                Flat No. 402, Sai Residency,<br />
+                M.G. Road, Near Government Hospital,<br />
                 Kurnool, Andhra Pradesh - 518002
               </p>
               <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
@@ -119,19 +119,42 @@ export default function Checkout() {
               <div key={item.id} className="p-4 flex gap-4">
                 <div className="size-16 bg-gray-50 dark:bg-gray-700 rounded-lg flex items-center justify-center shrink-0 p-1">
                   {item.type === 'medicine' ? (
-                     <img className="size-full object-contain mix-blend-multiply dark:mix-blend-normal rounded-md" src={item.image} alt={item.name} />
+                    <img className="size-full object-contain mix-blend-multiply dark:mix-blend-normal rounded-md" src={item.image} alt={item.name} />
+                  ) : item.type === 'doctor' ? (
+                    <img className="size-full object-cover rounded-md" src={item.image} alt={item.name} />
                   ) : (
-                     <span className="material-symbols-outlined text-2xl text-blue-500">science</span>
+                    <span className="material-symbols-outlined text-2xl text-blue-500">
+                      {item.type === 'scan' ? 'radiology' :
+                        item.type === 'lab' ? 'science' :
+                          item.type === 'ambulance' ? 'ambulance' :
+                            item.type === 'wellness' ? 'self_improvement' :
+                              item.type === 'insurance' ? 'security' : 'home_health'}
+                    </span>
                   )}
                 </div>
                 <div className="flex-1">
                   <div className="flex justify-between items-start">
-                    <h4 className="font-semibold text-sm">{item.name}</h4>
+                    <h4 className="font-semibold text-sm line-clamp-1">{item.name}</h4>
                     <span className="font-bold text-sm">₹{item.price * item.qty}</span>
                   </div>
-                  <p className="text-xs text-gray-500 mt-1">{item.packSize || 'Lab Test'}</p>
+                  {item.type === 'medicine' ? (
+                    <p className="text-xs text-gray-500 mt-1">{item.packSize || 'Medicine'}</p>
+                  ) : (
+                    <div className="mt-1">
+                      <p className="text-[10px] font-bold text-primary uppercase leading-tight">
+                        {item.type === 'doctor' ? item.metadata?.specialty : item.metadata?.centerName}
+                      </p>
+                      <p className="text-[11px] text-gray-500 flex items-center gap-1 mt-0.5">
+                        <span className="material-symbols-outlined text-[12px]">calendar_today</span>
+                        {item.metadata?.date}, {item.metadata?.slot}
+                      </p>
+                    </div>
+                  )}
                   <div className="flex items-center gap-2 mt-2">
-                    <span className="text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded text-gray-600 dark:text-gray-300">Qty: {item.qty}</span>
+                    <span className="text-[10px] bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded text-gray-600 dark:text-gray-300 font-medium">Qty: {item.qty}</span>
+                    {item.type !== 'medicine' && (
+                      <span className="text-[10px] bg-blue-50 dark:bg-blue-900/20 px-2 py-0.5 rounded text-primary font-bold">APPOINTMENT</span>
+                    )}
                   </div>
                 </div>
               </div>
@@ -150,16 +173,16 @@ export default function Checkout() {
               <p className="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium">Your health and safety are our top priorities.</p>
             </div>
           </div>
-          
+
           <div className="grid grid-cols-2 gap-3">
-             <div className="bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm flex items-center gap-2 border border-emerald-100 dark:border-emerald-900/40">
-                <span className="material-symbols-outlined text-primary text-xl">pill</span>
-                <span className="text-[10px] font-bold text-slate-700 dark:text-gray-300 leading-tight">100% Genuine Medicine</span>
-             </div>
-             <div className="bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm flex items-center gap-2 border border-emerald-100 dark:border-emerald-900/40">
-                <span className="material-symbols-outlined text-primary text-xl">biotech</span>
-                <span className="text-[10px] font-bold text-slate-700 dark:text-gray-300 leading-tight">NABL Certified Labs</span>
-             </div>
+            <div className="bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm flex items-center gap-2 border border-emerald-100 dark:border-emerald-900/40">
+              <span className="material-symbols-outlined text-primary text-xl">pill</span>
+              <span className="text-[10px] font-bold text-slate-700 dark:text-gray-300 leading-tight">100% Genuine Medicine</span>
+            </div>
+            <div className="bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm flex items-center gap-2 border border-emerald-100 dark:border-emerald-900/40">
+              <span className="material-symbols-outlined text-primary text-xl">biotech</span>
+              <span className="text-[10px] font-bold text-slate-700 dark:text-gray-300 leading-tight">NABL Certified Labs</span>
+            </div>
           </div>
         </section>
 
@@ -172,10 +195,10 @@ export default function Checkout() {
           <div className="flex flex-col gap-3">
             {/* UPI */}
             <label className="cursor-pointer relative">
-              <input 
-                className="peer sr-only" 
-                name="payment_method" 
-                type="radio" 
+              <input
+                className="peer sr-only"
+                name="payment_method"
+                type="radio"
                 checked={paymentMethod === 'upi'}
                 onChange={() => setPaymentMethod('upi')}
               />
@@ -196,10 +219,10 @@ export default function Checkout() {
             </label>
             {/* COD */}
             <label className="cursor-pointer relative">
-              <input 
-                className="peer sr-only" 
-                name="payment_method" 
-                type="radio" 
+              <input
+                className="peer sr-only"
+                name="payment_method"
+                type="radio"
                 checked={paymentMethod === 'cod'}
                 onChange={() => setPaymentMethod('cod')}
               />
@@ -256,7 +279,7 @@ export default function Checkout() {
               <span className="text-xs text-gray-500 font-medium">Total Payable</span>
               <span className="text-xl font-bold">₹{grandTotal}</span>
             </div>
-            <button 
+            <button
               onClick={handlePlaceOrder}
               className="flex-1 bg-primary hover:bg-primary-dark text-white h-12 rounded-xl font-bold text-base shadow-lg shadow-blue-500/30 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
             >
