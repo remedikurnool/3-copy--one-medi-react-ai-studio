@@ -131,7 +131,8 @@ export default function Cart() {
                         item.type === 'lab' ? 'science' :
                           item.type === 'ambulance' ? 'ambulance' :
                             item.type === 'wellness' ? 'self_improvement' :
-                              item.type === 'insurance' ? 'security' : 'home_health'}
+                              item.type === 'insurance' ? 'security' :
+                                item.type === 'surgery' ? 'surgical' : 'home_health'}
                     </span>
                   </div>
                 )}
