@@ -17,11 +17,17 @@ Service Catalog (★ Abstraction Layer)
    ↓
 Service Masters (medicine, lab, doctor, etc.)
    ↓
+Taxonomies (specialty, body system, condition, surgery, risk)
+   ↓
 Pricing / Inventory / Availability
    ↓
-Unified Orders & Bookings
+Carts → Orders → Order Items (with snapshots)
    ↓
-Payouts, Audits, Analytics
+Bookings / Fulfillment
+   ↓
+Refunds → Vendor Payouts → Audit Logs → Analytics
+   ↓
+UI Configuration (menus, carousels, feature flags)
 ```
 
 ---
@@ -36,6 +42,10 @@ Payouts, Audits, Analytics
 | **`availability_slots`** | Generalized slot model for Doctors, Labs, Scans. `doctor_slots` becomes a specialization. |
 | **`carts` / `cart_items`** | Persistent cart for abandonment tracking and cross-session recovery. |
 | **`feature_flags`** | City-wise service enablement without code redeployment. |
+| **`order_items.service_snapshot`** | JSONB snapshot of the service at the time of purchase to prevent historical data loss. |
+| **Optimistic Locking** | `availability_slots` now uses a `version` column to prevent booking race conditions. |
+| **UI Config Layer** | Dynamic, admin-controlled menus and carousels. |
+| **Central Taxonomy** | Unified medical-grade tagging for all services (Specialties, Body Systems, etc.). |
 | **RLS Security Definer Function** | `has_vendor_access(vendor_id)` centralizes vendor logic to prevent policy drift. |
 
 ---
@@ -94,7 +104,7 @@ Payouts, Audits, Analytics
 | `lab_pricing` | `test_id`, `vendor_id`, `price`, `mrp`, `nabl_accredited` | Vendor-specific rates. |
 | `scan_pricing` | `scan_id`, `vendor_id`, `price`, `mrp` | Vendor-specific radiology rates. |
 | `service_pricing` | `service_id`, `vendor_id`, `base_price`, `variable_price` | For dynamic services. |
-| `availability_slots` | `service_catalog_id`, `vendor_id`, `start_time`, `end_time`, `capacity`, `booked_count` | ★ **Unified slot model** for all bookable services. |
+| `availability_slots` | `service_catalog_id`, `vendor_id`, `start_time`, `end_time`, `capacity`, `booked_count`, `version (int)` | ★ Unified slot model. Uses **optimistic locking** (`version`). |
 
 ---
 
@@ -104,7 +114,7 @@ Payouts, Audits, Analytics
 | `carts` | `id`, `profile_id`, `updated_at` | Persistent cart. |
 | `cart_items` | `cart_id`, `service_catalog_id`, `qty` | FK to abstraction layer. |
 | `orders` | `id`, `profile_id`, `net_amount`, `payment_status`, `payment_ref`, `status`, `created_at` | Transaction parent. |
-| `order_items` | `order_id`, `service_catalog_id`, `vendor_id`, `qty`, `unit_price`, `cgst`, `sgst` | Links to `service_catalog`. |
+| `order_items` | `order_id`, `service_catalog_id`, `vendor_id`, `qty`, `unit_price`, `cgst`, `sgst`, `service_snapshot (jsonb)` | Links to `service_catalog`. Snapshot for history. |
 | `service_bookings` | `order_item_id`, `patient_id`, `slot_id`, `fulfillment_status`, `clinical_notes` | Execution details. |
 | `order_artifacts` | `order_id`, `file_url`, `type (PRESC, REPORT)` | Prescription/Report vault links. |
 
@@ -127,6 +137,25 @@ Payouts, Audits, Analytics
 | `marketing_assets` | `type (BANNER, CAROUSEL)`, `image_url`, `link_url`, `city_id`, `sort_order` | CMS for homepage. |
 | `feature_flags` | `feature_key`, `city_id`, `enabled (bool)` | ★ City-wise rollouts. |
 | `content_master` | `title`, `type (article, video)`, `content_url`, `author_id` | Blogs & Videos. |
+
+---
+
+### Group I: UI Configuration Layer (Dynamic)
+| Table | Key Fields | Notes |
+| :--- | :--- | :--- |
+| `ui_menus` | `id`, `menu_type (enum)`, `title`, `icon`, `route`, `sort_order`, `city_id`, `is_active` | Types: DESKTOP, MOBILE, FLOATING. |
+| `ui_menu_items` | `menu_id`, `service_catalog_id`, `taxonomy_term_id`, `external_link`, `sort_order` | Flexible nesting. |
+| `ui_carousels` | `id`, `title`, `position (enum)`, `city_id`, `is_active` | Positions: HOME_TOP, SERVICE_PAGE, FOOTER. |
+| `ui_carousel_items` | `carousel_id`, `service_catalog_id`, `image_url`, `sort_order` | Dynamic banners. |
+
+---
+
+### Group J: Central Taxonomy & Filter Engine
+| Table | Key Fields | Notes |
+| :--- | :--- | :--- |
+| `taxonomies` | `id`, `name`, `slug`, `applicable_service_types (service_type[])` | e.g., "Specialty", "Body System". |
+| `taxonomy_terms` | `id`, `taxonomy_id`, `name`, `slug`, `parent_id` | e.g., "Cardiology". |
+| `service_taxonomy_map` | `service_catalog_id`, `taxonomy_term_id` | Universal tagging engine. |
 
 ---
 
