@@ -208,8 +208,14 @@ export default function MedicineList() {
             <div 
               key={med.id} 
               onClick={() => navigate(`/medicines/${med.id}`)} 
-              className="group bg-white dark:bg-slate-900 rounded-[2.5rem] p-5 shadow-glass border border-white dark:border-slate-800/50 flex gap-5 relative cursor-pointer active:scale-[0.99] transition-all hover:shadow-float"
+              className="group bg-white dark:bg-slate-900 rounded-[2.5rem] p-5 shadow-glass border border-white dark:border-slate-800/50 flex gap-5 relative cursor-pointer active:scale-[0.99] transition-all hover:shadow-float overflow-hidden"
             >
+               {med.prescriptionRequired && (
+                  <div className="absolute top-0 right-0 bg-rose-500 text-white text-[10px] font-black px-3 py-1.5 rounded-bl-2xl z-20 shadow-sm flex items-center gap-1">
+                    <span className="material-symbols-outlined text-[12px]">description</span> Rx
+                  </div>
+               )}
+
                <div className="size-28 shrink-0 bg-slate-50 dark:bg-slate-800 rounded-3xl flex items-center justify-center p-3 border border-slate-100 dark:border-slate-700 relative overflow-hidden">
                   <img src={med.image} alt={med.name} className="w-full h-full object-contain relative z-10 group-hover:scale-110 transition-transform duration-500" />
                </div>
@@ -231,11 +237,6 @@ export default function MedicineList() {
                      </button>
                   </div>
                </div>
-               {med.prescriptionRequired && (
-                  <div className="absolute top-2 right-2 bg-rose-500 text-white size-8 rounded-full flex items-center justify-center shadow-lg border-2 border-white dark:border-slate-900">
-                    <span className="material-symbols-outlined text-sm">prescription</span>
-                  </div>
-               )}
             </div>
           ))}
         </div>
