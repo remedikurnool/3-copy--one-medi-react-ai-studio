@@ -1,5 +1,17 @@
 # ONE MEDI: Database Architecture v2.0 (Production-Grade)
 
+> [!IMPORTANT]
+> **STATUS: FROZEN & PRODUCTION-READY**
+> 
+> This is the canonical architecture for ONE MEDI. All refinements have been applied and verified. This design is:
+> - ✅ Service-agnostic (covers all 16+ service modules)
+> - ✅ India-compliant (GST, prescriptions, audits, vendor KYC)
+> - ✅ Multi-tenant & RLS-safe (vendor isolation)
+> - ✅ Scalable (1M+ orders, partition-ready)
+> - ✅ Future-proof (dynamic UI, central taxonomies)
+> 
+> **DO NOT redesign core architecture.** All future features must fit within this model.
+
 This document is the refined technical design, incorporating all architectural feedback for a scalable, India-compliant, healthcare super-app backend.
 
 ---
