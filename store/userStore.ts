@@ -1,21 +1,8 @@
+
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { supabase, signOut as supabaseSignOut, type Profile, type Address, type FamilyMember } from '../lib/supabase';
 
-// Extended profile for frontend use (with additional computed/display fields)
-export interface UIUserProfile {
-  id: string;
-  name: string;
-  phone: string;
-  email: string;
-  gender: 'Male' | 'Female' | 'Other' | '';
-  dob: string;
-  bloodGroup: string;
-  avatarUrl: string;
-}
-
-// Local address format (compatible with existing UI)
-export interface UIAddress {
+export interface Address {
   id: string;
   tag: 'Home' | 'Office' | 'Other';
   line1: string;
@@ -25,8 +12,7 @@ export interface UIAddress {
   isDefault: boolean;
 }
 
-// Local family member format
-export interface UIFamilyMember {
+export interface FamilyMember {
   id: string;
   name: string;
   relation: string;
@@ -34,343 +20,124 @@ export interface UIFamilyMember {
   gender: 'Male' | 'Female' | 'Other';
 }
 
-interface UserState {
-  isAuthenticated: boolean;
-  userId: string | null;
-  profile: UIUserProfile;
-  addresses: UIAddress[];
-  familyMembers: UIFamilyMember[];
-  loading: boolean;
-  defaultAddress: UIAddress | undefined;
-
-  // Actions
-  setUser: (userId: string, profile: Profile | null) => void;
-  clearUser: () => void;
-  logout: () => Promise<void>;
-
-  // Profile actions
-  updateProfile: (updates: Partial<UIUserProfile>) => Promise<void>;
-  refreshProfile: () => Promise<void>;
-
-  // Address actions
-  fetchAddresses: () => Promise<void>;
-  addAddress: (address: Omit<UIAddress, 'id'>) => Promise<void>;
-  removeAddress: (id: string) => Promise<void>;
-  setDefaultAddress: (id: string) => Promise<void>;
-
-  // Family member actions
-  fetchFamilyMembers: () => Promise<void>;
-  addFamilyMember: (member: Omit<UIFamilyMember, 'id'>) => Promise<void>;
-  removeFamilyMember: (id: string) => Promise<void>;
+export interface UserProfile {
+  name: string;
+  phone: string;
+  email: string;
+  gender: 'Male' | 'Female' | 'Other';
+  dob: string;
+  bloodGroup: string;
+  height: string;
+  weight: string;
+  image: string;
 }
 
-const EMPTY_PROFILE: UIUserProfile = {
-  id: '',
+interface UserState {
+  isAuthenticated: boolean;
+  profile: UserProfile;
+  addresses: Address[];
+  familyMembers: FamilyMember[];
+  
+  login: (phone: string) => void;
+  logout: () => void;
+  googleLogin: () => void;
+  
+  updateProfile: (profile: Partial<UserProfile>) => void;
+  addAddress: (address: Address) => void;
+  removeAddress: (id: string) => void;
+  addFamilyMember: (member: FamilyMember) => void;
+  removeFamilyMember: (id: string) => void;
+}
+
+const MOCK_USER: UserProfile = {
+  name: 'Siva Kumar',
+  phone: '+91 98765 43210',
+  email: 'siva.kumar@gmail.com',
+  gender: 'Male',
+  dob: '1995-08-15',
+  bloodGroup: 'O+',
+  height: '175',
+  weight: '72',
+  image: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80'
+};
+
+const EMPTY_USER: UserProfile = {
   name: 'Guest User',
   phone: '',
   email: '',
-  gender: '',
+  gender: 'Male',
   dob: '',
   bloodGroup: '',
-  avatarUrl: 'https://cdn-icons-png.flaticon.com/512/149/149071.png',
+  height: '',
+  weight: '',
+  image: 'https://cdn-icons-png.flaticon.com/512/149/149071.png'
 };
-
-// Convert database profile to UI format
-const toUIProfile = (profile: Profile | null): UIUserProfile => {
-  if (!profile) return EMPTY_PROFILE;
-
-  return {
-    id: profile.id,
-    name: profile.full_name || 'User',
-    phone: profile.phone || '',
-    email: profile.email || '',
-    gender: (profile.gender as UIUserProfile['gender']) || '',
-    dob: profile.date_of_birth || '',
-    bloodGroup: profile.blood_group || '',
-    avatarUrl: profile.avatar_url || 'https://cdn-icons-png.flaticon.com/512/149/149071.png',
-  };
-};
-
-// Convert database address to UI format
-const toUIAddress = (addr: Address): UIAddress => ({
-  id: addr.id,
-  tag: (addr.tag as UIAddress['tag']) || 'Other',
-  line1: addr.line_1,
-  line2: addr.line_2 || '',
-  city: 'Kurnool', // TODO: fetch city name from cities table
-  pincode: addr.pincode || '',
-  isDefault: addr.is_default || false,
-});
-
-// Convert database family member to UI format
-const toUIFamilyMember = (member: FamilyMember): UIFamilyMember => ({
-  id: member.id,
-  name: member.name,
-  relation: member.relation || '',
-  age: member.age?.toString() || '',
-  gender: (member.gender as UIFamilyMember['gender']) || 'Male',
-});
 
 export const useUserStore = create<UserState>()(
   persist(
-    (set, get) => ({
+    (set) => ({
       isAuthenticated: false,
-      userId: null,
-      profile: EMPTY_PROFILE,
+      profile: EMPTY_USER,
       addresses: [],
       familyMembers: [],
-      loading: false,
-      get defaultAddress() {
-        return get().addresses.find(a => a.isDefault) || get().addresses[0];
-      },
 
-      setUser: (userId, profile) => set({
+      login: (phone) => set({
         isAuthenticated: true,
-        userId,
-        profile: toUIProfile(profile),
+        profile: { ...MOCK_USER, phone: `+91 ${phone}` },
+        addresses: [
+          {
+            id: 'addr1',
+            tag: 'Home',
+            line1: 'Flat 402, Sai Residency',
+            line2: 'M.G. Road, Near Govt Hospital',
+            city: 'Kurnool',
+            pincode: '518002',
+            isDefault: true
+          }
+        ]
       }),
 
-      clearUser: () => set({
+      googleLogin: () => set({
+        isAuthenticated: true,
+        profile: MOCK_USER,
+        addresses: [
+          {
+            id: 'addr1',
+            tag: 'Home',
+            line1: 'Flat 402, Sai Residency',
+            line2: 'M.G. Road, Near Govt Hospital',
+            city: 'Kurnool',
+            pincode: '518002',
+            isDefault: true
+          }
+        ]
+      }),
+
+      logout: () => set({
         isAuthenticated: false,
-        userId: null,
-        profile: EMPTY_PROFILE,
+        profile: EMPTY_USER,
         addresses: [],
-        familyMembers: [],
+        familyMembers: []
       }),
 
-      logout: async () => {
-        try {
-          await supabaseSignOut();
-        } catch (error) {
-          console.error('Logout error:', error);
-        }
-        get().clearUser();
-      },
-
-      updateProfile: async (updates) => {
-        const { userId } = get();
-        if (!userId) return;
-
-        try {
-          const dbUpdates: Partial<Profile> = {};
-          if (updates.name) dbUpdates.full_name = updates.name;
-          if (updates.email) dbUpdates.email = updates.email;
-          if (updates.gender) dbUpdates.gender = updates.gender;
-          if (updates.dob) dbUpdates.date_of_birth = updates.dob;
-          if (updates.bloodGroup) dbUpdates.blood_group = updates.bloodGroup;
-          if (updates.avatarUrl) dbUpdates.avatar_url = updates.avatarUrl;
-
-          const { error } = await supabase
-            .from('profiles')
-            .update(dbUpdates)
-            .eq('id', userId);
-
-          if (error) throw error;
-
-          // Update local state
-          set((state) => ({
-            profile: { ...state.profile, ...updates },
-          }));
-        } catch (error) {
-          console.error('Error updating profile:', error);
-          throw error;
-        }
-      },
-
-      refreshProfile: async () => {
-        const { userId } = get();
-        if (!userId) return;
-
-        try {
-          const { data, error } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', userId)
-            .single();
-
-          if (error) throw error;
-          set({ profile: toUIProfile(data) });
-        } catch (error) {
-          console.error('Error refreshing profile:', error);
-        }
-      },
-
-      fetchAddresses: async () => {
-        const { userId } = get();
-        if (!userId) return;
-
-        try {
-          const { data, error } = await supabase
-            .from('addresses')
-            .select('*')
-            .eq('profile_id', userId)
-            .order('is_default', { ascending: false });
-
-          if (error) throw error;
-          set({ addresses: (data || []).map(toUIAddress) });
-        } catch (error) {
-          console.error('Error fetching addresses:', error);
-        }
-      },
-
-      addAddress: async (address) => {
-        const { userId } = get();
-        if (!userId) return;
-
-        try {
-          const { data, error } = await supabase
-            .from('addresses')
-            .insert({
-              profile_id: userId,
-              tag: address.tag,
-              line_1: address.line1,
-              line_2: address.line2,
-              pincode: address.pincode,
-              is_default: address.isDefault,
-            })
-            .select()
-            .single();
-
-          if (error) throw error;
-
-          set((state) => ({
-            addresses: [...state.addresses, toUIAddress(data)],
-          }));
-        } catch (error) {
-          console.error('Error adding address:', error);
-          throw error;
-        }
-      },
-
-      removeAddress: async (id) => {
-        const { userId } = get();
-        if (!userId) return;
-
-        try {
-          const { error } = await supabase
-            .from('addresses')
-            .delete()
-            .eq('id', id)
-            .eq('profile_id', userId);
-
-          if (error) throw error;
-
-          set((state) => ({
-            addresses: state.addresses.filter(a => a.id !== id),
-          }));
-        } catch (error) {
-          console.error('Error removing address:', error);
-          throw error;
-        }
-      },
-
-      setDefaultAddress: async (id) => {
-        const { userId, addresses } = get();
-        if (!userId) return;
-
-        try {
-          // First, unset all defaults
-          await supabase
-            .from('addresses')
-            .update({ is_default: false })
-            .eq('profile_id', userId);
-
-          // Then set the new default
-          const { error } = await supabase
-            .from('addresses')
-            .update({ is_default: true })
-            .eq('id', id);
-
-          if (error) throw error;
-
-          set({
-            addresses: addresses.map(a => ({
-              ...a,
-              isDefault: a.id === id,
-            })),
-          });
-        } catch (error) {
-          console.error('Error setting default address:', error);
-          throw error;
-        }
-      },
-
-      fetchFamilyMembers: async () => {
-        const { userId } = get();
-        if (!userId) return;
-
-        try {
-          const { data, error } = await supabase
-            .from('family_members')
-            .select('*')
-            .eq('owner_id', userId)
-            .order('created_at', { ascending: true });
-
-          if (error) throw error;
-          set({ familyMembers: (data || []).map(toUIFamilyMember) });
-        } catch (error) {
-          console.error('Error fetching family members:', error);
-        }
-      },
-
-      addFamilyMember: async (member) => {
-        const { userId } = get();
-        if (!userId) return;
-
-        try {
-          const { data, error } = await supabase
-            .from('family_members')
-            .insert({
-              owner_id: userId,
-              name: member.name,
-              relation: member.relation,
-              age: parseInt(member.age) || null,
-              gender: member.gender,
-            })
-            .select()
-            .single();
-
-          if (error) throw error;
-
-          set((state) => ({
-            familyMembers: [...state.familyMembers, toUIFamilyMember(data)],
-          }));
-        } catch (error) {
-          console.error('Error adding family member:', error);
-          throw error;
-        }
-      },
-
-      removeFamilyMember: async (id) => {
-        const { userId } = get();
-        if (!userId) return;
-
-        try {
-          const { error } = await supabase
-            .from('family_members')
-            .delete()
-            .eq('id', id)
-            .eq('owner_id', userId);
-
-          if (error) throw error;
-
-          set((state) => ({
-            familyMembers: state.familyMembers.filter(f => f.id !== id),
-          }));
-        } catch (error) {
-          console.error('Error removing family member:', error);
-          throw error;
-        }
-      },
+      updateProfile: (updates) => set((state) => ({
+        profile: { ...state.profile, ...updates }
+      })),
+      addAddress: (address) => set((state) => ({
+        addresses: [...state.addresses, address]
+      })),
+      removeAddress: (id) => set((state) => ({
+        addresses: state.addresses.filter(a => a.id !== id)
+      })),
+      addFamilyMember: (member) => set((state) => ({
+        familyMembers: [...state.familyMembers, member]
+      })),
+      removeFamilyMember: (id) => set((state) => ({
+        familyMembers: state.familyMembers.filter(f => f.id !== id)
+      })),
     }),
     {
       name: 'one-medi-user',
-      partialize: (state) => ({
-        // Only persist these fields
-        isAuthenticated: state.isAuthenticated,
-        userId: state.userId,
-        profile: state.profile,
-      }),
     }
   )
 );

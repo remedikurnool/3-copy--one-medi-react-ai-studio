@@ -1,44 +1,27 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { signInWithOTP, signInWithGoogle } from '../../lib/supabase';
+import { useUserStore } from '../../store/userStore';
 
 export default function Login() {
   const navigate = useNavigate();
+  const { googleLogin } = useUserStore();
   const [phone, setPhone] = useState('');
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
 
-  const handleSendOTP = async (e: React.FormEvent) => {
+  const handleSendOTP = (e: React.FormEvent) => {
     e.preventDefault();
     if (phone.length !== 10) {
       setError('Please enter a valid 10-digit mobile number');
       return;
     }
-
-    setLoading(true);
-    setError('');
-
-    try {
-      await signInWithOTP(phone);
-      navigate('/otp', { state: { phone } });
-    } catch (err: any) {
-      console.error('OTP error:', err);
-      setError(err.message || 'Failed to send OTP. Please try again.');
-    } finally {
-      setLoading(false);
-    }
+    // Simulate API Call
+    navigate('/otp', { state: { phone } });
   };
 
-  const handleGoogleLogin = async () => {
-    setLoading(true);
-    try {
-      await signInWithGoogle();
-      // Google OAuth will redirect automatically
-    } catch (err: any) {
-      console.error('Google login error:', err);
-      setError(err.message || 'Failed to sign in with Google');
-      setLoading(false);
-    }
+  const handleGoogleLogin = () => {
+    googleLogin();
+    navigate('/');
   };
 
   return (
@@ -48,8 +31,8 @@ export default function Login() {
       <div className="absolute bottom-[-10%] left-[-10%] w-[60%] h-[40%] bg-secondary/10 rounded-full blur-[80px] pointer-events-none"></div>
 
       {/* Close Button */}
-      <button
-        onClick={() => navigate('/')}
+      <button 
+        onClick={() => navigate('/')} 
         className="absolute top-6 right-6 z-50 p-2 rounded-full bg-gray-100 dark:bg-gray-800 text-slate-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors shadow-sm"
         aria-label="Close"
       >
@@ -73,16 +56,15 @@ export default function Login() {
                 <img src="https://flagcdn.com/w40/in.png" alt="India" className="w-6 rounded-sm" />
                 <span className="font-bold text-slate-700 dark:text-gray-300">+91</span>
               </div>
-              <input
-                type="tel"
+              <input 
+                type="tel" 
                 value={phone}
                 onChange={(e) => {
                   const val = e.target.value.replace(/\D/g, '').slice(0, 10);
                   setPhone(val);
                   setError('');
                 }}
-                disabled={loading}
-                className="flex-1 bg-transparent border-none h-full px-4 font-bold text-lg text-slate-900 dark:text-white focus:ring-0 placeholder:text-gray-300 tracking-widest disabled:opacity-50"
+                className="flex-1 bg-transparent border-none h-full px-4 font-bold text-lg text-slate-900 dark:text-white focus:ring-0 placeholder:text-gray-300 tracking-widest"
                 placeholder="00000 00000"
                 autoFocus
               />
@@ -90,19 +72,12 @@ export default function Login() {
             {error && <p className="text-xs text-red-500 font-bold ml-1 flex items-center gap-1"><span className="material-symbols-outlined text-sm">error</span>{error}</p>}
           </div>
 
-          <button
-            type="submit"
-            disabled={phone.length < 10 || loading}
+          <button 
+            type="submit" 
+            disabled={phone.length < 10}
             className="h-14 bg-primary hover:bg-primary-dark disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed text-white rounded-2xl font-black text-lg shadow-lg shadow-primary/30 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
           >
-            {loading ? (
-              <>
-                <span className="animate-spin material-symbols-outlined">progress_activity</span>
-                Sending OTP...
-              </>
-            ) : (
-              <>Get OTP <span className="material-symbols-outlined">arrow_forward</span></>
-            )}
+            Get OTP <span className="material-symbols-outlined">arrow_forward</span>
           </button>
         </form>
 
@@ -111,10 +86,9 @@ export default function Login() {
           <span className="relative bg-white dark:bg-bg-dark px-4 text-xs font-bold text-gray-400 uppercase tracking-widest">Or continue with</span>
         </div>
 
-        <button
+        <button 
           onClick={handleGoogleLogin}
-          disabled={loading}
-          className="h-14 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl font-bold text-slate-700 dark:text-white shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 active:scale-[0.98] transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="h-14 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl font-bold text-slate-700 dark:text-white shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 active:scale-[0.98] transition-all flex items-center justify-center gap-3"
         >
           <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="w-6 h-6" />
           Google

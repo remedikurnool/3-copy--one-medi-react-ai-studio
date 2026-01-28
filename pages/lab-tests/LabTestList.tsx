@@ -1,7 +1,7 @@
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useLabTests, useLabTestSearch, useLabTestsByCategory } from '../../hooks/useLabTests';
+import { LAB_TESTS } from '../../constants';
 import { useLocationStore } from '../../store/locationStore';
 import LocationModal from '../../components/ui/LocationModal';
 import { ServiceCardSkeleton } from '../../components/ui/Skeletons';
@@ -14,7 +14,7 @@ interface CategoryItemProps {
 }
 
 const CategoryItem: React.FC<CategoryItemProps> = ({ icon, label, onClick, isActive }) => (
-  <button
+  <button 
     onClick={onClick}
     className="flex flex-col items-center gap-2 group shrink-0"
   >
@@ -30,8 +30,8 @@ export default function LabTestList() {
   const { city } = useLocationStore();
   const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
   const [search, setSearch] = useState('');
-  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [selectedCat, setSelectedCat] = useState('All');
+  const [isLoading, setIsLoading] = useState(true);
 
   const categories = [
     { label: 'All', icon: 'grid_view' },
@@ -42,36 +42,18 @@ export default function LabTestList() {
     { label: 'Women Health', icon: 'pregnant_woman' },
   ];
 
-  // Fetch lab tests from Supabase
-  const { data: allTests, loading: loadingAll } = useLabTests();
-  const { data: searchResults, loading: loadingSearch } = useLabTestSearch(debouncedSearch);
-  const { data: categoryTests, loading: loadingCategory } = useLabTestsByCategory(
-    selectedCat === 'All' ? '' : selectedCat
-  );
-
-  // Debounce search input
+  // Simulate loading
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearch(search);
-    }, 300);
+    setIsLoading(true);
+    const timer = setTimeout(() => setIsLoading(false), 900);
     return () => clearTimeout(timer);
-  }, [search]);
+  }, [selectedCat, search]);
 
-  // Filter and combine results
-  const filteredTests = useMemo(() => {
-    // If searching, use search results
-    if (debouncedSearch && searchResults) {
-      return searchResults;
-    }
-    // If category selected, use category results
-    if (selectedCat !== 'All' && categoryTests) {
-      return categoryTests;
-    }
-    // Default: all tests
-    return allTests || [];
-  }, [allTests, searchResults, categoryTests, debouncedSearch, selectedCat]);
-
-  const isLoading = loadingAll || (debouncedSearch && loadingSearch) || (selectedCat !== 'All' && loadingCategory);
+  const filteredTests = LAB_TESTS.filter(test => {
+    const matchesSearch = test.name.toLowerCase().includes(search.toLowerCase());
+    const matchesCategory = selectedCat === 'All' || test.category === selectedCat;
+    return matchesSearch && matchesCategory;
+  });
 
   return (
     <div className="min-h-screen bg-bg-light dark:bg-bg-dark text-slate-900 dark:text-white pb-32 font-sans relative overflow-x-hidden">
@@ -95,35 +77,27 @@ export default function LabTestList() {
             <span className="material-symbols-outlined">shopping_cart</span>
           </button>
         </div>
-
+        
         <div className="px-4 pb-3">
           <div className="relative">
             <span className="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-slate-400">search</span>
-            <input
+            <input 
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full h-12 pl-12 pr-4 rounded-xl border-none bg-gray-100 dark:bg-gray-800 focus:ring-2 focus:ring-primary transition-all font-medium"
-              placeholder="Search health packages..."
+              className="w-full h-12 pl-12 pr-4 rounded-xl border-none bg-gray-100 dark:bg-gray-800 focus:ring-2 focus:ring-primary transition-all font-medium" 
+              placeholder="Search health packages..." 
             />
-            {search && (
-              <button
-                onClick={() => setSearch('')}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
-              >
-                <span className="material-symbols-outlined">close</span>
-              </button>
-            )}
           </div>
         </div>
 
         <div className="flex gap-4 px-4 py-4 overflow-x-auto no-scrollbar">
           {categories.map((c) => (
-            <CategoryItem
-              key={c.label}
-              icon={c.icon}
-              label={c.label}
+            <CategoryItem 
+              key={c.label} 
+              icon={c.icon} 
+              label={c.label} 
               isActive={selectedCat === c.label}
-              onClick={() => setSelectedCat(c.label)}
+              onClick={() => setSelectedCat(c.label)} 
             />
           ))}
         </div>
@@ -133,65 +107,35 @@ export default function LabTestList() {
         {isLoading ? (
           Array(4).fill(0).map((_, i) => <ServiceCardSkeleton key={i} />)
         ) : (
-          filteredTests.map((test: any) => (
-            <div
-              key={test.id}
+          filteredTests.map((test) => (
+            <div 
+              key={test.id} 
               onClick={() => navigate(`/lab-tests/${test.id}`)}
               className="bg-white dark:bg-gray-800 rounded-[2rem] p-5 border border-slate-100 dark:border-slate-700 shadow-sm relative overflow-hidden cursor-pointer active:scale-[0.98] transition-all"
             >
-              <div className="absolute top-0 right-0 bg-emerald-500 text-white text-[10px] font-black px-3 py-1 rounded-bl-xl uppercase tracking-widest">33% OFF</div>
+              <div className="absolute top-0 right-0 bg-emerald-500 text-white text-[10px] font-black px-3 py-1 rounded-bl-xl uppercase tracking-widest">{test.discount}</div>
               <div className="size-12 rounded-2xl bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center text-primary mb-4 shadow-inner">
-                <span className="material-symbols-outlined text-2xl">biotech</span>
+                 <span className="material-symbols-outlined text-2xl">biotech</span>
               </div>
               <h4 className="text-xl font-black text-slate-900 dark:text-white mb-1 tracking-tight">{test.name}</h4>
-              <p className="text-xs text-slate-500 dark:text-slate-400 font-bold mb-4 line-clamp-1">{test.description || test.category || 'Health Checkup'}</p>
-
+              <p className="text-xs text-slate-500 dark:text-slate-400 font-bold mb-4 line-clamp-1">{test.description}</p>
+              
               <div className="flex items-center gap-3 mb-5">
-                <span className="px-2 py-0.5 bg-slate-50 dark:bg-gray-700 rounded-md text-[10px] font-black text-slate-400 uppercase tracking-tighter">
-                  {test.parameters?.length || 10} PARAMETERS
-                </span>
-                <span className="px-2 py-0.5 bg-blue-50 dark:bg-blue-900/20 rounded-md text-[10px] font-black text-blue-500 uppercase tracking-tighter">
-                  REPORT: {test.report_time_hours || 24}h
-                </span>
-                {test.fasting_required && (
-                  <span className="px-2 py-0.5 bg-amber-50 dark:bg-amber-900/20 rounded-md text-[10px] font-black text-amber-500 uppercase tracking-tighter">
-                    FASTING
-                  </span>
-                )}
+                 <span className="px-2 py-0.5 bg-slate-50 dark:bg-gray-700 rounded-md text-[10px] font-black text-slate-400 uppercase tracking-tighter">{test.parameterCount} PARAMETERS</span>
+                 <span className="px-2 py-0.5 bg-blue-50 dark:bg-blue-900/20 rounded-md text-[10px] font-black text-blue-500 uppercase tracking-tighter">REPORT: {test.reportTime}</span>
               </div>
 
               <div className="pt-4 border-t border-slate-50 dark:border-slate-700 flex items-center justify-between">
                 <div>
-                  <p className="text-[10px] text-slate-400 line-through font-bold">₹1,500</p>
-                  <p className="text-2xl font-black text-slate-900 dark:text-white tracking-tighter">₹999</p>
+                  <p className="text-[10px] text-slate-400 line-through font-bold">₹{test.mrp}</p>
+                  <p className="text-2xl font-black text-slate-900 dark:text-white tracking-tighter">₹{test.price}</p>
                 </div>
-                <button
-                  onClick={(e) => { e.stopPropagation(); navigate(`/lab-booking`, { state: { testId: test.id } }); }}
-                  className="bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-6 h-11 rounded-xl font-black text-xs uppercase tracking-widest shadow-xl active:scale-95 transition-all"
-                >
-                  Book
+                <button className="bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-6 h-11 rounded-xl font-black text-xs uppercase tracking-widest shadow-xl active:scale-95 transition-all">
+                   Book
                 </button>
               </div>
             </div>
           ))
-        )}
-
-        {!isLoading && filteredTests.length === 0 && (
-          <div className="flex flex-col items-center justify-center py-20 text-center gap-4">
-            <div className="size-20 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center">
-              <span className="material-symbols-outlined text-4xl text-gray-400">biotech</span>
-            </div>
-            <div>
-              <p className="font-black uppercase tracking-widest">No tests found</p>
-              <p className="text-xs font-bold text-gray-500 mt-1">Try a different search or category</p>
-            </div>
-            <button
-              onClick={() => { setSelectedCat('All'); setSearch(''); }}
-              className="text-primary font-bold text-xs uppercase tracking-widest border border-primary/20 px-4 py-2 rounded-xl"
-            >
-              Clear Filters
-            </button>
-          </div>
         )}
       </main>
     </div>

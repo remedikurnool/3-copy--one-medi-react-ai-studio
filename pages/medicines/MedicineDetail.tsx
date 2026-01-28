@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useMedicine, useMedicineInventory } from '../../hooks/useMedicines';
+import { MEDICINES } from '../../constants';
 import { useCartStore } from '../../store/cartStore';
 import { triggerCartAnimation } from '../../components/ui/FlyingCartAnimation';
 import { Breadcrumbs } from '../../components/ui/Breadcrumbs';
@@ -35,11 +35,11 @@ const AccordionItem = ({ icon, title, children, colorClass, iconColorClass }: Ac
 const SafetyBadge = ({ type, status }: { type: string, status: string }) => {
   let color = 'bg-gray-100 text-gray-600';
   let icon = 'help';
-
+  
   if (status === 'Safe') { color = 'bg-green-100 text-green-700'; icon = 'check_circle'; }
   else if (status === 'Caution') { color = 'bg-orange-100 text-orange-700'; icon = 'warning'; }
   else if (status === 'Unsafe' || status === 'Avoid') { color = 'bg-red-100 text-red-700'; icon = 'block'; }
-
+  
   return (
     <div className={`flex flex-col items-center justify-center p-3 rounded-xl ${color} dark:bg-opacity-10 text-center gap-1`}>
       <span className="material-symbols-outlined text-xl mb-1">{type === 'Pregnancy' ? 'pregnant_woman' : type === 'Alcohol' ? 'liquor' : 'directions_car'}</span>
@@ -49,113 +49,83 @@ const SafetyBadge = ({ type, status }: { type: string, status: string }) => {
   );
 };
 
-// Loading skeleton component
-const MedicineDetailSkeleton = () => (
-  <div className="min-h-screen bg-bg-light dark:bg-bg-dark pb-24 animate-pulse">
-    <header className="flex items-center justify-between bg-white dark:bg-gray-900 px-4 py-3">
-      <div className="size-10 rounded-full bg-gray-200 dark:bg-gray-700"></div>
-      <div className="h-6 w-32 bg-gray-200 dark:bg-gray-700 rounded"></div>
-      <div className="size-10 rounded-full bg-gray-200 dark:bg-gray-700"></div>
-    </header>
-    <div className="p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-2xl p-4">
-        <div className="w-44 h-44 mx-auto bg-gray-200 dark:bg-gray-700 rounded-2xl mb-4"></div>
-        <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-2"></div>
-        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2 mb-4"></div>
-        <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded w-1/3"></div>
-      </div>
-    </div>
-  </div>
-);
-
 export default function MedicineDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-
-  // Fetch medicine from Supabase
-  const { data: medicine, loading, error } = useMedicine(id);
-  const { data: inventory } = useMedicineInventory(id);
-
+  const medicine = MEDICINES.find(m => m.id === id);
   const addToCart = useCartStore((state) => state.addToCart);
   const cartItemsCount = useCartStore((state) => state.items.length);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  
+  // State for selected variant (default to first one)
+  const [selectedVariant, setSelectedVariant] = useState(medicine ? medicine.variants[0] : null);
 
   useEffect(() => {
-    setSelectedImageIndex(0);
-  }, [id]);
+    // Reset image index and variant when id changes
+    if (medicine) {
+        setSelectedImageIndex(0);
+        setSelectedVariant(medicine.variants[0]);
+    }
+  }, [id, medicine]);
 
-  // Show loading state
-  if (loading) {
-    return <MedicineDetailSkeleton />;
-  }
+  if (!medicine || !selectedVariant) return <div className="p-8 text-center text-slate-900 dark:text-white">Product not found</div>;
 
-  // Show error or not found
-  if (error || !medicine) {
-    return (
-      <div className="min-h-screen bg-bg-light dark:bg-bg-dark flex flex-col items-center justify-center p-8">
-        <span className="material-symbols-outlined text-6xl text-gray-400 mb-4">medication</span>
-        <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Product not found</h2>
-        <p className="text-gray-500 text-sm mb-6">The medicine you're looking for doesn't exist.</p>
-        <button
-          onClick={() => navigate('/medicines')}
-          className="bg-primary text-white px-6 py-3 rounded-xl font-bold"
-        >
-          Browse Medicines
-        </button>
-      </div>
-    );
-  }
+  // Handle multiple images (fallback to single image if array not present)
+  const displayImages = medicine.images && medicine.images.length > 0 ? medicine.images : [medicine.image];
 
-  // Get best price from inventory (if available)
-  const bestInventory = inventory && inventory.length > 0
-    ? inventory.reduce((best, curr) => curr.selling_price < best.selling_price ? curr : best, inventory[0])
-    : null;
+  // Logic to find alternatives: Same generic name, different ID, price is less than current variant
+  const alternatives = MEDICINES.filter(m => 
+    m.genericName === medicine.genericName && 
+    m.id !== medicine.id && 
+    (m.variants[0]?.sellingPrice || 0) < selectedVariant.sellingPrice
+  ).sort((a, b) => (a.variants[0]?.sellingPrice || 0) - (b.variants[0]?.sellingPrice || 0));
 
-  const displayPrice = bestInventory?.selling_price || 0;
-  const displayMrp = bestInventory?.mrp || displayPrice * 1.2;
-  const discountPercentage = displayMrp > 0 ? Math.round(((displayMrp - displayPrice) / displayMrp) * 100) : 0;
-
-  // Handle multiple images (use image_url or fallback)
-  const displayImages = medicine.image_url ? [medicine.image_url] : ['https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=400&q=80'];
-
-  const handleAddToCart = (e: React.MouseEvent) => {
+  const handleAddToCart = (e: React.MouseEvent, targetMedicine = medicine, specificVariant = selectedVariant) => {
     e.stopPropagation();
-    triggerCartAnimation(e, displayImages[0]);
+    triggerCartAnimation(e, targetMedicine.image);
+    
+    // If adding an alternative from the list, typically use its default variant (index 0)
+    // If adding the main medicine, use the specifically selected variant
+    const variantToAdd = targetMedicine.id === medicine.id ? specificVariant : targetMedicine.variants[0];
+
+    if (!variantToAdd) return;
 
     addToCart({
-      id: medicine.id,
+      id: targetMedicine.id + (targetMedicine.id === medicine.id ? `-${variantToAdd.id}` : ''), // Ensure unique cart ID for variants if needed
       type: 'medicine',
-      name: medicine.name,
-      price: displayPrice,
-      mrp: displayMrp,
-      image: displayImages[0],
-      packSize: medicine.pack_size || '1 Unit',
+      name: targetMedicine.name,
+      price: variantToAdd.sellingPrice,
+      mrp: variantToAdd.mrp,
+      image: targetMedicine.image,
+      packSize: variantToAdd.packSize,
       qty: 1,
-      discount: discountPercentage > 0 ? `${discountPercentage}% OFF` : '',
-      isPrescriptionRequired: medicine.prescription_required || false
+      discount: `${Math.round(((variantToAdd.mrp - variantToAdd.sellingPrice) / variantToAdd.mrp) * 100)}% OFF`,
+      isPrescriptionRequired: targetMedicine.prescriptionRequired
     });
   };
 
   const handleBuyNow = (e: React.MouseEvent) => {
     handleAddToCart(e);
     setTimeout(() => {
-      navigate('/cart');
-    }, 400);
+        navigate('/cart');
+    }, 400); 
   };
+
+  const discountPercentage = Math.round(((selectedVariant.mrp - selectedVariant.sellingPrice) / selectedVariant.mrp) * 100);
 
   return (
     <div className="min-h-screen bg-bg-light dark:bg-bg-dark pb-24 relative flex flex-col font-sans">
       <header className="sticky top-0 z-50 flex items-center justify-between bg-white/95 dark:bg-gray-900/95 backdrop-blur-md px-4 py-3 shadow-sm border-b border-gray-100 dark:border-gray-800">
-        <button
-          onClick={() => navigate(-1)}
+        <button 
+          onClick={() => navigate(-1)} 
           className="flex size-10 items-center justify-center rounded-full text-slate-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
         >
           <span className="material-symbols-outlined text-2xl">arrow_back</span>
         </button>
         <h1 className="text-lg font-bold leading-tight tracking-tight text-slate-900 dark:text-white text-center flex-1">Product Details</h1>
-        <button
+        <button 
           id="cart-icon-target"
-          onClick={() => navigate('/cart')}
+          onClick={() => navigate('/cart')} 
           className="flex size-10 items-center justify-center rounded-full text-slate-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors relative"
         >
           <span className="material-symbols-outlined text-2xl">shopping_cart</span>
@@ -168,37 +138,37 @@ export default function MedicineDetail() {
           <div className="px-4 mb-2">
             <Breadcrumbs items={[
               { label: 'Medicines', path: '/medicines' },
-              { label: medicine.therapeutic_class || 'General', path: '/medicines' },
+              { label: medicine.therapeuticClass, path: '/medicines' },
               { label: medicine.name }
             ]} />
           </div>
-
+          
           {/* Image Gallery Section */}
           <div className="px-4 pb-2 flex justify-center">
             <div className="flex gap-3 items-start max-w-full">
-              {/* Main Image */}
-              <div className="shrink-0 w-44 h-44 aspect-square rounded-2xl overflow-hidden border border-gray-100 dark:border-gray-700 bg-white shadow-sm relative group">
-                <div
-                  className="absolute inset-0 bg-center bg-contain bg-no-repeat p-4 transition-transform duration-500 group-hover:scale-105"
-                  style={{ backgroundImage: `url("${displayImages[selectedImageIndex]}")` }}
-                >
+                {/* Main Image */}
+                <div className="shrink-0 w-44 h-44 aspect-square rounded-2xl overflow-hidden border border-gray-100 dark:border-gray-700 bg-white shadow-sm relative group">
+                  <div 
+                    className="absolute inset-0 bg-center bg-contain bg-no-repeat p-4 transition-transform duration-500 group-hover:scale-105" 
+                    style={{backgroundImage: `url("${displayImages[selectedImageIndex]}")`}}
+                  >
+                  </div>
                 </div>
-              </div>
 
-              {/* Thumbnails Gallery - Vertical on Right */}
-              {displayImages.length > 1 && (
-                <div className="flex flex-col gap-2 h-44 overflow-y-auto no-scrollbar py-1">
-                  {displayImages.map((img, idx) => (
-                    <button
-                      key={idx}
-                      onClick={() => setSelectedImageIndex(idx)}
-                      className={`size-12 shrink-0 rounded-lg border-2 overflow-hidden transition-all bg-white p-1 ${selectedImageIndex === idx ? 'border-primary scale-105 shadow-sm' : 'border-gray-200 dark:border-gray-700 opacity-60 hover:opacity-100'}`}
-                    >
-                      <img src={img} alt="" className="w-full h-full object-contain" />
-                    </button>
-                  ))}
-                </div>
-              )}
+                {/* Thumbnails Gallery - Vertical on Right */}
+                {displayImages.length > 1 && (
+                    <div className="flex flex-col gap-2 h-44 overflow-y-auto no-scrollbar py-1">
+                        {displayImages.map((img, idx) => (
+                            <button 
+                                key={idx} 
+                                onClick={() => setSelectedImageIndex(idx)}
+                                className={`size-12 shrink-0 rounded-lg border-2 overflow-hidden transition-all bg-white p-1 ${selectedImageIndex === idx ? 'border-primary scale-105 shadow-sm' : 'border-gray-200 dark:border-gray-700 opacity-60 hover:opacity-100'}`}
+                            >
+                                <img src={img} alt="" className="w-full h-full object-contain" />
+                            </button>
+                        ))}
+                    </div>
+                )}
             </div>
           </div>
         </div>
@@ -207,27 +177,23 @@ export default function MedicineDetail() {
           <div className="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-gray-700">
             <div className="mb-3">
               <h2 className="text-2xl font-extrabold text-slate-900 dark:text-white leading-tight mb-1">{medicine.name}</h2>
-              <p className="text-gray-500 dark:text-gray-400 text-sm font-medium">Mfr: {medicine.manufacturer || 'Generic'}</p>
+              <p className="text-gray-500 dark:text-gray-400 text-sm font-medium">Mfr: {medicine.manufacturer}</p>
               <div className="flex flex-wrap gap-2 mt-2">
-                {medicine.composition && (
-                  <span className="text-[10px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded border border-blue-100 font-bold uppercase tracking-wide">
+                 <span className="text-[10px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded border border-blue-100 font-bold uppercase tracking-wide">
                     {medicine.composition}
-                  </span>
-                )}
-                {medicine.dosage_form && (
-                  <span className="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded border border-slate-200 font-bold uppercase tracking-wide">
-                    {medicine.dosage_form}
-                  </span>
-                )}
+                 </span>
+                 <span className="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded border border-slate-200 font-bold uppercase tracking-wide">
+                    {medicine.dosageForm}
+                 </span>
               </div>
             </div>
-
+            
             <div className="flex flex-wrap gap-2 mb-4">
               <span className="inline-flex items-center gap-1 bg-gray-100 dark:bg-gray-700 text-xs font-bold px-2.5 py-1 rounded-md text-gray-600 dark:text-gray-300">
                 <span className="material-symbols-outlined text-[16px]">medication</span>
-                {medicine.pack_size || '1 Unit'}
+                {selectedVariant.packSize}
               </span>
-              {medicine.prescription_required ? (
+              {medicine.prescriptionRequired ? (
                 <span className="inline-flex items-center gap-1 bg-red-50 dark:bg-red-900/20 text-xs font-bold px-2.5 py-1 rounded-md text-red-600 dark:text-red-400 border border-red-100 dark:border-red-900/30">
                   <span className="material-symbols-outlined text-[16px]">description</span>
                   Rx Required
@@ -239,28 +205,39 @@ export default function MedicineDetail() {
               )}
             </div>
 
-            {/* Inventory Availability */}
-            {inventory && inventory.length > 0 && (
-              <div className="mb-4 p-3 bg-green-50 dark:bg-green-900/20 rounded-xl border border-green-100 dark:border-green-800">
-                <p className="text-xs font-bold text-green-700 dark:text-green-400">
-                  <span className="material-symbols-outlined text-sm align-middle mr-1">check_circle</span>
-                  Available at {inventory.length} vendor{inventory.length > 1 ? 's' : ''} near you
-                </p>
-              </div>
+            {/* Variants Selector */}
+            {medicine.variants.length > 1 && (
+                <div className="mb-5">
+                    <p className="text-xs font-bold text-slate-500 dark:text-gray-400 mb-2 uppercase tracking-wider">Select Pack Size</p>
+                    <div className="flex flex-wrap gap-2">
+                        {medicine.variants.map((v) => (
+                            <button
+                                key={v.id}
+                                onClick={() => setSelectedVariant(v)}
+                                className={`px-3 py-2 rounded-lg border-2 text-xs font-bold transition-all flex flex-col items-center min-w-[80px] ${
+                                    selectedVariant.id === v.id
+                                    ? 'border-primary bg-primary/5 text-primary shadow-sm'
+                                    : 'border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-slate-600 dark:text-gray-400 hover:border-primary/30'
+                                }`}
+                            >
+                                <span>{v.packSize}</span>
+                                <span className={`text-[10px] mt-0.5 ${selectedVariant.id === v.id ? 'text-primary' : 'text-slate-400'}`}>₹{v.sellingPrice}</span>
+                            </button>
+                        ))}
+                    </div>
+                </div>
             )}
 
             <div className="flex items-end justify-between border-t border-gray-100 dark:border-gray-700 pt-4">
               <div>
-                {discountPercentage > 0 && (
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-gray-400 text-sm line-through font-medium">₹{displayMrp.toFixed(2)}</span>
-                    <span className="text-xs font-bold bg-secondary/10 text-secondary dark:text-teal-400 px-2 py-0.5 rounded-md">
-                      {discountPercentage}% OFF
-                    </span>
-                  </div>
-                )}
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-gray-400 text-sm line-through font-medium">₹{selectedVariant.mrp.toFixed(2)}</span>
+                  <span className="text-xs font-bold bg-secondary/10 text-secondary dark:text-teal-400 px-2 py-0.5 rounded-md">
+                    {discountPercentage}% OFF
+                  </span>
+                </div>
                 <div className="flex items-baseline gap-1">
-                  <span className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">₹{displayPrice.toFixed(2)}</span>
+                  <span className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">₹{selectedVariant.sellingPrice.toFixed(2)}</span>
                 </div>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Inclusive of all taxes</p>
               </div>
@@ -268,91 +245,126 @@ export default function MedicineDetail() {
           </div>
         </div>
 
-        {/* Chemical Composition Section */}
-        {medicine.composition && (
-          <div className="px-4 mb-4">
-            <div className="bg-teal-50 dark:bg-teal-900/20 rounded-2xl p-4 border border-teal-100 dark:border-teal-800">
-              <div className="flex items-center gap-2 mb-3">
-                <span className="material-symbols-outlined text-teal-600 dark:text-teal-400">science</span>
-                <h3 className="text-sm font-bold text-teal-800 dark:text-teal-200">Chemical Composition</h3>
-              </div>
-              <p className="text-sm font-medium text-slate-700 dark:text-gray-300 mb-2">Contains <span className="font-bold text-teal-700 dark:text-teal-400">{medicine.composition}</span></p>
-              {medicine.therapeutic_class && (
-                <p className="text-xs text-gray-500">Therapeutic Class: {medicine.therapeutic_class}</p>
-              )}
+        {/* GENERIC ALTERNATIVES SECTION */}
+        {alternatives.length > 0 && (
+          <div className="px-4 mb-4 animate-slide-up">
+            <div className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/10 rounded-2xl p-4 border border-green-200 dark:border-green-800 shadow-sm relative overflow-hidden">
+               <div className="absolute top-0 right-0 p-4 opacity-10">
+                  <span className="material-symbols-outlined text-6xl text-green-600">savings</span>
+               </div>
+               
+               <div className="flex items-center gap-2 mb-3 relative z-10">
+                  <div className="size-8 rounded-lg bg-green-100 dark:bg-green-800 flex items-center justify-center text-green-700 dark:text-green-300">
+                     <span className="material-symbols-outlined text-lg">percent</span>
+                  </div>
+                  <h3 className="text-sm font-bold text-green-900 dark:text-green-100">Cheaper Substitute Available</h3>
+               </div>
+
+               {alternatives.map(alt => {
+                 const altVariant = alt.variants[0];
+                 const savings = selectedVariant.sellingPrice - altVariant.sellingPrice;
+                 const savingsPercent = Math.round((savings / selectedVariant.sellingPrice) * 100);
+                 
+                 return (
+                   <div key={alt.id} className="bg-white dark:bg-gray-800 rounded-xl p-3 border border-green-100 dark:border-green-900/50 shadow-sm flex items-center gap-3 relative z-10">
+                      <div className="size-12 rounded-lg bg-gray-50 dark:bg-gray-700 flex items-center justify-center shrink-0">
+                         <img src={alt.image} alt={alt.name} className="size-8 object-contain" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                         <h4 className="font-bold text-sm text-slate-900 dark:text-white truncate">{alt.name}</h4>
+                         <p className="text-[10px] text-gray-500 dark:text-gray-400">By {alt.manufacturer}</p>
+                         <div className="flex items-baseline gap-2 mt-1">
+                            <span className="font-black text-base text-green-600 dark:text-green-400">₹{altVariant.sellingPrice}</span>
+                            <span className="text-xs text-gray-400 line-through">₹{selectedVariant.sellingPrice}</span>
+                         </div>
+                      </div>
+                      <div className="flex flex-col items-end gap-2">
+                         <span className="text-[9px] font-black bg-green-600 text-white px-2 py-0.5 rounded-full uppercase tracking-wide shadow-sm">
+                            Save {savingsPercent}%
+                         </span>
+                         <button 
+                           onClick={(e) => handleAddToCart(e, alt)}
+                           className="text-[10px] font-bold text-primary border border-primary px-3 py-1.5 rounded-lg hover:bg-primary hover:text-white transition-all active:scale-95"
+                         >
+                            ADD
+                         </button>
+                      </div>
+                   </div>
+                 );
+               })}
             </div>
           </div>
         )}
 
-        {/* Prescription Promo */}
+        {/* Chemical Composition Section */}
+        <div className="px-4 mb-4">
+           <div className="bg-teal-50 dark:bg-teal-900/20 rounded-2xl p-4 border border-teal-100 dark:border-teal-800">
+              <div className="flex items-center gap-2 mb-3">
+                 <span className="material-symbols-outlined text-teal-600 dark:text-teal-400">science</span>
+                 <h3 className="text-sm font-bold text-teal-800 dark:text-teal-200">Chemical Composition</h3>
+              </div>
+              <p className="text-sm font-medium text-slate-700 dark:text-gray-300 mb-2">Contains <span className="font-bold text-teal-700 dark:text-teal-400">{medicine.composition}</span></p>
+              <p className="text-xs text-gray-500">Therapeutic Class: {medicine.therapeuticClass}</p>
+           </div>
+        </div>
+
+        {/* Prescription Promo Moved Here */}
         <div className="px-4 mb-4">
           <PrescriptionPromo compact />
         </div>
 
         <div className="px-4 flex flex-col gap-3 pb-6">
-          {/* Uses & Indications */}
-          {medicine.indications && medicine.indications.length > 0 && (
-            <AccordionItem icon="healing" title="Uses & Indications" colorClass="bg-blue-50 dark:bg-blue-900/30" iconColorClass="text-blue-600 dark:text-blue-400">
-              <ul className="list-disc pl-5 space-y-1">
-                {medicine.indications.map((use: string, i: number) => <li key={i}>{use}</li>)}
-              </ul>
-            </AccordionItem>
-          )}
+          <AccordionItem icon="healing" title="Uses & Indications" colorClass="bg-blue-50 dark:bg-blue-900/30" iconColorClass="text-blue-600 dark:text-blue-400">
+             <ul className="list-disc pl-5 space-y-1">
+               {medicine.indications.map((use, i) => <li key={i}>{use}</li>)}
+             </ul>
+          </AccordionItem>
 
-          {/* Dosage Instructions */}
-          {medicine.dosage_instructions && (
-            <AccordionItem icon="medication_liquid" title="Dosage Instructions" colorClass="bg-teal-50 dark:bg-teal-900/30" iconColorClass="text-teal-600 dark:text-teal-400">
-              <p>{medicine.dosage_instructions}</p>
-              {medicine.route_of_administration && (
-                <p className="mt-2 text-xs text-gray-500 font-bold">Route: {medicine.route_of_administration}</p>
-              )}
-            </AccordionItem>
-          )}
+          <AccordionItem icon="medication_liquid" title="Dosage Instructions" colorClass="bg-teal-50 dark:bg-teal-900/30" iconColorClass="text-teal-600 dark:text-teal-400">
+             <p>{medicine.dosageInstructions}</p>
+             <p className="mt-2 text-xs text-gray-500 font-bold">Route: {medicine.routeOfAdministration}</p>
+          </AccordionItem>
 
-          {/* Side Effects */}
-          {medicine.side_effects && medicine.side_effects.length > 0 && (
+          {medicine.sideEffects && (
             <AccordionItem icon="warning" title="Side Effects" colorClass="bg-orange-50 dark:bg-orange-900/30" iconColorClass="text-orange-600 dark:text-orange-400">
-              <p className="mb-2">Common side effects may include:</p>
-              <ul className="list-disc pl-5 space-y-1">
-                {medicine.side_effects.map((effect: string, i: number) => <li key={i}>{effect}</li>)}
-              </ul>
+               <p className="mb-2">Common side effects may include:</p>
+               <ul className="list-disc pl-5 space-y-1">
+                  {medicine.sideEffects.map((effect, i) => <li key={i}>{effect}</li>)}
+               </ul>
             </AccordionItem>
           )}
 
-          {/* Warnings */}
-          {medicine.warnings && medicine.warnings.length > 0 && (
-            <AccordionItem icon="block" title="Warnings & Precautions" colorClass="bg-red-50 dark:bg-red-900/30" iconColorClass="text-red-600 dark:text-red-400">
-              <ul className="list-disc pl-5 space-y-1 text-red-600 dark:text-red-400">
-                {medicine.warnings.map((w: string, i: number) => <li key={i}>{w}</li>)}
-              </ul>
-            </AccordionItem>
+          {medicine.warnings && (
+             <AccordionItem icon="block" title="Warnings & Precautions" colorClass="bg-red-50 dark:bg-red-900/30" iconColorClass="text-red-600 dark:text-red-400">
+                <ul className="list-disc pl-5 space-y-1 text-red-600 dark:text-red-400">
+                   {medicine.warnings.map((w, i) => <li key={i}>{w}</li>)}
+                </ul>
+             </AccordionItem>
           )}
         </div>
 
-        {/* Safety Advice Section */}
-        {medicine.safety_advice && (
-          <div className="px-4 mb-6">
-            <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-widest mb-3 px-1">Safety Advice</h3>
-            <div className="grid grid-cols-3 gap-2">
-              <SafetyBadge type="Pregnancy" status={medicine.safety_advice.pregnancy || 'Consult'} />
-              <SafetyBadge type="Alcohol" status={medicine.safety_advice.alcohol || 'Consult'} />
-              <SafetyBadge type="Driving" status={medicine.safety_advice.driving || 'Consult'} />
-            </div>
-          </div>
-        )}
-
+        {/* Safety Advice Section - Moved to Bottom */}
+        <div className="px-4 mb-6">
+           <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-widest mb-3 px-1">Safety Advice</h3>
+           <div className="grid grid-cols-3 gap-2">
+              <SafetyBadge type="Pregnancy" status={medicine.safetyAdvice.pregnancy} />
+              <SafetyBadge type="Alcohol" status={medicine.safetyAdvice.alcohol} />
+              <SafetyBadge type="Driving" status={medicine.safetyAdvice.driving} />
+           </div>
+        </div>
+        
         <div className="h-8"></div>
       </main>
 
       <footer className="fixed bottom-0 left-0 right-0 z-40 bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800 p-4 pb-6 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
         <div className="flex gap-3 h-14 max-w-md mx-auto">
           <button onClick={(e) => handleAddToCart(e)} className="flex-1 rounded-xl border-2 border-primary bg-transparent text-primary dark:text-white font-bold text-lg hover:bg-primary/10 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
-            <span className="material-symbols-outlined">shopping_cart</span>
-            Add to Cart
+             <span className="material-symbols-outlined">shopping_cart</span>
+             Add to Cart
           </button>
           <button onClick={handleBuyNow} className="flex-1 rounded-xl bg-primary text-white font-bold text-lg hover:brightness-105 hover:shadow-lg active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-md shadow-primary/30">
-            <span className="material-symbols-outlined filled">flash_on</span>
-            Buy Now
+             <span className="material-symbols-outlined filled">flash_on</span>
+             Buy Now
           </button>
         </div>
       </footer>
