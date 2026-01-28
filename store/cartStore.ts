@@ -2,7 +2,7 @@ import { create } from 'zustand';
 
 export interface CartItem {
   id: string;
-  type: 'medicine' | 'lab' | 'doctor' | 'scan' | 'home_care' | 'surgery' | 'ambulance' | 'wellness' | 'insurance';
+  type: 'medicine' | 'lab';
   name: string;
   price: number;
   mrp: number;
@@ -11,14 +11,6 @@ export interface CartItem {
   qty: number;
   discount?: string;
   isPrescriptionRequired?: boolean;
-  metadata?: {
-    slot?: string;
-    date?: string;
-    patientName?: string;
-    centerName?: string;
-    doctorName?: string;
-    specialty?: string;
-  };
 }
 
 interface CartState {
@@ -38,14 +30,14 @@ export const useCartStore = create<CartState>((set, get) => ({
   prescription: null,
   addToCart: (item) => set((state) => {
     const existing = state.items.find((i) => i.id === item.id);
-    if (existing && item.type === 'medicine') {
+    if (existing) {
       return {
         items: state.items.map((i) =>
           i.id === item.id ? { ...i, qty: i.qty + 1 } : i
         ),
       };
     }
-    return { items: [...state.items, { ...item, qty: item.qty || 1 }] };
+    return { items: [...state.items, { ...item, qty: 1 }] };
   }),
   removeFromCart: (id) => set((state) => ({
     items: state.items.filter((i) => i.id !== id),
