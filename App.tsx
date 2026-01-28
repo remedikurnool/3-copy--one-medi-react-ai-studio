@@ -5,6 +5,8 @@ import { Layout } from './components/Layout';
 import { FlyingCartAnimation } from './components/ui/FlyingCartAnimation';
 import ScrollToTop from './components/ScrollToTop';
 import { GlobalLoadingSkeleton } from './components/ui/Skeletons';
+import { AuthProvider } from './components/AuthProvider';
+
 
 // -- Lazy Load Pages for Performance --
 
@@ -82,90 +84,93 @@ const Prescriptions = lazy(() => import('./pages/Prescriptions'));
 
 const App = () => {
   return (
-    <HashRouter>
-      <ScrollToTop />
-      <FlyingCartAnimation />
-      <Suspense fallback={<GlobalLoadingSkeleton />}>
-        <Routes>
-          {/* Auth Routes */}
-          <Route path="/login" element={<Login />} />
-          <Route path="/otp" element={<OTP />} />
+    <AuthProvider>
+      <HashRouter>
+        <ScrollToTop />
+        <FlyingCartAnimation />
+        <Suspense fallback={<GlobalLoadingSkeleton />}>
+          <Routes>
+            {/* Auth Routes */}
+            <Route path="/login" element={<Login />} />
+            <Route path="/otp" element={<OTP />} />
 
-          {/* Main Layout Routes */}
-          <Route path="/" element={<Layout><Home /></Layout>} />
-          <Route path="/bookings" element={<Layout><Bookings /></Layout>} />
-          <Route path="/chat" element={<Layout><Chat /></Layout>} />
-          <Route path="/profile" element={<Layout><Profile /></Layout>} />
-          <Route path="/services" element={<Layout><Services /></Layout>} />
-          
-          <Route path="/medicines" element={<Layout><MedicineList /></Layout>} />
-          <Route path="/doctors" element={<Layout><DoctorList /></Layout>} />
-          
-          <Route path="/scans" element={<Layout><ScanList /></Layout>} />
-          <Route path="/scans/pregnancy" element={<Layout><PregnancyScans /></Layout>} />
-          
-          <Route path="/lab-tests" element={<Layout><LabTestList /></Layout>} />
-          
-          <Route path="/home-care" element={<Layout><HomeCareList /></Layout>} />
-          <Route path="/home-care/icu-calculator" element={<Layout><ICUCalculator /></Layout>} />
-          <Route path="/home-care/booking" element={<Layout><HomeCareBooking /></Layout>} />
-          
-          <Route path="/physiotherapy" element={<Layout><PhysioList /></Layout>} />
-          <Route path="/diabetes-care" element={<Layout><DiabetesCare /></Layout>} />
-          <Route path="/hospitals" element={<Layout><HospitalList /></Layout>} />
-          <Route path="/hospitals/:id" element={<HospitalDetail />} />
+            {/* Main Layout Routes */}
+            <Route path="/" element={<Layout><Home /></Layout>} />
+            <Route path="/bookings" element={<Layout><Bookings /></Layout>} />
+            <Route path="/chat" element={<Layout><Chat /></Layout>} />
+            <Route path="/profile" element={<Layout><Profile /></Layout>} />
+            <Route path="/services" element={<Layout><Services /></Layout>} />
 
-          {/* New Routes */}
-          <Route path="/ambulance" element={<Layout><AmbulanceBooking /></Layout>} />
-          <Route path="/blood-banks" element={<Layout><BloodBankList /></Layout>} />
-          <Route path="/insurance" element={<Layout><InsuranceList /></Layout>} />
-          
-          <Route path="/surgeries" element={<Layout><SurgeryList /></Layout>} />
-          <Route path="/surgeries/detail/:id" element={<SurgeryDetail />} />
-          <Route path="/surgeries/second-opinion" element={<Layout><SurgerySecondOpinion /></Layout>} />
-          
-          <Route path="/wellness" element={<Layout><WellnessCenter /></Layout>} />
-          <Route path="/skin-hair" element={<Layout><SkinHairCare /></Layout>} />
-          <Route path="/health-feed" element={<Layout><HealthFeed /></Layout>} />
+            <Route path="/medicines" element={<Layout><MedicineList /></Layout>} />
+            <Route path="/doctors" element={<Layout><DoctorList /></Layout>} />
 
-          {/* Mother & Baby Routes */}
-          <Route path="/mother-baby" element={<Layout><MotherBabyHome /></Layout>} />
-          <Route path="/mother-baby/vaccination-tracker" element={<Layout><VaccinationTracker /></Layout>} />
-          <Route path="/mother-baby/guides" element={<Layout><CareGuides /></Layout>} />
+            <Route path="/scans" element={<Layout><ScanList /></Layout>} />
+            <Route path="/scans/pregnancy" element={<Layout><PregnancyScans /></Layout>} />
 
-          {/* Utilities */}
-          <Route path="/upload-rx" element={<UploadRx />} />
+            <Route path="/lab-tests" element={<Layout><LabTestList /></Layout>} />
 
-          {/* Full Screen Pages */}
-          <Route path="/medicines/:id" element={<MedicineDetail />} />
-          <Route path="/cart" element={<Cart />} />
-          <Route path="/checkout" element={<Checkout />} />
-          <Route path="/order-success" element={<OrderSuccess />} />
-          <Route path="/notifications" element={<Notifications />} />
-          
-          <Route path="/doctors/:id" element={<DoctorProfile />} />
-          <Route path="/doctors/booking" element={<DoctorBooking />} />
-          
-          <Route path="/scans/detail" element={<ScanDetail />} />
-          <Route path="/scans/booking" element={<ScanBooking />} />
-          
-          <Route path="/lab-tests/:id" element={<LabTestDetail />} />
-          <Route path="/lab-tests/booking" element={<LabBooking />} />
+            <Route path="/home-care" element={<Layout><HomeCareList /></Layout>} />
+            <Route path="/home-care/icu-calculator" element={<Layout><ICUCalculator /></Layout>} />
+            <Route path="/home-care/booking" element={<Layout><HomeCareBooking /></Layout>} />
 
-          <Route path="/home-care/:id" element={<HomeCareDetail />} />
-          <Route path="/physiotherapy/:id" element={<PhysioDetail />} />
-          
-          <Route path="/profile/edit" element={<ProfileEdit />} />
-          <Route path="/profile/addresses" element={<Addresses />} />
-          <Route path="/profile/family" element={<FamilyMembers />} />
-          <Route path="/profile/payments" element={<PaymentMethods />} />
-          <Route path="/profile/health-records" element={<HealthRecords />} />
-          <Route path="/profile/calculators" element={<Calculators />} />
-          <Route path="/prescriptions" element={<Prescriptions />} />
-        </Routes>
-      </Suspense>
-    </HashRouter>
+            <Route path="/physiotherapy" element={<Layout><PhysioList /></Layout>} />
+            <Route path="/diabetes-care" element={<Layout><DiabetesCare /></Layout>} />
+            <Route path="/hospitals" element={<Layout><HospitalList /></Layout>} />
+            <Route path="/hospitals/:id" element={<HospitalDetail />} />
+
+            {/* New Routes */}
+            <Route path="/ambulance" element={<Layout><AmbulanceBooking /></Layout>} />
+            <Route path="/blood-banks" element={<Layout><BloodBankList /></Layout>} />
+            <Route path="/insurance" element={<Layout><InsuranceList /></Layout>} />
+
+            <Route path="/surgeries" element={<Layout><SurgeryList /></Layout>} />
+            <Route path="/surgeries/detail/:id" element={<SurgeryDetail />} />
+            <Route path="/surgeries/second-opinion" element={<Layout><SurgerySecondOpinion /></Layout>} />
+
+            <Route path="/wellness" element={<Layout><WellnessCenter /></Layout>} />
+            <Route path="/skin-hair" element={<Layout><SkinHairCare /></Layout>} />
+            <Route path="/health-feed" element={<Layout><HealthFeed /></Layout>} />
+
+            {/* Mother & Baby Routes */}
+            <Route path="/mother-baby" element={<Layout><MotherBabyHome /></Layout>} />
+            <Route path="/mother-baby/vaccination-tracker" element={<Layout><VaccinationTracker /></Layout>} />
+            <Route path="/mother-baby/guides" element={<Layout><CareGuides /></Layout>} />
+
+            {/* Utilities */}
+            <Route path="/upload-rx" element={<UploadRx />} />
+
+            {/* Full Screen Pages */}
+            <Route path="/medicines/:id" element={<MedicineDetail />} />
+            <Route path="/cart" element={<Cart />} />
+            <Route path="/checkout" element={<Checkout />} />
+            <Route path="/order-success" element={<OrderSuccess />} />
+            <Route path="/notifications" element={<Notifications />} />
+
+            <Route path="/doctors/:id" element={<DoctorProfile />} />
+            <Route path="/doctors/booking" element={<DoctorBooking />} />
+
+            <Route path="/scans/detail" element={<ScanDetail />} />
+            <Route path="/scans/booking" element={<ScanBooking />} />
+
+            <Route path="/lab-tests/:id" element={<LabTestDetail />} />
+            <Route path="/lab-tests/booking" element={<LabBooking />} />
+
+            <Route path="/home-care/:id" element={<HomeCareDetail />} />
+            <Route path="/physiotherapy/:id" element={<PhysioDetail />} />
+
+            <Route path="/profile/edit" element={<ProfileEdit />} />
+            <Route path="/profile/addresses" element={<Addresses />} />
+            <Route path="/profile/family" element={<FamilyMembers />} />
+            <Route path="/profile/payments" element={<PaymentMethods />} />
+            <Route path="/profile/health-records" element={<HealthRecords />} />
+            <Route path="/profile/calculators" element={<Calculators />} />
+            <Route path="/prescriptions" element={<Prescriptions />} />
+          </Routes>
+        </Suspense>
+      </HashRouter>
+    </AuthProvider>
   );
 };
 
 export default App;
+

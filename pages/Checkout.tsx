@@ -3,12 +3,19 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCartStore } from '../store/cartStore';
 import { useUserStore } from '../store/userStore';
+import { useCreateOrder } from '../hooks/useOrders';
+import { useAuth } from '../components/AuthProvider';
 
 export default function Checkout() {
   const navigate = useNavigate();
   const [paymentMethod, setPaymentMethod] = useState('upi');
+  const [isPlacingOrder, setIsPlacingOrder] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
   const { items, totalPrice, totalMrp, clearCart } = useCartStore();
-  const { profile } = useUserStore();
+  const { profile, defaultAddress } = useUserStore();
+  const { createOrder, loading: orderLoading } = useCreateOrder();
+  const { user } = useAuth();
 
   const finalTotal = totalPrice();
   const finalMrp = totalMrp();
@@ -16,10 +23,48 @@ export default function Checkout() {
   const deliveryFee = finalTotal >= 500 ? 0 : 40;
   const grandTotal = finalTotal + deliveryFee;
 
-  const handlePlaceOrder = () => {
-    // Simulate order placement
-    clearCart();
-    navigate('/order-success');
+  const handlePlaceOrder = async () => {
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+
+    setError(null);
+    setIsPlacingOrder(true);
+
+    try {
+      // Transform cart items to order items format
+      const orderItems = items.map(item => ({
+        item_type: item.type as 'medicine' | 'lab_test' | 'scan' | 'consultation' | 'service',
+        item_id: item.id,
+        item_name: item.name,
+        quantity: item.qty,
+        unit_price: item.price,
+        total_price: item.price * item.qty,
+        discount_amount: item.mrp ? (item.mrp - item.price) * item.qty : 0,
+      }));
+
+      const order = await createOrder({
+        profile_id: user.id,
+        order_type: items.some(i => i.type === 'medicine') ? 'medicine' : 'lab_test',
+        total_amount: grandTotal,
+        discount_amount: savings,
+        delivery_fee: deliveryFee,
+        delivery_address_id: defaultAddress?.id,
+        payment_method: paymentMethod === 'cod' ? 'cod' : 'online',
+        notes: `Payment method: ${paymentMethod}`,
+      }, orderItems);
+
+      if (order) {
+        clearCart();
+        navigate('/order-success', { state: { orderId: order.id } });
+      }
+    } catch (err: any) {
+      console.error('Order placement failed:', err);
+      setError(err.message || 'Failed to place order. Please try again.');
+    } finally {
+      setIsPlacingOrder(false);
+    }
   };
 
   if (items.length === 0) {
@@ -30,11 +75,12 @@ export default function Checkout() {
   const hasMedicines = items.some(item => item.type === 'medicine');
   const hasLabs = items.some(item => item.type === 'lab');
 
+
   return (
     <div className="relative flex h-full min-h-screen w-full flex-col overflow-x-hidden pb-24 bg-bg-light dark:bg-bg-dark font-sans text-slate-900 dark:text-white">
       {/* Top App Bar */}
       <div className="sticky top-0 z-50 flex items-center bg-white dark:bg-gray-900 p-4 shadow-sm border-b border-gray-100 dark:border-gray-800">
-        <button 
+        <button
           onClick={() => navigate(-1)}
           className="flex size-10 shrink-0 items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
         >
@@ -48,21 +94,21 @@ export default function Checkout() {
         <div className="flex items-center justify-between relative">
           <div className="absolute top-1/2 left-0 w-full h-1 bg-gray-100 dark:bg-gray-800 -z-0 rounded-full"></div>
           <div className="absolute top-1/2 left-0 w-1/2 h-1 bg-primary -z-0 rounded-full"></div>
-          
+
           <div className="flex flex-col items-center gap-2 z-10">
             <div className="size-8 rounded-full bg-primary flex items-center justify-center text-white shadow-md ring-4 ring-white dark:ring-gray-900">
               <span className="material-symbols-outlined text-[16px] font-bold">check</span>
             </div>
             <span className="text-xs font-semibold text-primary">Address</span>
           </div>
-          
+
           <div className="flex flex-col items-center gap-2 z-10">
             <div className="size-8 rounded-full bg-primary flex items-center justify-center text-white shadow-md ring-4 ring-white dark:ring-gray-900">
               <span className="text-xs font-bold">2</span>
             </div>
             <span className="text-xs font-bold text-primary">Payment</span>
           </div>
-          
+
           <div className="flex flex-col items-center gap-2 z-10">
             <div className="size-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-400 ring-4 ring-white dark:ring-gray-900">
               <span className="text-xs font-bold">3</span>
@@ -96,8 +142,8 @@ export default function Checkout() {
               </div>
               <h4 className="font-bold text-lg mb-1">{profile.name}</h4>
               <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed mb-4 max-w-[85%]">
-                Flat No. 402, Sai Residency,<br/>
-                M.G. Road, Near Government Hospital,<br/>
+                Flat No. 402, Sai Residency,<br />
+                M.G. Road, Near Government Hospital,<br />
                 Kurnool, Andhra Pradesh - 518002
               </p>
               <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
@@ -119,9 +165,9 @@ export default function Checkout() {
               <div key={item.id} className="p-4 flex gap-4">
                 <div className="size-16 bg-gray-50 dark:bg-gray-700 rounded-lg flex items-center justify-center shrink-0 p-1">
                   {item.type === 'medicine' ? (
-                     <img className="size-full object-contain mix-blend-multiply dark:mix-blend-normal rounded-md" src={item.image} alt={item.name} />
+                    <img className="size-full object-contain mix-blend-multiply dark:mix-blend-normal rounded-md" src={item.image} alt={item.name} />
                   ) : (
-                     <span className="material-symbols-outlined text-2xl text-blue-500">science</span>
+                    <span className="material-symbols-outlined text-2xl text-blue-500">science</span>
                   )}
                 </div>
                 <div className="flex-1">
@@ -150,16 +196,16 @@ export default function Checkout() {
               <p className="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium">Your health and safety are our top priorities.</p>
             </div>
           </div>
-          
+
           <div className="grid grid-cols-2 gap-3">
-             <div className="bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm flex items-center gap-2 border border-emerald-100 dark:border-emerald-900/40">
-                <span className="material-symbols-outlined text-primary text-xl">pill</span>
-                <span className="text-[10px] font-bold text-slate-700 dark:text-gray-300 leading-tight">100% Genuine Medicine</span>
-             </div>
-             <div className="bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm flex items-center gap-2 border border-emerald-100 dark:border-emerald-900/40">
-                <span className="material-symbols-outlined text-primary text-xl">biotech</span>
-                <span className="text-[10px] font-bold text-slate-700 dark:text-gray-300 leading-tight">NABL Certified Labs</span>
-             </div>
+            <div className="bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm flex items-center gap-2 border border-emerald-100 dark:border-emerald-900/40">
+              <span className="material-symbols-outlined text-primary text-xl">pill</span>
+              <span className="text-[10px] font-bold text-slate-700 dark:text-gray-300 leading-tight">100% Genuine Medicine</span>
+            </div>
+            <div className="bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm flex items-center gap-2 border border-emerald-100 dark:border-emerald-900/40">
+              <span className="material-symbols-outlined text-primary text-xl">biotech</span>
+              <span className="text-[10px] font-bold text-slate-700 dark:text-gray-300 leading-tight">NABL Certified Labs</span>
+            </div>
           </div>
         </section>
 
@@ -172,10 +218,10 @@ export default function Checkout() {
           <div className="flex flex-col gap-3">
             {/* UPI */}
             <label className="cursor-pointer relative">
-              <input 
-                className="peer sr-only" 
-                name="payment_method" 
-                type="radio" 
+              <input
+                className="peer sr-only"
+                name="payment_method"
+                type="radio"
                 checked={paymentMethod === 'upi'}
                 onChange={() => setPaymentMethod('upi')}
               />
@@ -196,10 +242,10 @@ export default function Checkout() {
             </label>
             {/* COD */}
             <label className="cursor-pointer relative">
-              <input 
-                className="peer sr-only" 
-                name="payment_method" 
-                type="radio" 
+              <input
+                className="peer sr-only"
+                name="payment_method"
+                type="radio"
                 checked={paymentMethod === 'cod'}
                 onChange={() => setPaymentMethod('cod')}
               />
@@ -256,7 +302,7 @@ export default function Checkout() {
               <span className="text-xs text-gray-500 font-medium">Total Payable</span>
               <span className="text-xl font-bold">₹{grandTotal}</span>
             </div>
-            <button 
+            <button
               onClick={handlePlaceOrder}
               className="flex-1 bg-primary hover:bg-primary-dark text-white h-12 rounded-xl font-bold text-base shadow-lg shadow-blue-500/30 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
             >

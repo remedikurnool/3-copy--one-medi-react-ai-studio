@@ -1,17 +1,47 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCartStore } from '../store/cartStore';
+import { useAuth } from '../components/AuthProvider';
 import PrescriptionUpload from '../components/ui/PrescriptionUpload';
 
 export default function Cart() {
   const navigate = useNavigate();
-  const { items, updateQuantity, removeFromCart, totalPrice, totalMrp, prescription, setPrescription } = useCartStore();
-  
+  const { user } = useAuth();
+  const {
+    items,
+    updateQuantity,
+    removeFromCart,
+    totalPrice,
+    totalMrp,
+    prescription,
+    setPrescription,
+    syncing,
+    loadCartFromSupabase,
+    syncCartToSupabase
+  } = useCartStore();
+
+  // Load cart from Supabase when user logs in
+  useEffect(() => {
+    if (user?.id) {
+      loadCartFromSupabase(user.id);
+    }
+  }, [user?.id, loadCartFromSupabase]);
+
+  // Sync cart to Supabase when items change (debounced)
+  useEffect(() => {
+    if (user?.id && items.length > 0) {
+      const timeout = setTimeout(() => {
+        syncCartToSupabase(user.id);
+      }, 1000); // Debounce 1 second
+      return () => clearTimeout(timeout);
+    }
+  }, [user?.id, items, syncCartToSupabase]);
+
   const finalTotal = totalPrice();
   const finalMrp = totalMrp();
   const savings = finalMrp - finalTotal;
-  
+
   // Logic: Cart is "active" if it has items OR a prescription is uploaded (Concierge Mode)
   const isConciergeMode = items.length === 0 && !!prescription;
   const isCartEmpty = items.length === 0 && !prescription;
@@ -27,8 +57,8 @@ export default function Cart() {
         </div>
         <h2 className="text-xl font-bold mb-2">Your cart is empty</h2>
         <p className="text-gray-500 text-center mb-6">Looks like you haven't added anything yet.</p>
-        <button 
-          onClick={() => navigate('/')} 
+        <button
+          onClick={() => navigate('/')}
           className="bg-primary text-white px-6 py-3 rounded-xl font-bold"
         >
           Explore Medicines
@@ -46,9 +76,15 @@ export default function Cart() {
         </button>
         <div className="flex-1 text-center pr-8">
           <h1 className="text-lg font-bold">My Cart</h1>
-          <p className="text-xs text-gray-500 font-medium">
-            {isConciergeMode ? 'Prescription Order' : `${items.length} Items`}
-          </p>
+          <div className="flex items-center justify-center gap-2 text-xs text-gray-500 font-medium">
+            <span>{isConciergeMode ? 'Prescription Order' : `${items.length} Items`}</span>
+            {syncing && (
+              <span className="flex items-center gap-1 text-primary">
+                <span className="material-symbols-outlined text-sm animate-spin">sync</span>
+                Syncing...
+              </span>
+            )}
+          </div>
         </div>
       </header>
 
@@ -56,17 +92,17 @@ export default function Cart() {
       <div className="bg-white dark:bg-gray-900 pt-4 pb-6 px-6">
         <div className="flex items-center justify-between relative">
           <div className="absolute top-1/2 left-0 w-full h-0.5 bg-gray-200 dark:bg-gray-700 -z-10 -translate-y-1/2"></div>
-          
+
           <div className="flex flex-col items-center gap-1 bg-white dark:bg-gray-900 px-2">
             <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold text-sm shadow-lg shadow-primary/30">1</div>
             <span className="text-xs font-bold text-primary">Cart</span>
           </div>
-          
+
           <div className="flex flex-col items-center gap-1 bg-white dark:bg-gray-900 px-2">
             <div className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-800 text-gray-400 dark:text-gray-500 flex items-center justify-center font-bold text-sm">2</div>
             <span className="text-xs font-medium text-gray-500">Address</span>
           </div>
-          
+
           <div className="flex flex-col items-center gap-1 bg-white dark:bg-gray-900 px-2">
             <div className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-800 text-gray-400 dark:text-gray-500 flex items-center justify-center font-bold text-sm">3</div>
             <span className="text-xs font-medium text-gray-500">Payment</span>
@@ -111,69 +147,71 @@ export default function Cart() {
       {/* Cart Items */}
       {!isConciergeMode && (
         <section className="mt-6 px-4 flex flex-col gap-4">
-            {items.map((item) => (
-               <div key={item.id} className="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 flex gap-4">
-                <div className="shrink-0">
-                  {item.type === 'medicine' ? (
-                     <div 
-                      className="w-20 h-20 rounded-lg bg-gray-100 dark:bg-gray-700 bg-cover bg-center" 
-                      style={{backgroundImage: `url('${item.image}')`}}
-                    ></div>
-                  ) : (
-                    <div className="w-20 h-20 rounded-lg bg-blue-50 dark:bg-gray-700 flex items-center justify-center text-primary dark:text-blue-400">
-                      <span className="material-symbols-outlined text-4xl">science</span>
+          {items.map((item) => (
+            <div key={item.id} className="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 flex gap-4">
+              <div className="shrink-0">
+                {item.type === 'medicine' ? (
+                  <div
+                    className="w-20 h-20 rounded-lg bg-gray-100 dark:bg-gray-700 bg-cover bg-center"
+                    style={{ backgroundImage: `url('${item.image}')` }}
+                  ></div>
+                ) : (
+                  <div className="w-20 h-20 rounded-lg bg-blue-50 dark:bg-gray-700 flex items-center justify-center text-primary dark:text-blue-400">
+                    <span className="material-symbols-outlined text-4xl">
+                      {item.type === 'lab' ? 'science' : item.type === 'scan' ? 'mri' : item.type === 'doctor' ? 'stethoscope' : 'medical_services'}
+                    </span>
+                  </div>
+                )}
+              </div>
+              <div className="flex-1 flex flex-col justify-between">
+                <div>
+                  <div className="flex justify-between items-start">
+                    <h3 className="text-base font-bold leading-tight line-clamp-2">{item.name}</h3>
+                    <button onClick={() => removeFromCart(item.id)} className="text-gray-400 hover:text-red-500">
+                      <span className="material-symbols-outlined text-lg">delete</span>
+                    </button>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-0.5">{item.packSize || 'Package'}</p>
+                  {item.isPrescriptionRequired && (
+                    <div className="flex items-center gap-1 mt-1">
+                      <span className="material-symbols-outlined text-red-500 text-[14px]">prescription</span>
+                      <span className="text-[10px] text-red-500 font-bold uppercase">Prescription Required</span>
                     </div>
                   )}
                 </div>
-                <div className="flex-1 flex flex-col justify-between">
+                <div className="flex justify-between items-end mt-2">
                   <div>
-                    <div className="flex justify-between items-start">
-                      <h3 className="text-base font-bold leading-tight line-clamp-2">{item.name}</h3>
-                      <button onClick={() => removeFromCart(item.id)} className="text-gray-400 hover:text-red-500">
-                        <span className="material-symbols-outlined text-lg">delete</span>
-                      </button>
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg font-bold">₹{item.price * item.qty}</span>
+                      {item.mrp > item.price && <span className="text-xs text-gray-400 line-through">₹{item.mrp * item.qty}</span>}
                     </div>
-                    <p className="text-xs text-gray-500 mt-0.5">{item.packSize || 'Package'}</p>
-                    {item.isPrescriptionRequired && (
-                      <div className="flex items-center gap-1 mt-1">
-                        <span className="material-symbols-outlined text-red-500 text-[14px]">prescription</span>
-                        <span className="text-[10px] text-red-500 font-bold uppercase">Prescription Required</span>
-                      </div>
-                    )}
                   </div>
-                  <div className="flex justify-between items-end mt-2">
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-lg font-bold">₹{item.price * item.qty}</span>
-                        {item.mrp > item.price && <span className="text-xs text-gray-400 line-through">₹{item.mrp * item.qty}</span>}
-                      </div>
-                    </div>
-                    {/* Large Stepper */}
-                    <div className="flex items-center bg-gray-100 dark:bg-gray-900 rounded-lg p-1">
-                      <button 
-                        onClick={() => updateQuantity(item.id, item.qty - 1)}
-                        className="w-8 h-8 flex items-center justify-center rounded-md bg-white dark:bg-gray-800 shadow-sm text-slate-900 dark:text-white"
-                      >
-                        <span className="material-symbols-outlined text-base">remove</span>
-                      </button>
-                      <input className="w-8 text-center bg-transparent border-none p-0 text-sm font-bold focus:ring-0" readOnly type="text" value={item.qty}/>
-                      <button 
-                        onClick={() => updateQuantity(item.id, item.qty + 1)}
-                        className="w-8 h-8 flex items-center justify-center rounded-md bg-primary text-white shadow-sm shadow-primary/30"
-                      >
-                        <span className="material-symbols-outlined text-base">add</span>
-                      </button>
-                    </div>
+                  {/* Large Stepper */}
+                  <div className="flex items-center bg-gray-100 dark:bg-gray-900 rounded-lg p-1">
+                    <button
+                      onClick={() => updateQuantity(item.id, item.qty - 1)}
+                      className="w-8 h-8 flex items-center justify-center rounded-md bg-white dark:bg-gray-800 shadow-sm text-slate-900 dark:text-white"
+                    >
+                      <span className="material-symbols-outlined text-base">remove</span>
+                    </button>
+                    <input className="w-8 text-center bg-transparent border-none p-0 text-sm font-bold focus:ring-0" readOnly type="text" value={item.qty} />
+                    <button
+                      onClick={() => updateQuantity(item.id, item.qty + 1)}
+                      className="w-8 h-8 flex items-center justify-center rounded-md bg-primary text-white shadow-sm shadow-primary/30"
+                    >
+                      <span className="material-symbols-outlined text-base">add</span>
+                    </button>
                   </div>
                 </div>
               </div>
-            ))}
+            </div>
+          ))}
         </section>
       )}
-      
+
       {/* Prescription Upload Section */}
       <section className="mx-4 mt-6 bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-100 dark:border-gray-700">
-        <PrescriptionUpload 
+        <PrescriptionUpload
           required={isPrescriptionNeeded}
           label="Upload Prescription"
           initialUrl={prescription}
@@ -221,13 +259,13 @@ export default function Cart() {
             </span>
             {!isConciergeMode && <button className="text-[10px] text-primary underline text-left">View Details</button>}
           </div>
-          <button 
+          <button
             disabled={!canCheckout}
             onClick={() => navigate('/checkout')}
             className="flex-1 bg-primary hover:bg-primary-dark disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-bold py-3.5 px-6 rounded-xl shadow-lg shadow-primary/30 flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
           >
-            {canCheckout 
-              ? (isConciergeMode ? 'Submit Prescription' : 'Select Address') 
+            {canCheckout
+              ? (isConciergeMode ? 'Submit Prescription' : 'Select Address')
               : 'Upload Rx to Continue'}
             <span className="material-symbols-outlined">arrow_forward</span>
           </button>
