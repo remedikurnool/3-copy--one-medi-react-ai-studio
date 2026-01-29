@@ -1,21 +1,9 @@
 
 import React from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 export default function OrderSuccess() {
   const navigate = useNavigate();
-  const location = useLocation();
-
-  // Get order ID from navigation state
-  const state = location.state as { orderId?: string } | null;
-  const orderId = state?.orderId || null;
-
-  // Format order ID for display (show short version if UUID)
-  const displayOrderId = orderId
-    ? orderId.includes('-')
-      ? `#OM-${orderId.slice(0, 8).toUpperCase()}`  // Short UUID format
-      : `#${orderId}`
-    : '#OM-PENDING';
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 flex flex-col items-center justify-center p-6 text-center">
@@ -23,24 +11,18 @@ export default function OrderSuccess() {
         <span className="material-symbols-outlined text-5xl text-green-600 dark:text-green-400">check_circle</span>
       </div>
       <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Order Placed Successfully!</h1>
-      <p className="text-gray-500 dark:text-gray-400 mb-2 max-w-xs mx-auto">
-        Your order {displayOrderId} has been confirmed and will be delivered shortly.
+      <p className="text-gray-500 dark:text-gray-400 mb-8 max-w-xs mx-auto">
+        Your order #OM-88392 has been confirmed and will be delivered shortly.
       </p>
-
-      {orderId && (
-        <p className="text-xs text-gray-400 dark:text-gray-500 mb-8 font-mono">
-          Reference: {orderId}
-        </p>
-      )}
-
+      
       <div className="w-full max-w-xs flex flex-col gap-3">
-        <button
+        <button 
           onClick={() => navigate('/bookings')}
           className="w-full h-12 bg-primary hover:bg-primary-dark text-white rounded-xl font-bold shadow-lg shadow-primary/30 transition-all active:scale-95"
         >
           Track Order
         </button>
-        <button
+        <button 
           onClick={() => navigate('/')}
           className="w-full h-12 bg-gray-100 dark:bg-gray-800 text-slate-900 dark:text-white rounded-xl font-bold hover:bg-gray-200 dark:hover:bg-gray-700 transition-all"
         >
