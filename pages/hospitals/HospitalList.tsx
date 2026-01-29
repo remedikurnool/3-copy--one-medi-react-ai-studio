@@ -1,10 +1,18 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { HOSPITALS } from '../../constants';
+import { useHospitals, useHospitalSearch } from '../../hooks';
 
 export default function HospitalList() {
   const navigate = useNavigate();
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // Fetch hospitals from Supabase
+  const { data: hospitals, loading, error } = useHospitals();
+  const { data: searchResults } = useHospitalSearch(searchQuery);
+
+  // Use search results if query exists, otherwise use all hospitals
+  const displayHospitals = searchQuery.length >= 2 ? searchResults : hospitals;
 
   return (
     <div className="min-h-screen bg-bg-light dark:bg-bg-dark text-slate-900 dark:text-white pb-24 font-sans">
@@ -15,48 +23,89 @@ export default function HospitalList() {
           </button>
           <h1 className="text-xl font-bold leading-tight flex-1 text-center pr-10">Find Hospitals</h1>
         </div>
-        
+
         <div className="px-4 pb-3">
           <div className="flex w-full items-stretch rounded-xl h-14 bg-gray-100 dark:bg-gray-800 border border-transparent focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 transition-all">
             <div className="text-gray-500 flex items-center justify-center pl-4 pr-2">
               <span className="material-symbols-outlined text-2xl">search</span>
             </div>
-            <input className="flex w-full min-w-0 flex-1 bg-transparent border-none focus:ring-0 text-base h-full placeholder:text-gray-500" placeholder="Search hospital or specialty..." />
+            <input
+              className="flex w-full min-w-0 flex-1 bg-transparent border-none focus:ring-0 text-base h-full placeholder:text-gray-500"
+              placeholder="Search hospital or specialty..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
           </div>
         </div>
       </div>
 
       <div className="flex flex-col gap-4 p-4">
-        {HOSPITALS.map(hospital => (
-          <div 
-            key={hospital.id} 
+        {loading && (
+          <div className="flex items-center justify-center py-12">
+            <div className="animate-spin rounded-full h-8 w-8 border-2 border-primary border-t-transparent"></div>
+          </div>
+        )}
+
+        {error && (
+          <div className="text-center py-8 text-red-500">
+            <span className="material-symbols-outlined text-4xl mb-2">error</span>
+            <p className="text-sm">Failed to load hospitals. Please try again.</p>
+          </div>
+        )}
+
+        {!loading && displayHospitals?.map(hospital => (
+          <div
+            key={hospital.id}
             onClick={() => navigate(`/hospitals/${hospital.id}`)}
             className="flex flex-col gap-0 rounded-3xl bg-white dark:bg-gray-800 shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden hover:shadow-lg transition-all cursor-pointer active:scale-[0.98]"
           >
-            <div className="relative h-48 w-full bg-cover bg-center" style={{backgroundImage: `url("${hospital.image}")`}}>
-              <div className="absolute top-3 left-3 bg-green-500 text-white text-[10px] font-black px-2.5 py-1 rounded-lg shadow-sm flex items-center gap-1">
-                <span className="material-symbols-outlined text-[14px]">check_circle</span>
-                Open 24/7
-              </div>
+            <div className="relative h-48 w-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
+              {hospital.logo_url ? (
+                <img src={hospital.logo_url} alt={hospital.name} className="max-h-full max-w-full object-contain p-4" />
+              ) : (
+                <span className="material-symbols-outlined text-6xl text-primary/40">local_hospital</span>
+              )}
+              {hospital.location?.is_open_24x7 && (
+                <div className="absolute top-3 left-3 bg-green-500 text-white text-[10px] font-black px-2.5 py-1 rounded-lg shadow-sm flex items-center gap-1">
+                  <span className="material-symbols-outlined text-[14px]">check_circle</span>
+                  Open 24/7
+                </div>
+              )}
+              {hospital.is_verified && (
+                <div className="absolute top-3 right-3 bg-blue-500 text-white text-[10px] font-black px-2.5 py-1 rounded-lg shadow-sm flex items-center gap-1">
+                  <span className="material-symbols-outlined text-[14px]">verified</span>
+                  Verified
+                </div>
+              )}
             </div>
-            
+
             <div className="p-5">
               <div className="flex justify-between items-start mb-2">
                 <div>
                   <h3 className="text-lg font-bold leading-tight">{hospital.name}</h3>
-                  <p className="text-secondary text-sm font-medium mt-0.5">{hospital.type}</p>
+                  <p className="text-secondary text-sm font-medium mt-0.5">Multi-Specialty Hospital</p>
                 </div>
                 <div className="flex items-center gap-1 bg-amber-50 dark:bg-amber-900/20 px-1.5 py-0.5 rounded text-xs font-bold text-amber-600">
-                    <span className="material-symbols-outlined text-sm filled">star</span> {hospital.rating}
+                  <span className="material-symbols-outlined text-sm filled">star</span> {hospital.rating?.toFixed(1) || '4.5'}
                 </div>
               </div>
               <div className="flex items-start gap-2 text-gray-500 dark:text-gray-400 text-sm">
                 <span className="material-symbols-outlined text-[18px] shrink-0 mt-0.5">location_on</span>
-                <p className="leading-snug">{hospital.location} • {hospital.distance} away</p>
+                <p className="leading-snug">{hospital.location?.address || 'Kurnool, Andhra Pradesh'}</p>
               </div>
+              {hospital.description && (
+                <p className="text-xs text-gray-400 mt-2 line-clamp-2">{hospital.description}</p>
+              )}
             </div>
           </div>
         ))}
+
+        {!loading && (!displayHospitals || displayHospitals.length === 0) && (
+          <div className="text-center py-12 text-gray-500">
+            <span className="material-symbols-outlined text-5xl mb-3 opacity-30">local_hospital</span>
+            <p className="text-sm">No hospitals found.</p>
+          </div>
+        )}
       </div>
     </div>
   );

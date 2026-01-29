@@ -1,15 +1,24 @@
-// Re-export all hooks
+// ==============================================================
+// HOOKS INDEX
+// Re-export all hooks from their respective modules
+// ==============================================================
+
+// Core Query Utilities
 export { useSupabaseQuery, useSupabaseRecord, useSupabaseList } from './useSupabaseQuery';
-export { useMedicines, useMedicine, useMedicineSearch, useMedicineInventory, useMedicinesByCategory } from './useMedicines';
-export { useDoctors, useDoctor, useDoctorsBySpecialty, useDoctorSearch, useDoctorSpecialties, useDoctorAvailability } from './useDoctors';
-export { useLabTests, useLabTest, useLabTestsByCategory, useLabTestSearch, useLabTestPricing, useLabTestCategories } from './useLabTests';
-export { useScans, useScan, useScansByModality, useScansByBodyPart, useScanSearch, useScanPricing, useScanModalities } from './useScans';
-export { useOrders, useOrder, createOrder, updateOrderStatus, updatePaymentStatus } from './useOrders';
 
-// Phase 7: UI Configuration
-export { useMenu, useMenus, useCarousel, useCarouselsByPlacement, useFeatureFlag, useFeatureFlags, usePromoBanners, useHeroCarousel } from './useUIConfig';
+// UI Configuration
+export {
+    useMenu,
+    useMenus,
+    useCarousel,
+    useCarouselsByPlacement,
+    useFeatureFlag,
+    useFeatureFlags,
+    usePromoBanners,
+    useHeroCarousel
+} from './useUIConfig';
 
-// Phase 8: Bookings
+// Bookings
 export {
     useBookings,
     useBooking,
@@ -24,7 +33,7 @@ export {
     useScanBooking
 } from './useBookings';
 
-// Phase 9: Vendors
+// Vendors
 export {
     useVendors,
     useVendor,
@@ -39,3 +48,102 @@ export {
     useScanPricingFromCenters,
     useVendorSearch
 } from './useVendors';
+
+// Hospitals & Blood Banks
+export {
+    useHospitals,
+    useHospital,
+    useHospitalSearch,
+    useBloodBanks,
+    useBloodBank
+} from './useHospitals';
+
+// Services (Home Care, Physio, Surgery, etc.)
+export type { ServiceMaster } from './useServices';
+export {
+    useServicesByCategory,
+    useService,
+    useServiceSearch,
+    useHomeCareServices,
+    usePhysiotherapyServices,
+    useAmbulanceServices,
+    useSurgeryPackages,
+    useDiabetesPrograms,
+    useWellnessPlans,
+    useSkinHairTreatments,
+    useMotherBabyServices,
+    useHomeVisitServices
+} from './useServices';
+
+// Insurance Plans
+export type { InsurancePlan } from './useInsurance';
+export {
+    useInsurancePlans,
+    useInsurancePlansByType,
+    useInsurancePlan,
+    useInsurancePlanTypes
+} from './useInsurance';
+
+
+// Health Content (Articles & Videos)
+export type { HealthContent } from './useContent';
+export {
+    useHealthContent,
+    useHealthContentByType,
+    useHealthContentByCategory,
+    useHealthContentBySlug,
+    useHealthContentById,
+    useHealthContentSearch,
+    useHealthContentCategories
+} from './useContent';
+
+// Medicines
+export type { Medicine } from './useMedicines';
+export {
+    useMedicines,
+    useMedicine,
+    useMedicineSearch
+} from './useMedicines';
+
+// Doctors (Profiles)
+export type { Doctor } from './useDoctors';
+export {
+    useDoctors,
+    useDoctor,
+    useDoctorSearch
+} from './useDoctors';
+
+// Lab Tests (Master)
+export type { LabTest } from './useLabTests';
+export {
+    useLabTests,
+    useLabTest,
+    useLabTestSearch
+} from './useLabTests';
+
+// Medical Scans
+export type { MedicalScan } from './useMedicalScans';
+export {
+    useMedicalScans,
+    useMedicalScan,
+    useScanSearch
+} from './useMedicalScans';
+
+// Orders & Coupons
+export {
+    useCreateOrder,
+    useCoupon,
+    useUploadPrescription,
+    useMyOrders,
+    useOrderDetails
+} from './useOrders';
+
+// Realtime & Notifications
+export {
+    useRealtimeOrders,
+    useRealtimeSlots,
+    useNotificationPermission,
+    useBookingReminders,
+    requestNotificationPermission,
+    showNotification
+} from './useRealtime';

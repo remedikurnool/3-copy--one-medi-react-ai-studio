@@ -37,16 +37,17 @@ interface UserState {
   profile: UserProfile;
   addresses: Address[];
   familyMembers: FamilyMember[];
-  
+
   login: (phone: string) => void;
   logout: () => void;
   googleLogin: () => void;
-  
+
   updateProfile: (profile: Partial<UserProfile>) => void;
   addAddress: (address: Address) => void;
   removeAddress: (id: string) => void;
   addFamilyMember: (member: FamilyMember) => void;
   removeFamilyMember: (id: string) => void;
+  setAuthenticated: (status: boolean) => void;
 }
 
 const MOCK_USER: UserProfile = {
@@ -135,6 +136,7 @@ export const useUserStore = create<UserState>()(
       removeFamilyMember: (id) => set((state) => ({
         familyMembers: state.familyMembers.filter(f => f.id !== id)
       })),
+      setAuthenticated: (status) => set({ isAuthenticated: status }),
     }),
     {
       name: 'one-medi-user',

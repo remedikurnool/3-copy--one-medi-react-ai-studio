@@ -9,23 +9,65 @@ export interface LocationState {
   pincode: string;
   isDetecting: boolean;
   error: string | null;
-  
+
   detectLocation: () => Promise<void>;
   setManualLocation: (city: string, address: string) => void;
 }
 
-// Mock function to simulate Reverse Geocoding (Coords -> Address)
-// In a real app, this would call Google Maps Geocoding API
-const mockReverseGeocode = async (lat: number, lng: number) => {
-  return new Promise<{address: string, city: string, pincode: string}>((resolve) => {
-    setTimeout(() => {
-      resolve({
-        address: 'Gayatri Estate, Near Park Road',
-        city: 'Kurnool',
-        pincode: '518002'
-      });
-    }, 1500); // Simulate network delay
-  });
+// Real Reverse Geocoding using OpenStreetMap Nominatim API (free, no API key required)
+const reverseGeocode = async (lat: number, lng: number): Promise<{ address: string, city: string, pincode: string }> => {
+  try {
+    const response = await fetch(
+      `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1`,
+      {
+        headers: {
+          'Accept': 'application/json',
+          'User-Agent': 'ONE-MEDI-App/1.0' // Required by Nominatim usage policy
+        }
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error('Geocoding API request failed');
+    }
+
+    const data = await response.json();
+
+    // Extract address components from response
+    const addressDetails = data.address || {};
+
+    // Build readable address
+    const addressParts = [
+      addressDetails.road,
+      addressDetails.neighbourhood || addressDetails.suburb,
+      addressDetails.city_district
+    ].filter(Boolean);
+
+    const address = addressParts.length > 0
+      ? addressParts.join(', ')
+      : data.display_name?.split(',').slice(0, 2).join(', ') || 'Location detected';
+
+    // Get city - try multiple fields as OSM naming varies by region
+    const city = addressDetails.city
+      || addressDetails.town
+      || addressDetails.village
+      || addressDetails.state_district
+      || addressDetails.county
+      || 'Kurnool'; // Fallback for Kurnool area
+
+    // Get pincode
+    const pincode = addressDetails.postcode || '518002';
+
+    return { address, city, pincode };
+  } catch (error) {
+    console.error('Reverse geocoding failed:', error);
+    // Fallback to Kurnool defaults if geocoding fails
+    return {
+      address: 'Location detected',
+      city: 'Kurnool',
+      pincode: '518002'
+    };
+  }
 };
 
 export const useLocationStore = create<LocationState>()(
@@ -33,9 +75,9 @@ export const useLocationStore = create<LocationState>()(
     (set) => ({
       latitude: null,
       longitude: null,
-      address: 'Select Location',
+      address: 'Detecting location...',
       city: 'Kurnool',
-      pincode: '',
+      pincode: '518002',
       isDetecting: false,
       error: null,
 
@@ -43,50 +85,70 @@ export const useLocationStore = create<LocationState>()(
         set({ isDetecting: true, error: null });
 
         if (!navigator.geolocation) {
-          set({ isDetecting: false, error: 'Geolocation is not supported by your browser.' });
+          set({ isDetecting: false, error: 'Geolocation not supported by your browser' });
           return;
         }
 
-        navigator.geolocation.getCurrentPosition(
-          async (position) => {
-            const { latitude, longitude } = position.coords;
-            try {
-              // Simulate API call
-              const data = await mockReverseGeocode(latitude, longitude);
-              set({
-                latitude,
-                longitude,
-                address: data.address,
-                city: data.city,
-                pincode: data.pincode,
-                isDetecting: false
-              });
-            } catch (err) {
-              set({ isDetecting: false, error: 'Failed to fetch address details.' });
-            }
-          },
-          (error) => {
-            let errorMessage = 'Unable to retrieve your location.';
-            if (error.code === error.PERMISSION_DENIED) {
-              errorMessage = 'Location permission denied. Please enable it in settings.';
-            }
-            set({ isDetecting: false, error: errorMessage });
-          },
-          { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-        );
+        try {
+          const position = await new Promise<GeolocationPosition>((resolve, reject) => {
+            navigator.geolocation.getCurrentPosition(resolve, reject, {
+              enableHighAccuracy: true,
+              timeout: 10000,
+              maximumAge: 60000 // Cache for 1 minute
+            });
+          });
+
+          const { latitude, longitude } = position.coords;
+
+          // Get address from coordinates using real geocoding
+          const { address, city, pincode } = await reverseGeocode(latitude, longitude);
+
+          set({
+            latitude,
+            longitude,
+            address,
+            city,
+            pincode,
+            isDetecting: false,
+            error: null
+          });
+        } catch (geoError: any) {
+          let errorMessage = 'Unable to detect location';
+
+          if (geoError.code === 1) {
+            errorMessage = 'Location access denied. Please enable in settings.';
+          } else if (geoError.code === 2) {
+            errorMessage = 'Location unavailable. Please try again.';
+          } else if (geoError.code === 3) {
+            errorMessage = 'Location request timed out. Please try again.';
+          }
+
+          set({
+            isDetecting: false,
+            error: errorMessage,
+            // Keep existing location data on error
+          });
+        }
       },
 
-      setManualLocation: (city, address) => {
-        set({ city, address, error: null });
-      }
+      setManualLocation: (city, address) => set({
+        city,
+        address,
+        latitude: null,
+        longitude: null,
+        error: null
+      }),
     }),
     {
-      name: 'one-medi-location',
-      partialize: (state) => ({ 
-        city: state.city, 
+      name: 'one-medi-location', // localStorage key
+      partialize: (state) => ({
+        // Only persist these fields, not detecting state or errors
+        latitude: state.latitude,
+        longitude: state.longitude,
         address: state.address,
-        pincode: state.pincode 
-      }), // Only persist these fields
+        city: state.city,
+        pincode: state.pincode,
+      }),
     }
   )
 );

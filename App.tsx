@@ -23,9 +23,12 @@ const Profile = lazy(() => import('./pages/Profile'));
 const Cart = lazy(() => import('./pages/Cart'));
 const Checkout = lazy(() => import('./pages/Checkout'));
 const OrderSuccess = lazy(() => import('./pages/OrderSuccess'));
+const OrderList = lazy(() => import('./pages/orders/OrderList'));
+const OrderDetail = lazy(() => import('./pages/orders/OrderDetail'));
 const Notifications = lazy(() => import('./pages/Notifications'));
 const Services = lazy(() => import('./pages/Services'));
 const UploadRx = lazy(() => import('./pages/UploadRx'));
+const NotFound = lazy(() => import('./pages/NotFound'));
 
 // Feature: Medicines
 const MedicineList = lazy(() => import('./pages/medicines/MedicineList'));
@@ -146,6 +149,8 @@ const App = () => {
               <Route path="/cart" element={<Cart />} />
               <Route path="/checkout" element={<Checkout />} />
               <Route path="/order-success" element={<OrderSuccess />} />
+              <Route path="/orders" element={<OrderList />} />
+              <Route path="/orders/:id" element={<OrderDetail />} />
               <Route path="/notifications" element={<Notifications />} />
 
               <Route path="/doctors/:id" element={<DoctorProfile />} />
@@ -167,6 +172,9 @@ const App = () => {
               <Route path="/profile/health-records" element={<HealthRecords />} />
               <Route path="/profile/calculators" element={<Calculators />} />
               <Route path="/prescriptions" element={<Prescriptions />} />
+
+              {/* 404 Catch-all Route */}
+              <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>
         </HashRouter>

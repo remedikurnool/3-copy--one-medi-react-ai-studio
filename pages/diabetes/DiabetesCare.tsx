@@ -1,9 +1,8 @@
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { DIABETES_PACKAGES } from '../../constants';
+import { useDiabetesPrograms, ServiceMaster } from '../../hooks';
 
-// Mock data for diabetes product categories
+// Static diabetes product categories (UI navigation only)
 const DIABETES_CATEGORIES = [
   { id: 'c1', title: 'Devices', icon: 'devices', color: 'text-blue-500', bg: 'bg-blue-50 dark:bg-blue-900/20', link: '/medicines?cat=diabetes' },
   { id: 'c2', title: 'Medication', icon: 'medication', color: 'text-teal-500', bg: 'bg-teal-50 dark:bg-teal-900/20', link: '/medicines?cat=diabetes' },
@@ -13,6 +12,8 @@ const DIABETES_CATEGORIES = [
 
 export default function DiabetesCare() {
   const navigate = useNavigate();
+
+  const { data: diabetesPackages, loading, error } = useDiabetesPrograms();
 
   return (
     <div className="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden bg-bg-light dark:bg-bg-dark font-sans text-slate-900 dark:text-white pb-24">
@@ -29,11 +30,11 @@ export default function DiabetesCare() {
         <div className="p-4">
           <div className="relative overflow-hidden rounded-[2.5rem] bg-white dark:bg-gray-800 shadow-glass border border-white dark:border-gray-700">
             <div className="flex flex-col">
-              <div className="w-full h-56 bg-cover bg-center" style={{backgroundImage: 'url("https://images.unsplash.com/photo-1610484826967-09c5720778c7?auto=format&fit=crop&q=80&w=1200")'}}>
+              <div className="w-full h-56 bg-cover bg-center" style={{ backgroundImage: 'url("https://images.unsplash.com/photo-1610484826967-09c5720778c7?auto=format&fit=crop&q=80&w=1200")' }}>
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
                 <div className="absolute bottom-0 left-0 p-6 w-full">
                   <span className="inline-block px-3 py-1 mb-2 text-[10px] font-black tracking-widest text-white bg-secondary/80 backdrop-blur-md rounded-full uppercase">One Medi Care</span>
-                  <h2 className="text-white text-3xl font-black leading-tight drop-shadow-md">Monitor. Control.<br/>Prevent.</h2>
+                  <h2 className="text-white text-3xl font-black leading-tight drop-shadow-md">Monitor. Control.<br />Prevent.</h2>
                 </div>
               </div>
               <div className="p-6 flex flex-col gap-4">
@@ -52,7 +53,7 @@ export default function DiabetesCare() {
           <h3 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] mb-4 ml-1">Specialized Categories</h3>
           <div className="grid grid-cols-4 gap-3">
             {DIABETES_CATEGORIES.map((cat) => (
-              <button 
+              <button
                 key={cat.id}
                 onClick={() => navigate(cat.link)}
                 className="flex flex-col items-center gap-2 group"
@@ -80,7 +81,7 @@ export default function DiabetesCare() {
               <span className="text-sm font-black uppercase tracking-tight z-10">Book Tests</span>
             </button>
             <button onClick={() => navigate('/doctors')} className="relative flex flex-col items-center justify-center gap-3 p-5 bg-white dark:bg-gray-800 rounded-3xl shadow-glass border border-white dark:border-gray-700 active:scale-95 transition-transform h-36 group overflow-hidden">
-               <div className="absolute top-[-10px] right-[-10px] opacity-[0.05] group-hover:opacity-[0.1] transition-opacity">
+              <div className="absolute top-[-10px] right-[-10px] opacity-[0.05] group-hover:opacity-[0.1] transition-opacity">
                 <span className="material-symbols-outlined text-[80px]">medical_services</span>
               </div>
               <div className="size-14 rounded-2xl bg-teal-100 dark:bg-teal-900/40 flex items-center justify-center text-secondary shadow-inner">
@@ -91,84 +92,106 @@ export default function DiabetesCare() {
           </div>
         </div>
 
+        {/* Loading State */}
+        {loading && (
+          <div className="flex items-center justify-center py-12">
+            <div className="animate-spin rounded-full h-10 w-10 border-2 border-primary border-t-transparent"></div>
+          </div>
+        )}
+
+        {/* Error State */}
+        {error && (
+          <div className="text-center py-8 text-red-500 px-4">
+            <span className="material-symbols-outlined text-4xl mb-2">error</span>
+            <p className="text-sm font-medium">Failed to load packages</p>
+          </div>
+        )}
+
         {/* Packages */}
-        <div className="pt-6 px-4">
-          <div className="flex items-center gap-2 mb-4">
-            <span className="material-symbols-outlined text-secondary filled">verified_user</span>
-            <h3 className="text-xl font-black text-slate-900 dark:text-white uppercase tracking-tighter">Diabetes Packages</h3>
-          </div>
-          <div className="flex flex-col gap-5">
-            {DIABETES_PACKAGES.map((pkg, i) => (
-              <div key={pkg.id} className={`p-6 rounded-[2.5rem] border shadow-glass relative overflow-hidden transition-all hover:shadow-float ${i === 0 ? 'bg-gradient-to-br from-white to-blue-50 dark:from-gray-800 dark:to-gray-900 border-blue-100 dark:border-blue-900' : 'bg-white dark:bg-gray-800 border-gray-100 dark:border-gray-700'}`}>
-                {i === 0 && <div className="absolute -right-6 -top-6 size-32 bg-blue-400/10 rounded-full blur-3xl"></div>}
-                
-                {/* Taxonomy Badges */}
-                <div className="flex flex-wrap gap-2 mb-2 relative z-10">
-                   {pkg.diabetesType && <span className="bg-orange-100 dark:bg-orange-900/40 text-orange-700 dark:text-orange-300 text-[9px] font-black px-2 py-0.5 rounded uppercase tracking-widest border border-orange-200 dark:border-orange-800">{pkg.diabetesType}</span>}
-                   {pkg.careLevel && <span className="bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 text-[9px] font-black px-2 py-0.5 rounded uppercase tracking-widest border border-purple-200 dark:border-purple-800">{pkg.careLevel}</span>}
-                </div>
+        {!loading && diabetesPackages && diabetesPackages.length > 0 && (
+          <div className="pt-6 px-4">
+            <div className="flex items-center gap-2 mb-4">
+              <span className="material-symbols-outlined text-secondary filled">verified_user</span>
+              <h3 className="text-xl font-black text-slate-900 dark:text-white uppercase tracking-tighter">Diabetes Packages</h3>
+            </div>
+            <div className="flex flex-col gap-5">
+              {diabetesPackages.map((pkg: ServiceMaster, i: number) => (
+                <div key={pkg.id} className={`p-6 rounded-[2.5rem] border shadow-glass relative overflow-hidden transition-all hover:shadow-float ${i === 0 ? 'bg-gradient-to-br from-white to-blue-50 dark:from-gray-800 dark:to-gray-900 border-blue-100 dark:border-blue-900' : 'bg-white dark:bg-gray-800 border-gray-100 dark:border-gray-700'}`}>
+                  {i === 0 && <div className="absolute -right-6 -top-6 size-32 bg-blue-400/10 rounded-full blur-3xl"></div>}
 
-                <div className="flex justify-between items-start mb-4 relative z-10">
-                  <div>
-                    <h4 className="text-xl font-black text-slate-900 dark:text-white">{pkg.title}</h4>
-                    <p className="text-slate-500 font-bold text-xs uppercase tracking-wide">{pkg.description}</p>
+                  {/* Category Badge */}
+                  <div className="flex flex-wrap gap-2 mb-2 relative z-10">
+                    <span className="bg-orange-100 dark:bg-orange-900/40 text-orange-700 dark:text-orange-300 text-[9px] font-black px-2 py-0.5 rounded uppercase tracking-widest border border-orange-200 dark:border-orange-800">{pkg.category}</span>
+                    {pkg.is_home_service && <span className="bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300 text-[9px] font-black px-2 py-0.5 rounded uppercase tracking-widest border border-green-200 dark:border-green-800">Home Service</span>}
                   </div>
-                  {pkg.isPopular && <div className="bg-blue-600 text-white text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-widest shadow-lg">POPULAR</div>}
-                </div>
-                
-                {/* Enhanced Metadata Chips */}
-                <div className="flex flex-wrap gap-2 mb-4 relative z-10">
-                   <div className="flex items-center gap-1 bg-white/60 dark:bg-black/20 px-2 py-1 rounded-lg border border-slate-200 dark:border-slate-700">
-                      <span className="material-symbols-outlined text-[14px] text-blue-500">schedule</span>
-                      <span className="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-300">Duration: {pkg.duration}</span>
-                   </div>
-                   <div className="flex items-center gap-1 bg-white/60 dark:bg-black/20 px-2 py-1 rounded-lg border border-slate-200 dark:border-slate-700">
-                      <span className="material-symbols-outlined text-[14px] text-purple-500">monitoring</span>
-                      <span className="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-300">{pkg.monitoringFrequency}</span>
-                   </div>
-                   <div className="flex items-center gap-1 bg-white/60 dark:bg-black/20 px-2 py-1 rounded-lg border border-slate-200 dark:border-slate-700">
-                      <span className="material-symbols-outlined text-[14px] text-green-500">support_agent</span>
-                      <span className="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-300">{pkg.supportChannel}</span>
-                   </div>
-                </div>
 
-                <div className="flex flex-col gap-3 my-5 relative z-10">
-                  {pkg.includedServices.map(f => (
-                    <div key={f} className="flex items-center gap-2.5 text-xs font-bold text-slate-600 dark:text-gray-300">
-                      <span className="material-symbols-outlined text-secondary text-[20px] filled">check_circle</span>
-                      {f}
+                  <div className="flex justify-between items-start mb-4 relative z-10">
+                    <div>
+                      <h4 className="text-xl font-black text-slate-900 dark:text-white">{pkg.name}</h4>
+                      <p className="text-slate-500 font-bold text-xs uppercase tracking-wide">{pkg.description || 'Comprehensive diabetes care package'}</p>
                     </div>
-                  ))}
-                </div>
-                <div className="flex items-center justify-between mt-4 pt-5 border-t border-slate-100 dark:border-gray-700 relative z-10">
-                  <div className="flex flex-col">
-                    <span className="text-xs text-slate-400 font-bold line-through">₹{pkg.pricing.mrp}</span>
-                    <span className="text-2xl font-black text-slate-900 dark:text-white tracking-tighter">₹{pkg.pricing.offerPrice}</span>
-                    <span className="text-[9px] font-bold text-slate-400 uppercase">{pkg.pricing.billingCycle}</span>
+                    {i === 0 && <div className="bg-blue-600 text-white text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-widest shadow-lg">POPULAR</div>}
                   </div>
-                  <button className={`${i === 0 ? 'bg-secondary hover:bg-blue-600 shadow-float shadow-secondary/20' : 'bg-slate-900 dark:bg-white text-white dark:text-slate-900'} text-white px-8 py-3 rounded-2xl font-black text-xs uppercase tracking-widest transition-all active:scale-95`}>
-                    Book Now
-                  </button>
+
+                  {/* Metadata Chips */}
+                  <div className="flex flex-wrap gap-2 mb-4 relative z-10">
+                    {pkg.duration_minutes && (
+                      <div className="flex items-center gap-1 bg-white/60 dark:bg-black/20 px-2 py-1 rounded-lg border border-slate-200 dark:border-slate-700">
+                        <span className="material-symbols-outlined text-[14px] text-blue-500">schedule</span>
+                        <span className="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-300">Duration: {pkg.duration_minutes}m</span>
+                      </div>
+                    )}
+                    <div className="flex items-center gap-1 bg-white/60 dark:bg-black/20 px-2 py-1 rounded-lg border border-slate-200 dark:border-slate-700">
+                      <span className="material-symbols-outlined text-[14px] text-purple-500">monitoring</span>
+                      <span className="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-300">Regular Monitoring</span>
+                    </div>
+                    <div className="flex items-center gap-1 bg-white/60 dark:bg-black/20 px-2 py-1 rounded-lg border border-slate-200 dark:border-slate-700">
+                      <span className="material-symbols-outlined text-[14px] text-green-500">support_agent</span>
+                      <span className="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-300">24/7 Support</span>
+                    </div>
+                  </div>
+
+                  {/* Requirements/Features */}
+                  {pkg.requirements && pkg.requirements.length > 0 && (
+                    <div className="flex flex-col gap-3 my-5 relative z-10">
+                      {pkg.requirements.slice(0, 4).map(f => (
+                        <div key={f} className="flex items-center gap-2.5 text-xs font-bold text-slate-600 dark:text-gray-300">
+                          <span className="material-symbols-outlined text-secondary text-[20px] filled">check_circle</span>
+                          {f}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  <div className="flex items-center justify-between mt-4 pt-5 border-t border-slate-100 dark:border-gray-700 relative z-10">
+                    <div className="flex flex-col">
+                      <span className="text-2xl font-black text-slate-900 dark:text-white tracking-tighter">Contact for Quote</span>
+                      <span className="text-[9px] font-bold text-slate-400 uppercase">{pkg.unit || 'Per Package'}</span>
+                    </div>
+                    <button className={`${i === 0 ? 'bg-secondary hover:bg-blue-600 shadow-float shadow-secondary/20' : 'bg-slate-900 dark:bg-white text-white dark:text-slate-900'} text-white px-8 py-3 rounded-2xl font-black text-xs uppercase tracking-widest transition-all active:scale-95`}>
+                      Book Now
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Diet & Wellness Nudge */}
         <div className="p-4">
-           <div 
-             onClick={() => navigate('/wellness')}
-             className="bg-lime-50 dark:bg-lime-900/20 p-5 rounded-[2rem] border border-lime-100 dark:border-lime-800 flex items-center justify-between cursor-pointer"
-           >
-              <div>
-                 <h4 className="text-lg font-black text-lime-900 dark:text-lime-100 leading-tight">Diabetic Diet?</h4>
-                 <p className="text-xs text-lime-700 dark:text-lime-300 mt-1 font-medium">Get customized meal plans from expert dieticians.</p>
-              </div>
-              <div className="size-10 rounded-full bg-lime-200 dark:bg-lime-800 flex items-center justify-center text-lime-800 dark:text-lime-100">
-                 <span className="material-symbols-outlined">restaurant</span>
-              </div>
-           </div>
+          <div
+            onClick={() => navigate('/wellness')}
+            className="bg-lime-50 dark:bg-lime-900/20 p-5 rounded-[2rem] border border-lime-100 dark:border-lime-800 flex items-center justify-between cursor-pointer"
+          >
+            <div>
+              <h4 className="text-lg font-black text-lime-900 dark:text-lime-100 leading-tight">Diabetic Diet?</h4>
+              <p className="text-xs text-lime-700 dark:text-lime-300 mt-1 font-medium">Get customized meal plans from expert dieticians.</p>
+            </div>
+            <div className="size-10 rounded-full bg-lime-200 dark:bg-lime-800 flex items-center justify-center text-lime-800 dark:text-lime-100">
+              <span className="material-symbols-outlined">restaurant</span>
+            </div>
+          </div>
         </div>
 
         {/* Tips & Devices CTA */}
