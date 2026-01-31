@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { useCartStore } from '../../store/cartStore';
-import { useLabTest } from '../../hooks';
+import { useCartStore } from '@/store/cartStore';
+import { useLabTest } from '@/hooks';
 
 // Reusable Components for this page
 const InfoCard = ({ icon, label, value, color, darkColor }: any) => (

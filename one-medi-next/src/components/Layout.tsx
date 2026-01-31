@@ -1,7 +1,7 @@
 
 import React from 'react';
 import DesktopHeader from './ui/DesktopHeader';
-import { FloatingBottomNav } from './ui/FloatingBottomNav';
+import FloatingBottomNav from './ui/FloatingBottomNav';
 import FloatingServiceMenu from './ui/FloatingServiceMenu';
 import Footer from './ui/Footer';
 import { FlyingCartAnimation } from './ui/FlyingCartAnimation';

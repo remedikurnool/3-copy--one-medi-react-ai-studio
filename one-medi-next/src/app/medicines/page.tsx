@@ -1,18 +1,19 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useCartStore } from '@/store/cartStore';
-import { triggerCartAnimation } from '@/components/ui/FlyingCartAnimation';
 import { MedicineCardSkeleton } from '@/components/ui/Skeletons';
 import { useMedicines, useMedicineSearch } from '@/hooks/useMedicines';
+import { MedicineCard } from '@/components/cards/MedicineCard';
 
 const CATEGORY_GRID = [
-    { name: 'Pain Relief', icon: 'https://cdn-icons-png.flaticon.com/128/3004/3004458.png', filter: 'Pain Relief', color: 'bg-red-50 text-red-600' },
-    { name: 'Diabetes', icon: 'https://cdn-icons-png.flaticon.com/128/2857/2857753.png', filter: 'Diabetes', color: 'bg-blue-50 text-blue-600' },
-    { name: 'Cardiac', icon: 'https://cdn-icons-png.flaticon.com/128/10430/10430630.png', filter: 'Cardiac', color: 'bg-indigo-50 text-indigo-600' },
-    { name: 'Stomach', icon: 'https://cdn-icons-png.flaticon.com/128/2619/2619177.png', filter: 'Stomach Care', color: 'bg-green-50 text-green-600' },
-    { name: 'Vitamins', icon: 'https://cdn-icons-png.flaticon.com/128/994/994928.png', filter: 'Vitamins', color: 'bg-teal-50 text-teal-600' },
+    { name: 'Pain Relief', icon: 'health_and_safety', filter: 'Pain Relief', color: 'text-red-500' },
+    { name: 'Diabetes', icon: 'bloodtype', filter: 'Diabetes', color: 'text-blue-500' },
+    { name: 'Cardiac', icon: 'cardiology', filter: 'Cardiac', color: 'text-indigo-500' },
+    { name: 'Stomach', icon: 'digestive', filter: 'Stomach Care', color: 'text-green-500' },
+    { name: 'Vitamins', icon: 'nutrition', filter: 'Vitamins', color: 'text-teal-500' },
+    { name: 'Skin Care', icon: 'dermatology', filter: 'Skin Care', color: 'text-pink-500' },
 ];
 
 const CONCERNS = [
@@ -23,11 +24,10 @@ const CONCERNS = [
     { id: 'c_baby', label: 'Baby Colic', query: 'Baby', image: 'https://images.unsplash.com/photo-1519689680058-324335c77eba?auto=format&fit=crop&q=80&w=200' },
 ];
 
-export default function MedicinesPage() {
+function MedicinesContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const cartItemsCount = useCartStore((state) => state.items.length);
-    const addToCart = useCartStore((state) => state.addToCart);
 
     const [search, setSearch] = useState('');
     const [selectedCategory, setSelectedCategory] = useState(searchParams.get('cat') || 'All');
@@ -72,30 +72,11 @@ export default function MedicinesPage() {
 
     const filteredMedicines = medicines.filter((med: any) => {
         const matchesCategory = selectedCategory === 'All' || (med.category && med.category.toLowerCase() === selectedCategory.toLowerCase());
-
         const matchesConcern = !selectedConcern ||
             (med.indications && med.indications.some((i: string) => i.toLowerCase().includes(selectedConcern.toLowerCase()))) ||
             (med.category && med.category.toLowerCase().includes(selectedConcern.toLowerCase()));
-
         return matchesCategory && matchesConcern;
     });
-
-    const handleAdd = (e: React.MouseEvent, med: any) => {
-        e.stopPropagation();
-        triggerCartAnimation(e, med.image_url);
-        addToCart({
-            id: med.id,
-            type: 'medicine',
-            name: med.name,
-            price: med.price,
-            mrp: med.price * 1.2, // Assuming 20% discount if no mrp in DB
-            image: med.image_url,
-            packSize: med.pack_size,
-            qty: 1,
-            discount: '20% OFF',
-            isPrescriptionRequired: med.prescription_required
-        });
-    };
 
     return (
         <div className="flex flex-col min-h-screen bg-bg-light dark:bg-bg-dark font-sans animate-fade-in pb-24 text-slate-900 dark:text-white">
@@ -107,7 +88,7 @@ export default function MedicinesPage() {
                         </button>
                         <h1 className="text-lg font-black uppercase tracking-tight">Pharmacy</h1>
                     </div>
-                    <button id="cart-icon-target" onClick={() => router.push('/cart')} className="relative p-2.5 bg-slate-50 dark:bg-slate-800 rounded-2xl transition-all active:scale-95 shadow-soft border border-white dark:border-slate-700">
+                    <button onClick={() => router.push('/cart')} className="relative p-2.5 bg-slate-50 dark:bg-slate-800 rounded-2xl transition-all active:scale-95 shadow-soft border border-white dark:border-slate-700 hover:bg-slate-100">
                         <span className="material-symbols-outlined text-2xl">shopping_cart</span>
                         {cartItemsCount > 0 && <span className="absolute -top-1 -right-1 flex items-center justify-center size-5 bg-red-500 rounded-full text-[10px] text-white font-black border-2 border-white dark:border-gray-900 shadow-md animate-bounce">{cartItemsCount}</span>}
                     </button>
@@ -129,15 +110,14 @@ export default function MedicinesPage() {
             {/* Shop by Concern Section */}
             <section className="px-4 py-4 border-b border-gray-100 dark:border-gray-800/50">
                 <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Shop by Concern</h3>
-                <div className="flex gap-4 overflow-x-auto no-scrollbar pb-2">
+                <div className="flex gap-4 overflow-x-auto no-scrollbar pb-2 snap-x snap-mandatory">
                     {CONCERNS.map((concern) => (
                         <button
                             key={concern.id}
                             onClick={() => toggleConcern(concern.query)}
-                            className="flex flex-col items-center gap-2 shrink-0 group min-w-[60px]"
+                            className="snap-start flex flex-col items-center gap-2 shrink-0 group min-w-[60px]"
                         >
                             <div className={`size-14 rounded-full p-0.5 border-2 transition-all ${selectedConcern === concern.query ? 'border-primary ring-2 ring-primary/20 scale-105' : 'border-transparent group-hover:border-gray-200'}`}>
-                                {/* eslint-disable-next-line @next/next/no-img-element */}
                                 <img src={concern.image} alt={concern.label} className="w-full h-full object-cover rounded-full shadow-sm" />
                             </div>
                             <span className={`text-[10px] font-bold text-center leading-tight transition-colors ${selectedConcern === concern.query ? 'text-primary' : 'text-slate-600 dark:text-slate-400'}`}>
@@ -169,8 +149,7 @@ export default function MedicinesPage() {
                             className="flex flex-col items-center gap-2 shrink-0 group"
                         >
                             <div className={`size-16 rounded-[1.5rem] flex items-center justify-center transition-all duration-500 border-2 ${selectedCategory.toLowerCase() === cat.filter.toLowerCase() && !selectedConcern ? 'border-primary bg-primary/10 shadow-float scale-105' : 'border-white dark:border-slate-800 bg-white dark:bg-slate-800 shadow-soft'} group-active:scale-95`}>
-                                {/* eslint-disable-next-line @next/next/no-img-element */}
-                                <img src={cat.icon} alt={cat.name} className="w-9 h-9 object-contain group-hover:scale-110 transition-transform duration-500" />
+                                <span className={`material-symbols-outlined text-2xl ${cat.color}`}>{cat.icon}</span>
                             </div>
                             <span className={`text-[10px] font-black uppercase tracking-tighter text-center leading-tight max-w-[64px] transition-colors ${selectedCategory.toLowerCase() === cat.filter.toLowerCase() && !selectedConcern ? 'text-primary' : 'text-gray-400'}`}>
                                 {cat.name}
@@ -196,45 +175,17 @@ export default function MedicinesPage() {
                     )}
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                     {isLoading
                         ? Array(6).fill(0).map((_, i) => <MedicineCardSkeleton key={i} />)
                         : filteredMedicines.map((med: any) => (
-                            <div
+                            <MedicineCard
                                 key={med.id}
+                                medicine={med}
                                 onClick={() => router.push(`/medicines/${med.id}`)}
-                                className="group bg-white dark:bg-slate-900 rounded-[2.5rem] p-5 shadow-glass border border-white dark:border-slate-800/50 flex gap-5 relative cursor-pointer active:scale-[0.99] transition-all hover:shadow-float overflow-hidden"
-                            >
-                                {med.prescription_required && (
-                                    <div className="absolute top-0 right-0 bg-rose-500 text-white text-[10px] font-black px-3 py-1.5 rounded-bl-2xl z-20 shadow-sm flex items-center gap-1">
-                                        <span className="material-symbols-outlined text-[12px]">description</span> Rx
-                                    </div>
-                                )}
-
-                                <div className="size-28 shrink-0 bg-slate-50 dark:bg-slate-800 rounded-3xl flex items-center justify-center p-3 border border-slate-100 dark:border-slate-700 relative overflow-hidden">
-                                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                                    <img src={med.image_url} alt={med.name} className="w-full h-full object-contain relative z-10 group-hover:scale-110 transition-transform duration-500" />
-                                </div>
-                                <div className="flex-1 flex flex-col justify-between py-1 min-w-0">
-                                    <div>
-                                        <h3 className="font-black text-base leading-tight text-slate-900 dark:text-white line-clamp-2 tracking-tight">{med.name}</h3>
-                                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1.5">{med.category}</p>
-                                    </div>
-                                    <div className="flex items-end justify-between mt-3">
-                                        <div className="flex flex-col">
-                                            <span className="text-xl font-black text-slate-900 dark:text-white tracking-tighter">₹{med.price}</span>
-                                            <span className="text-[10px] text-slate-400 line-through font-bold">₹{(med.price * 1.2).toFixed(0)}</span>
-                                        </div>
-                                        <button
-                                            onClick={(e) => handleAdd(e, med)}
-                                            className="size-11 rounded-2xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 flex items-center justify-center shadow-xl active:scale-90 transition-all border border-white/10"
-                                        >
-                                            <span className="material-symbols-outlined text-2xl">add</span>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
+                            />
+                        ))
+                    }
                 </div>
 
                 {!isLoading && filteredMedicines.length === 0 && (
@@ -253,5 +204,20 @@ export default function MedicinesPage() {
                 )}
             </main>
         </div>
+    );
+}
+
+export default function MedicinesPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen bg-bg-light dark:bg-bg-dark flex items-center justify-center">
+                <div className="animate-pulse text-center">
+                    <span className="material-symbols-outlined text-4xl text-gray-400 animate-spin">sync</span>
+                    <p className="text-sm font-medium text-gray-500 mt-2">Loading pharmacy...</p>
+                </div>
+            </div>
+        }>
+            <MedicinesContent />
+        </Suspense>
     );
 }

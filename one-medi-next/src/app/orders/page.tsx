@@ -4,50 +4,52 @@ import React, { Suspense } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUserStore } from '../../store/userStore';
 import { useMyOrders } from '../../hooks';
-// import { NoOrdersState } from '../../components/ui/EmptyState'; // Assuming this might not exist yet, using inline fallback
+import { motion, AnimatePresence } from 'framer-motion';
 
 const OrderStatusBadge = ({ status }: { status: string }) => {
-    const getStatusColor = () => {
+    const getStatusStyle = () => {
         switch (status) {
-            case 'confirmed': return 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400';
-            case 'pending': return 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400';
-            case 'shipped': return 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400';
-            case 'delivered': return 'bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary';
-            case 'cancelled': return 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400';
-            default: return 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400';
+            case 'confirmed': return 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 border-emerald-200';
+            case 'pending': return 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 border-amber-200';
+            case 'shipped': return 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 border-blue-200';
+            case 'delivered': return 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border-slate-200';
+            case 'cancelled': return 'bg-red-50 text-red-600 dark:bg-red-900/20 dark:text-red-400 border-red-100';
+            default: return 'bg-gray-100 text-gray-600 border-gray-200';
         }
     };
 
     return (
-        <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide ${getStatusColor()}`}>
+        <div className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider border ${getStatusStyle()}`}>
             {status}
-        </span>
+        </div>
     );
 };
 
 function OrderListContent() {
     const router = useRouter();
-    const { profile } = useUserStore(); // useUserStore has 'profile' which has 'id'
+    const { profile } = useUserStore();
     const { orders, loading, error, refetch } = useMyOrders(profile?.id);
 
     const formatDate = (dateString: string) => {
         if (!dateString) return 'N/A';
         const date = new Date(dateString);
-        if (isNaN(date.getTime())) return 'Invalid Date';
+        if (isNaN(date.getTime())) return 'Invalid';
         return date.toLocaleDateString(undefined, {
             day: 'numeric',
             month: 'short',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
+            year: 'numeric'
         });
     };
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-bg-light dark:bg-bg-dark p-4 flex flex-col gap-4">
-                {[1, 2, 3].map(i => (
-                    <div key={i} className="bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-sm border border-gray-100 dark:border-gray-700 animate-pulse h-32"></div>
+            <div className="min-h-screen bg-bg-light dark:bg-bg-dark p-4 pt-20 flex flex-col gap-4">
+                {[1, 2, 3, 4].map(i => (
+                    <div key={i} className="bg-white dark:bg-gray-800 rounded-[2rem] p-6 shadow-sm border border-slate-50 dark:border-slate-800 animate-pulse h-40">
+                        <div className="h-4 bg-slate-100 dark:bg-slate-700 w-1/3 rounded mb-4"></div>
+                        <div className="h-10 bg-slate-100 dark:bg-slate-700 w-full rounded-xl mb-4"></div>
+                        <div className="h-4 bg-slate-100 dark:bg-slate-700 w-1/2 rounded"></div>
+                    </div>
                 ))}
             </div>
         );
@@ -55,80 +57,104 @@ function OrderListContent() {
 
     if (error) {
         return (
-            <div className="min-h-screen bg-bg-light dark:bg-bg-dark p-4 flex items-center justify-center">
+            <div className="min-h-screen bg-bg-light dark:bg-bg-dark p-6 flex items-center justify-center">
                 <div className="text-center">
-                    <span className="material-symbols-outlined text-4xl text-red-500 mb-2">error</span>
-                    <p className="text-gray-600 dark:text-gray-400">Failed to load orders.</p>
-                    <button onClick={refetch} className="text-primary font-bold mt-2">Try Again</button>
-                    <button onClick={() => router.back()} className="block mt-4 text-sm text-gray-500">Go Back</button>
+                    <div className="size-20 bg-red-50 dark:bg-red-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <span className="material-symbols-outlined text-4xl text-red-500">error_outline</span>
+                    </div>
+                    <p className="text-slate-600 dark:text-slate-400 font-bold mb-4">Failed to load orders.</p>
+                    <button onClick={refetch} className="text-primary font-black uppercase tracking-widest text-xs border border-primary/20 px-6 py-3 rounded-xl hover:bg-primary hover:text-white transition-colors">
+                        Try Again
+                    </button>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-bg-light dark:bg-bg-dark pb-24 font-sans text-slate-900 dark:text-white">
-            <header className="sticky top-0 z-40 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md border-b border-gray-100 dark:border-gray-800 px-4 py-3 flex items-center gap-3">
+        <div className="min-h-screen bg-bg-light dark:bg-bg-dark pb-32 font-sans text-slate-900 dark:text-white">
+            <header className="sticky top-0 z-40 bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl border-b border-white/20 dark:border-gray-800 p-4 flex items-center gap-3">
                 <button
                     onClick={() => router.back()}
-                    className="size-8 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                    className="size-10 flex items-center justify-center rounded-full bg-slate-50 dark:bg-gray-800 hover:bg-slate-100 dark:hover:bg-gray-700 transition-colors"
                 >
-                    <span className="material-symbols-outlined text-slate-700 dark:text-slate-200">arrow_back</span>
+                    <span className="material-symbols-outlined text-slate-700 dark:text-slate-200 text-lg">arrow_back</span>
                 </button>
-                <h1 className="text-lg font-bold">My Orders</h1>
+                <h1 className="text-xl font-black uppercase tracking-tight">My Orders</h1>
             </header>
 
-            <div className="p-4 flex flex-col gap-4">
+            <div className="p-4 flex flex-col gap-4 max-w-lg mx-auto w-full">
                 {orders.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center py-20 text-center">
-                        <div className="size-20 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mb-4">
-                            <span className="material-symbols-outlined text-4xl text-gray-400">shopping_bag</span>
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="flex flex-col items-center justify-center py-20 text-center"
+                    >
+                        <div className="size-32 bg-slate-50 dark:bg-slate-800/50 rounded-[2rem] flex items-center justify-center mb-6 shadow-inner">
+                            <span className="material-symbols-outlined text-6xl text-slate-300">shopping_bag</span>
                         </div>
-                        <h3 className="text-lg font-bold mb-1">No orders yet</h3>
-                        <p className="text-sm text-gray-500 mb-6">Start shopping for your medicines and lab tests.</p>
+                        <h3 className="text-2xl font-black mb-2 text-slate-900 dark:text-white tracking-tight">No orders found</h3>
+                        <p className="text-sm font-medium text-slate-500 mb-8 max-w-[200px]">Your order history will appear here once you make a purchase.</p>
                         <button
                             onClick={() => router.push('/')}
-                            className="bg-primary text-white px-6 py-2.5 rounded-xl font-bold text-sm shadow-lg shadow-primary/30"
+                            className="bg-primary hover:bg-primary-dark text-white px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-primary/30 transition-all hover:scale-105 active:scale-95"
                         >
                             Start Shopping
                         </button>
-                    </div>
+                    </motion.div>
                 ) : (
-                    orders.map((order) => (
-                        <div
-                            key={order.id}
-                            onClick={() => router.push(`/orders/${order.id}`)}
-                            className="bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-sm border border-gray-100 dark:border-gray-700 active:scale-[0.99] transition-transform cursor-pointer"
-                        >
-                            <div className="flex justify-between items-start mb-3">
-                                <div className="flex gap-3 items-center">
-                                    <div className="size-10 rounded-full bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-primary">
-                                        <span className="material-symbols-outlined text-xl">
-                                            {order.prescription_url ? 'description' : 'shopping_bag'}
-                                        </span>
+                    <AnimatePresence>
+                        {orders.map((order, index) => (
+                            <motion.div
+                                key={order.id}
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: index * 0.05 }}
+                                onClick={() => router.push(`/orders/${order.id}`)}
+                                className="bg-white dark:bg-gray-800 rounded-[2rem] p-5 shadow-sm hover:shadow-card-hover border border-slate-100 dark:border-slate-800 active:scale-[0.99] transition-all cursor-pointer group"
+                            >
+                                <div className="flex justify-between items-start mb-4">
+                                    <div className="flex gap-4 items-center">
+                                        <div className={`size-12 rounded-2xl flex items-center justify-center ${order.prescription_url
+                                                ? 'bg-purple-50 text-purple-600 dark:bg-purple-900/20 dark:text-purple-400'
+                                                : 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400'
+                                            }`}>
+                                            <span className="material-symbols-outlined text-2xl">
+                                                {order.prescription_url ? 'file_upload' : 'shopping_basket'}
+                                            </span>
+                                        </div>
+                                        <div>
+                                            <h3 className="font-black text-sm uppercase tracking-wider text-slate-400">Order #{order.id.slice(0, 8)}</h3>
+                                            <p className="text-sm font-bold text-slate-900 dark:text-white mt-0.5">
+                                                {formatDate(order.created_at)}
+                                            </p>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <h3 className="font-bold text-sm">Order #{order.id.slice(0, 8).toUpperCase()}</h3>
-                                        <p className="text-[10px] text-gray-500 dark:text-gray-400 font-medium">
-                                            {formatDate(order.created_at)}
-                                        </p>
-                                    </div>
+                                    <OrderStatusBadge status={order.status} />
                                 </div>
-                                <OrderStatusBadge status={order.status} />
-                            </div>
 
-                            <div className="flex items-center justify-between pt-3 border-t border-dashed border-gray-100 dark:border-gray-700">
-                                <div className="flex flex-col">
-                                    <span className="text-[10px] text-gray-400 font-medium uppercase tracking-wider">Total Amount</span>
-                                    <span className="font-bold text-base">₹{order.final_amount}</span>
+                                <div className="bg-slate-50 dark:bg-slate-700/30 rounded-xl p-3 mb-4 flex gap-2 overflow-hidden relative">
+                                    {/* Preview of first few items is tricky without explicit item data here unless joined. 
+                                    Assuming order object might just be summary. If we have items count or abstract, show that. 
+                                    For now just show generic summary */}
+                                    <div className="flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-300">
+                                        <span className="material-symbols-outlined text-base">receipt_long</span>
+                                        <span>Contains medicines & health products</span>
+                                    </div>
                                 </div>
-                                <div className="flex items-center gap-1 text-primary text-xs font-bold">
-                                    View Details
-                                    <span className="material-symbols-outlined text-sm">chevron_right</span>
+
+                                <div className="flex items-center justify-between pt-2">
+                                    <div className="flex flex-col">
+                                        <span className="text-[10px] text-slate-400 font-black uppercase tracking-wider">Total Amount</span>
+                                        <span className="font-black text-xl text-slate-900 dark:text-white">₹{order.final_amount}</span>
+                                    </div>
+                                    <div className="size-10 rounded-full bg-slate-100 dark:bg-slate-700/50 flex items-center justify-center text-slate-400 group-hover:bg-primary group-hover:text-white transition-colors shadow-sm">
+                                        <span className="material-symbols-outlined text-xl">arrow_forward</span>
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
-                    ))
+                            </motion.div>
+                        ))}
+                    </AnimatePresence>
                 )}
             </div>
         </div>
@@ -137,7 +163,11 @@ function OrderListContent() {
 
 export default function OrderListPage() {
     return (
-        <Suspense fallback={<div>Loading...</div>}>
+        <Suspense fallback={
+            <div className="min-h-screen bg-bg-light dark:bg-bg-dark flex items-center justify-center">
+                <span className="material-symbols-outlined text-4xl text-slate-300 animate-spin">refresh</span>
+            </div>
+        }>
             <OrderListContent />
         </Suspense>
     );

@@ -3,6 +3,7 @@
 import React, { Suspense } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useCartStore } from '../../store/cartStore';
 import PrescriptionUpload from '../../components/ui/PrescriptionUpload';
 
@@ -14,7 +15,6 @@ function CartContent() {
     const finalMrp = totalMrp();
     const savings = finalMrp - finalTotal;
 
-    // Logic: Cart is "active" if it has items OR a prescription is uploaded (Concierge Mode)
     const isConciergeMode = items.length === 0 && !!prescription;
     const isCartEmpty = items.length === 0 && !prescription;
 
@@ -23,15 +23,19 @@ function CartContent() {
 
     if (isCartEmpty) {
         return (
-            <div className="flex flex-col items-center justify-center min-h-screen bg-bg-light dark:bg-bg-dark text-slate-900 dark:text-white p-6">
-                <div className="size-24 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mb-4">
-                    <span className="material-symbols-outlined text-4xl text-gray-400">shopping_cart_off</span>
-                </div>
-                <h2 className="text-xl font-bold mb-2">Your cart is empty</h2>
-                <p className="text-gray-500 text-center mb-6">Looks like you haven't added anything yet.</p>
+            <div className="flex flex-col items-center justify-center min-h-screen bg-bg-light dark:bg-bg-dark text-slate-900 dark:text-white p-6 animate-fade-in">
+                <motion.div
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    className="size-32 bg-slate-100 dark:bg-slate-800 rounded-[2.5rem] flex items-center justify-center mb-6 shadow-inner"
+                >
+                    <span className="material-symbols-outlined text-5xl text-slate-400">shopping_cart_off</span>
+                </motion.div>
+                <h2 className="text-2xl font-black mb-2 tracking-tight">Your cart is empty</h2>
+                <p className="text-slate-500 font-medium text-center mb-8 max-w-xs">Looks like you haven't added anything yet. Start shopping now!</p>
                 <button
                     onClick={() => router.push('/')}
-                    className="bg-primary text-white px-6 py-3 rounded-xl font-bold"
+                    className="bg-primary hover:bg-primary-dark text-white px-8 py-4 rounded-2xl font-black uppercase tracking-widest shadow-lg shadow-primary/30 transition-all hover:scale-105 active:scale-95"
                 >
                     Explore Medicines
                 </button>
@@ -40,142 +44,164 @@ function CartContent() {
     }
 
     return (
-        <div className="relative flex flex-col min-h-screen mx-auto w-full bg-bg-light dark:bg-bg-dark pb-36 font-sans text-slate-900 dark:text-white">
+        <div className="relative flex flex-col min-h-screen mx-auto w-full bg-bg-light dark:bg-bg-dark pb-40 font-sans text-slate-900 dark:text-white overflow-x-hidden">
             {/* Header */}
-            <header className="sticky top-0 z-40 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-4 py-3 flex items-center justify-between shadow-sm">
-                <button onClick={() => router.back()} className="p-2 -ml-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-slate-700 dark:text-slate-200">
-                    <span className="material-symbols-outlined">arrow_back</span>
+            <header className="sticky top-0 z-40 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-b border-white/20 dark:border-gray-800 px-4 py-3 flex items-center justify-between shadow-sm">
+                <button onClick={() => router.back()} className="size-10 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-slate-700 dark:text-slate-200 flex items-center justify-center">
+                    <span className="material-symbols-outlined text-2xl">arrow_back</span>
                 </button>
-                <div className="flex-1 text-center pr-8">
-                    <h1 className="text-lg font-bold">My Cart</h1>
-                    <p className="text-xs text-gray-500 font-medium">
+                <div className="flex-1 text-center pr-10">
+                    <h1 className="text-lg font-black uppercase tracking-tight">My Cart</h1>
+                    <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">
                         {isConciergeMode ? 'Prescription Order' : `${items.length} Items`}
                     </p>
                 </div>
             </header>
 
             {/* Progress Stepper */}
-            <div className="bg-white dark:bg-gray-900 pt-4 pb-6 px-6">
-                <div className="flex items-center justify-between relative">
-                    <div className="absolute top-1/2 left-0 w-full h-0.5 bg-gray-200 dark:bg-gray-700 -z-10 -translate-y-1/2"></div>
+            <div className="bg-white dark:bg-gray-900 pt-4 pb-6 px-8 rounded-b-[2rem] shadow-sm mb-4">
+                <div className="flex items-center justify-between relative max-w-sm mx-auto">
+                    <div className="absolute top-1/2 left-0 w-full h-1 bg-gray-100 dark:bg-gray-800 -z-10 -translate-y-1/2 rounded-full"></div>
+                    <div className="absolute top-1/2 left-0 w-1/3 h-1 bg-primary -z-10 -translate-y-1/2 rounded-full"></div>
 
-                    <div className="flex flex-col items-center gap-1 bg-white dark:bg-gray-900 px-2">
-                        <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold text-sm shadow-lg shadow-primary/30">1</div>
-                        <span className="text-xs font-bold text-primary">Cart</span>
+                    <div className="flex flex-col items-center gap-2">
+                        <div className="size-8 rounded-full bg-primary text-white flex items-center justify-center font-bold text-sm shadow-lg shadow-primary/30 ring-4 ring-white dark:ring-gray-900">1</div>
+                        <span className="text-[10px] font-black uppercase tracking-widest text-primary">Cart</span>
                     </div>
 
-                    <div className="flex flex-col items-center gap-1 bg-white dark:bg-gray-900 px-2">
-                        <div className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-800 text-gray-400 dark:text-gray-500 flex items-center justify-center font-bold text-sm">2</div>
-                        <span className="text-xs font-medium text-gray-500">Address</span>
+                    <div className="flex flex-col items-center gap-2">
+                        <div className="size-8 rounded-full bg-gray-200 dark:bg-gray-800 text-gray-400 dark:text-gray-500 flex items-center justify-center font-bold text-sm ring-4 ring-white dark:ring-gray-900">2</div>
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Address</span>
                     </div>
 
-                    <div className="flex flex-col items-center gap-1 bg-white dark:bg-gray-900 px-2">
-                        <div className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-800 text-gray-400 dark:text-gray-500 flex items-center justify-center font-bold text-sm">3</div>
-                        <span className="text-xs font-medium text-gray-500">Payment</span>
+                    <div className="flex flex-col items-center gap-2">
+                        <div className="size-8 rounded-full bg-gray-200 dark:bg-gray-800 text-gray-400 dark:text-gray-500 flex items-center justify-center font-bold text-sm ring-4 ring-white dark:ring-gray-900">3</div>
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Pay</span>
                     </div>
                 </div>
             </div>
 
             {/* Concierge Mode Alert */}
             {isConciergeMode && (
-                <div className="mx-4 mt-4 bg-teal-50 dark:bg-teal-900/20 p-4 rounded-xl border border-teal-100 dark:border-teal-800 flex gap-3">
-                    <div className="size-10 rounded-full bg-teal-100 dark:bg-teal-800 flex items-center justify-center shrink-0 text-teal-600 dark:text-teal-300">
-                        <span className="material-symbols-outlined">support_agent</span>
+                <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="mx-4 mt-2 bg-gradient-to-br from-teal-50 to-emerald-50 dark:from-teal-900/30 dark:to-emerald-900/30 p-5 rounded-[1.5rem] border border-teal-100 dark:border-teal-800/50 flex gap-4 shadow-sm"
+                >
+                    <div className="size-12 rounded-2xl bg-white dark:bg-teal-800/50 flex items-center justify-center shrink-0 text-teal-600 dark:text-teal-300 shadow-sm">
+                        <span className="material-symbols-outlined text-2xl">support_agent</span>
                     </div>
                     <div>
-                        <h3 className="text-sm font-bold text-teal-800 dark:text-teal-200">Pharmacist Review</h3>
-                        <p className="text-xs text-teal-600 dark:text-teal-400 mt-1">
-                            You've uploaded a prescription. Our pharmacist will review it, add the medicines to your order, and call you for confirmation.
+                        <h3 className="text-sm font-black text-teal-900 dark:text-teal-100 uppercase tracking-wide">Pharmacist Review</h3>
+                        <p className="text-xs font-medium text-teal-700 dark:text-teal-300 mt-1 leading-relaxed">
+                            Our pharmacist will review your uploaded prescription, add the medicines to your order, and call you for confirmation.
                         </p>
                     </div>
-                </div>
+                </motion.div>
             )}
 
-            {/* Free Delivery Nudge (Only for regular orders) */}
+            {/* Free Delivery Nudge */}
             {!isConciergeMode && finalTotal < 500 && (
-                <div className="mx-4 mt-4 p-4 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
-                    <div className="flex justify-between items-center mb-2">
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="mx-4 mt-2 p-4 bg-white dark:bg-gray-800 rounded-[1.5rem] shadow-sm border border-gray-100 dark:border-gray-700"
+                >
+                    <div className="flex justify-between items-center mb-3">
                         <div className="flex items-center gap-2">
-                            <div className="bg-secondary/10 p-1.5 rounded-full text-secondary">
-                                <span className="material-symbols-outlined text-xl">local_shipping</span>
+                            <div className="bg-amber-100 dark:bg-amber-900/30 p-1.5 rounded-lg text-amber-600">
+                                <span className="material-symbols-outlined text-lg">local_shipping</span>
                             </div>
-                            <p className="text-sm font-semibold">Free Delivery</p>
+                            <p className="text-xs font-bold uppercase tracking-tight text-slate-700 dark:text-slate-300">Free Delivery</p>
                         </div>
-                        <p className="text-xs font-medium text-gray-500">₹{500 - finalTotal} more to unlock</p>
+                        <p className="text-[10px] font-black uppercase text-slate-400">Add ₹{500 - finalTotal} more</p>
                     </div>
-                    <div className="h-2.5 w-full bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
-                        <div className="h-full bg-secondary rounded-full" style={{ width: `${(finalTotal / 500) * 100}%` }}></div>
+                    <div className="h-2 w-full bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+                        <motion.div
+                            initial={{ width: 0 }}
+                            animate={{ width: `${(finalTotal / 500) * 100}%` }}
+                            transition={{ duration: 1, ease: "easeOut" }}
+                            className="h-full bg-gradient-to-r from-amber-400 to-orange-500 rounded-full"
+                        />
                     </div>
-                    <p className="text-xs text-secondary mt-2 font-medium">You're almost there! Add more items.</p>
-                </div>
+                </motion.div>
             )}
 
             {/* Cart Items */}
             {!isConciergeMode && (
-                <section className="mt-6 px-4 flex flex-col gap-4">
-                    {items.map((item) => (
-                        <div key={item.id} className="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 flex gap-4">
-                            <div className="shrink-0">
-                                {item.type === 'medicine' ? (
-                                    <div
-                                        className="w-20 h-20 rounded-lg bg-gray-100 dark:bg-gray-700 relative overflow-hidden"
-                                    >
-                                        <Image src={item.image || '/placeholder.png'} alt={item.name} fill className="object-cover" unoptimized />
+                <section className="mt-4 px-4 flex flex-col gap-4">
+                    <AnimatePresence>
+                        {items.map((item) => (
+                            <motion.div
+                                key={item.id}
+                                layout
+                                initial={{ opacity: 0, x: -20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, x: -100 }}
+                                className="bg-white dark:bg-gray-800 p-4 rounded-[2rem] shadow-sm border border-slate-50 dark:border-slate-800 flex gap-4 group"
+                            >
+                                <div className="shrink-0 relative">
+                                    <div className="size-24 rounded-2xl bg-slate-50 dark:bg-slate-700/50 relative overflow-hidden flex items-center justify-center border border-slate-100 dark:border-slate-700">
+                                        {item.type === 'medicine' ? (
+                                            <Image src={item.image || 'https://placehold.co/600x400/e2e8f0/64748b?text=Product'} alt={item.name} fill className="object-cover mix-blend-multiply dark:mix-blend-normal p-2 group-hover:scale-110 transition-transform duration-500" unoptimized />
+                                        ) : (
+                                            <span className="material-symbols-outlined text-4xl text-primary opacity-50">science</span>
+                                        )}
                                     </div>
-                                ) : (
-                                    <div className="w-20 h-20 rounded-lg bg-blue-50 dark:bg-gray-700 flex items-center justify-center text-primary dark:text-blue-400">
-                                        <span className="material-symbols-outlined text-4xl">science</span>
-                                    </div>
-                                )}
-                            </div>
-                            <div className="flex-1 flex flex-col justify-between">
-                                <div>
-                                    <div className="flex justify-between items-start">
-                                        <h3 className="text-base font-bold leading-tight line-clamp-2">{item.name}</h3>
-                                        <button onClick={() => removeFromCart(item.id)} className="text-gray-400 hover:text-red-500">
-                                            <span className="material-symbols-outlined text-lg">delete</span>
-                                        </button>
-                                    </div>
-                                    <p className="text-xs text-gray-500 mt-0.5">{item.packSize || 'Package'}</p>
-                                    {item.isPrescriptionRequired && (
-                                        <div className="flex items-center gap-1 mt-1">
-                                            <span className="material-symbols-outlined text-red-500 text-[14px]">prescription</span>
-                                            <span className="text-[10px] text-red-500 font-bold uppercase">Prescription Required</span>
-                                        </div>
-                                    )}
                                 </div>
-                                <div className="flex justify-between items-end mt-2">
+
+                                <div className="flex-1 flex flex-col justify-between py-1">
                                     <div>
-                                        <div className="flex items-center gap-2">
-                                            <span className="text-lg font-bold">₹{item.price * item.qty}</span>
-                                            {item.mrp > item.price && <span className="text-xs text-gray-400 line-through">₹{item.mrp * item.qty}</span>}
+                                        <div className="flex justify-between items-start gap-2">
+                                            <h3 className="text-base font-black leading-tight line-clamp-2 text-slate-900 dark:text-white tracking-tight">{item.name}</h3>
+                                            <button onClick={() => removeFromCart(item.id)} className="text-slate-300 hover:text-red-500 transition-colors p-1 -mr-2 -mt-2">
+                                                <span className="material-symbols-outlined text-xl">close</span>
+                                            </button>
+                                        </div>
+                                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-1">{item.packSize || 'Unit'}</p>
+
+                                        {item.isPrescriptionRequired && (
+                                            <div className="inline-flex items-center gap-1 mt-2 px-2 py-0.5 bg-red-50 dark:bg-red-900/20 rounded-md border border-red-100 dark:border-red-900/30">
+                                                <span className="material-symbols-outlined text-red-500 text-[12px]">description</span>
+                                                <span className="text-[9px] text-red-600 dark:text-red-400 font-black uppercase tracking-wider">Rx Required</span>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    <div className="flex justify-between items-end mt-2">
+                                        <div className="flex flex-col">
+                                            <span className="text-lg font-black text-slate-900 dark:text-white">₹{item.price * item.qty}</span>
+                                            {item.mrp > item.price && (
+                                                <span className="text-[10px] text-slate-400 line-through font-bold">₹{item.mrp * item.qty}</span>
+                                            )}
+                                        </div>
+
+                                        {/* Stepper */}
+                                        <div className="flex items-center bg-slate-100 dark:bg-slate-900 rounded-xl p-1 shadow-inner">
+                                            <button
+                                                onClick={() => updateQuantity(item.id, item.qty - 1)}
+                                                className="size-8 flex items-center justify-center rounded-lg bg-white dark:bg-slate-800 shadow-sm text-slate-900 dark:text-white hover:bg-slate-50 active:scale-90 transition-all"
+                                            >
+                                                <span className="material-symbols-outlined text-base">remove</span>
+                                            </button>
+                                            <div className="w-8 text-center font-black text-sm">{item.qty}</div>
+                                            <button
+                                                onClick={() => updateQuantity(item.id, item.qty + 1)}
+                                                className="size-8 flex items-center justify-center rounded-lg bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-md active:scale-90 transition-all"
+                                            >
+                                                <span className="material-symbols-outlined text-base">add</span>
+                                            </button>
                                         </div>
                                     </div>
-                                    {/* Large Stepper */}
-                                    <div className="flex items-center bg-gray-100 dark:bg-gray-900 rounded-lg p-1">
-                                        <button
-                                            onClick={() => updateQuantity(item.id, item.qty - 1)}
-                                            className="w-8 h-8 flex items-center justify-center rounded-md bg-white dark:bg-gray-800 shadow-sm text-slate-900 dark:text-white"
-                                        >
-                                            <span className="material-symbols-outlined text-base">remove</span>
-                                        </button>
-                                        <input className="w-8 text-center bg-transparent border-none p-0 text-sm font-bold focus:ring-0" readOnly type="text" value={item.qty} />
-                                        <button
-                                            onClick={() => updateQuantity(item.id, item.qty + 1)}
-                                            className="w-8 h-8 flex items-center justify-center rounded-md bg-primary text-white shadow-sm shadow-primary/30"
-                                        >
-                                            <span className="material-symbols-outlined text-base">add</span>
-                                        </button>
-                                    </div>
                                 </div>
-                            </div>
-                        </div>
-                    ))}
+                            </motion.div>
+                        ))}
+                    </AnimatePresence>
                 </section>
             )}
 
             {/* Prescription Upload Section */}
-            <section className="mx-4 mt-6 bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-100 dark:border-gray-700">
+            <section className="mx-4 mt-8">
                 <PrescriptionUpload
                     required={isPrescriptionNeeded}
                     label="Upload Prescription"
@@ -185,54 +211,59 @@ function CartContent() {
                 />
             </section>
 
-            {/* Bill Details (Hidden for Concierge Mode until pharmacist adds items) */}
+            {/* Bill Details */}
             {!isConciergeMode && (
-                <section className="mx-4 mb-6 mt-6 bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-100 dark:border-gray-700">
-                    <h3 className="text-base font-bold mb-4 border-b border-gray-100 dark:border-gray-700 pb-2">Bill Details</h3>
-                    <div className="flex justify-between items-center mb-2 text-sm text-gray-600 dark:text-gray-300">
-                        <span>Item Total</span>
-                        <span>₹{finalMrp}</span>
+                <section className="mx-4 my-6 bg-white dark:bg-gray-800 rounded-[2rem] p-6 shadow-sm border border-slate-100 dark:border-slate-700 relative overflow-hidden">
+                    <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-transparent via-slate-200 to-transparent opacity-50" />
+                    <h3 className="text-xs font-black uppercase tracking-widest text-slate-400 mb-4">Payment Summary</h3>
+
+                    <div className="space-y-3 mb-4">
+                        <div className="flex justify-between items-center text-sm font-medium text-slate-600 dark:text-slate-300">
+                            <span>Item Total</span>
+                            <span className="font-bold">₹{finalMrp}</span>
+                        </div>
+                        <div className="flex justify-between items-center text-sm font-medium text-slate-600 dark:text-slate-300">
+                            <span className="flex items-center gap-1">Delivery Fee</span>
+                            <span>{finalTotal >= 500 ? <span className="text-emerald-600 font-black uppercase text-xs">Free</span> : '₹40'}</span>
+                        </div>
+                        <div className="flex justify-between items-center text-sm font-bold text-emerald-600">
+                            <span>Total Savings</span>
+                            <span>- ₹{savings}</span>
+                        </div>
                     </div>
-                    <div className="flex justify-between items-center mb-2 text-sm text-gray-600 dark:text-gray-300">
-                        <span className="flex items-center gap-1">Delivery Fee <span className="material-symbols-outlined text-[16px] text-gray-400">info</span></span>
-                        <span>{finalTotal >= 500 ? <span className="text-green-600 font-bold">FREE</span> : '₹40'}</span>
-                    </div>
-                    <div className="flex justify-between items-center mb-4 text-sm text-secondary font-medium">
-                        <span>Total Savings</span>
-                        <span>- ₹{savings}</span>
-                    </div>
-                    <div className="border-t border-dashed border-gray-300 dark:border-gray-600 pt-3 flex justify-between items-center">
-                        <span className="font-bold text-lg">To Pay</span>
-                        <span className="font-bold text-lg">₹{finalTotal + (finalTotal >= 500 ? 0 : 40)}</span>
+
+                    <div className="border-t-2 border-dashed border-slate-100 dark:border-slate-700 pt-4 flex justify-between items-center">
+                        <span className="font-black text-lg text-slate-900 dark:text-white">To Pay</span>
+                        <span className="font-black text-2xl text-slate-900 dark:text-white">₹{finalTotal + (finalTotal >= 500 ? 0 : 40)}</span>
                     </div>
                 </section>
             )}
 
             {/* Trust Badge */}
-            <div className="flex items-center justify-center gap-2 mb-8 text-gray-400">
-                <span className="material-symbols-outlined text-lg">verified_user</span>
-                <span className="text-xs font-medium">100% Secure Payments & Verified Pharmacy</span>
+            <div className="flex items-center justify-center gap-2 mb-8 text-slate-400 opacity-60">
+                <span className="material-symbols-outlined text-xl">verified_user</span>
+                <span className="text-[10px] font-black uppercase tracking-widest">Secure Payments • Verified Pharmacy</span>
             </div>
 
-            {/* Sticky Footer Action Bar */}
-            <div className="fixed bottom-0 left-0 w-full z-50 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] p-4">
+            {/* Sticky Footer */}
+            <div className="fixed bottom-0 left-0 w-full z-50 bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl border-t border-slate-100 dark:border-slate-800 p-4 pb-safe shadow-2xl">
                 <div className="max-w-md mx-auto flex gap-4 items-center">
                     <div className="flex flex-col">
-                        <span className="text-xs text-gray-500 font-medium">Total</span>
-                        <span className="text-xl font-bold leading-tight">
+                        <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Total</span>
+                        <span className="text-2xl font-black leading-none text-slate-900 dark:text-white">
                             {isConciergeMode ? 'TBD' : `₹${finalTotal + (finalTotal >= 500 ? 0 : 40)}`}
                         </span>
-                        {!isConciergeMode && <button className="text-[10px] text-primary underline text-left">View Details</button>}
+                        {!isConciergeMode && <button className="text-[10px] text-primary font-bold underline mt-1 text-left">View Details</button>}
                     </div>
                     <button
                         disabled={!canCheckout}
                         onClick={() => router.push('/checkout')}
-                        className="flex-1 bg-primary hover:bg-primary-dark disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-bold py-3.5 px-6 rounded-xl shadow-lg shadow-primary/30 flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
+                        className="flex-1 bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed font-black text-sm uppercase tracking-widest py-4 px-6 rounded-2xl shadow-xl flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
                     >
                         {canCheckout
-                            ? (isConciergeMode ? 'Submit Prescription' : 'Select Address')
-                            : 'Upload Rx to Continue'}
-                        <span className="material-symbols-outlined">arrow_forward</span>
+                            ? (isConciergeMode ? 'Submit Order' : 'Checkout')
+                            : 'Upload Rx'}
+                        <span className="material-symbols-outlined text-lg">arrow_forward</span>
                     </button>
                 </div>
             </div>
@@ -242,7 +273,11 @@ function CartContent() {
 
 export default function CartPage() {
     return (
-        <Suspense fallback={<div>Loading...</div>}>
+        <Suspense fallback={
+            <div className="min-h-screen bg-bg-light dark:bg-bg-dark flex items-center justify-center">
+                <span className="material-symbols-outlined text-4xl text-slate-300 animate-spin">progress_activity</span>
+            </div>
+        }>
             <CartContent />
         </Suspense>
     );

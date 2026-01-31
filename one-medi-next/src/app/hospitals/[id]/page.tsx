@@ -32,15 +32,16 @@ export default function HospitalDetailPage() {
     // Fallback data for fields not yet in Supabase schema
     // In a real app, these would be in a separate 'vendor_details' table or JSON metadata
     const extendedData = {
-        image: hospital.logo_url || 'https://images.unsplash.com/photo-1587351021759-3e566b9af9ef?auto=format&fit=crop&q=80&w=800', // Default hospital image
+        image: hospital.image || 'https://images.unsplash.com/photo-1587351021759-3e566b9af9ef?auto=format&fit=crop&q=80&w=800',
         totalBeds: 500, // Placeholder
         totalDoctors: 120, // Placeholder 
         yearEstablished: 2010, // Placeholder
         accreditations: ['NABH', 'NABL', 'JCI'],
         departments: ['Cardiology', 'Neurology', 'Orthopedics', 'Pediatrics', 'Oncology', 'Gynecology'],
         insurancePartners: ['HDFC Ergo', 'Star Health', 'Apollo Munich', 'ICICI Lombard', 'Bajaj Allianz'],
-        facilities: ['24/7 Pharmacy', 'Emergency Care', 'ICU / NICU', 'Ambulance Service', 'Blood Bank', 'Cafeteria'],
-        emergencyNumber: hospital.location?.phone || '108'
+        facilities: hospital.facilities || ['24/7 Pharmacy', 'Emergency Care', 'ICU / NICU', 'Ambulance Service', 'Blood Bank', 'Cafeteria'],
+        emergencyNumber: '108',
+        description: 'Leading healthcare provider in Kurnool offering world-class medical services and patient care.'
     };
 
     return (
@@ -63,12 +64,12 @@ export default function HospitalDetailPage() {
                     <div className="absolute bottom-0 left-0 right-0 p-5">
                         <div className="flex items-center gap-2 mb-2">
                             <span className="bg-primary text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest">Multi-Specialty</span>
-                            {hospital.location?.is_open_24x7 && <span className="bg-emerald-500 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest">Open 24/7</span>}
+                            {hospital.open24x7 && <span className="bg-emerald-500 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest">Open 24/7</span>}
                         </div>
                         <h2 className="text-3xl font-black text-white leading-tight drop-shadow-md">{hospital.name}</h2>
                         <p className="text-white/80 text-sm font-medium mt-1 flex items-center gap-1">
                             <span className="material-symbols-outlined text-sm">location_on</span>
-                            {hospital.location?.address || 'Kurnool'}
+                            {hospital.location}
                         </p>
                     </div>
                 </div>
@@ -101,7 +102,7 @@ export default function HospitalDetailPage() {
                     <section className="bg-white dark:bg-gray-800 p-6 rounded-[2rem] shadow-sm border border-gray-100 dark:border-gray-700">
                         <h3 className="text-lg font-black mb-3">About the Hospital</h3>
                         <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed font-medium">
-                            {hospital.description || 'Leading healthcare provider in Kurnool offering world-class medical services and patient care.'}
+                            {extendedData.description}
                         </p>
                         <div className="flex gap-3 mt-5">
                             {extendedData.accreditations.map((acc, i) => (

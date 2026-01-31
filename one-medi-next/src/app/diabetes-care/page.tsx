@@ -2,14 +2,14 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useDiabetesServices } from '@/hooks/useServices';
+import { useDiabetesPrograms } from '@/hooks/useServices';
 import type { ServiceMaster } from '@/hooks/useServices';
 
 export default function DiabetesCarePage() {
     const router = useRouter();
     const [search, setSearch] = useState('');
 
-    const { data: services, loading, error } = useDiabetesServices();
+    const { data: services, loading, error } = useDiabetesPrograms();
 
     const filteredServices = (services || []).filter((s: ServiceMaster) =>
         !search ||

@@ -12,10 +12,11 @@ export const PrescriptionPromo: React.FC<PrescriptionPromoProps> = ({ compact = 
   const router = useRouter();
 
   return (
-    <div className={`relative overflow-hidden rounded-2xl bg-gradient-to-r from-teal-500 to-blue-600 shadow-lg text-white ${compact ? 'p-4' : 'p-5'} ${className}`}>
+    <div className={`relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-teal-500 via-teal-600 to-blue-600 shadow-xl shadow-teal-500/20 text-white group cursor-pointer active:scale-[0.99] transition-all duration-300 ${compact ? 'p-4' : 'p-6'} ${className}`}>
       {/* Background Decor */}
-      <div className="absolute top-0 right-0 -mr-8 -mt-8 size-32 rounded-full bg-white/10 blur-2xl"></div>
-      <div className="absolute bottom-0 left-0 -ml-8 -mb-8 size-24 rounded-full bg-white/10 blur-2xl"></div>
+      <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10 mix-blend-overlay"></div>
+      <div className="absolute top-0 right-0 -mr-16 -mt-16 size-64 rounded-full bg-white/10 blur-3xl group-hover:bg-white/20 transition-colors duration-700"></div>
+      <div className="absolute bottom-0 left-0 -ml-16 -mb-16 size-48 rounded-full bg-blue-500/30 blur-3xl"></div>
 
       <div className="relative z-10 flex items-center justify-between gap-4">
         <div className="flex-1">

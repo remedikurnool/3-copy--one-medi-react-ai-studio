@@ -6,6 +6,7 @@ import { useLocationStore } from '../../store/locationStore';
 import LocationModal from '../../components/ui/LocationModal';
 import { useDoctors, useDoctorSearch } from '../../hooks/useDoctors';
 import { DoctorCardSkeleton } from '../../components/ui/Skeletons';
+import { DoctorCard } from '../../components/cards/DoctorCard';
 
 export default function DoctorListPage() {
     const router = useRouter();
@@ -20,25 +21,13 @@ export default function DoctorListPage() {
     const { data: searchResults, loading: loadingSearch } = useDoctorSearch(search);
 
     const isLoading = loadingAll || (search.length >= 2 && loadingSearch);
-
     const displayDoctors = search.length >= 2 ? searchResults : allDoctors;
-
     const filteredDoctors = (displayDoctors || []).filter(doc => {
-        // Note: Adjusting for potential property name mismatch if interface differs, 
-        // but assuming hooks return consistent 'specialization' as per legacy
-        const matchesSpecialty = selectedSpecialty === 'All' || doc.specialization === selectedSpecialty;
-        return matchesSpecialty;
-    }).map(doc => ({
-        ...doc,
-        specialty: doc.specialization,
-        experience: `${doc.experience_years} Years`,
-        fee: doc.consultation_fee,
-        image: doc.image_url,
-        hospital: 'One Medi Partner Clinic'
-    }));
+        return selectedSpecialty === 'All' || doc.specialty === selectedSpecialty;
+    });
 
     return (
-        <div className="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden pb-24 bg-bg-light dark:bg-bg-dark font-sans text-slate-900 dark:text-white">
+        <div className="min-h-screen bg-bg-light dark:bg-bg-dark font-sans text-slate-900 dark:text-white pb-24 relative">
             <LocationModal isOpen={isLocationModalOpen} onClose={() => setIsLocationModalOpen(false)} />
 
             {/* Sticky Header */}
@@ -52,154 +41,121 @@ export default function DoctorListPage() {
                             <span className="material-symbols-outlined text-2xl">arrow_back</span>
                         </button>
                         <div>
-                            <h2 className="text-slate-900 dark:text-white text-lg font-bold leading-tight tracking-[-0.015em]">ONE MEDI</h2>
-                            <div
+                            <h2 className="text-slate-900 dark:text-white text-lg font-black leading-tight tracking-tight">ONE MEDI</h2>
+                            <button
                                 onClick={() => setIsLocationModalOpen(true)}
                                 className="flex items-center gap-1 text-sm text-secondary font-medium cursor-pointer hover:text-primary transition-colors"
                             >
                                 <span className="material-symbols-outlined text-[16px] filled">location_on</span>
                                 <span>{city || 'Kurnool'}, AP</span>
                                 <span className="material-symbols-outlined text-[16px]">expand_more</span>
-                            </div>
+                            </button>
                         </div>
                     </div>
                 </div>
             </header>
 
-            {/* Hero Headline */}
-            <div className="pt-5 px-4 pb-2">
-                <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Find Your Doctor</h1>
-                <p className="text-gray-500 dark:text-gray-400 text-sm mt-1 font-medium">Book appointments with top specialists</p>
-            </div>
-
-            {/* Unified Sticky Filter Bar (Search + Specialty) */}
-            <div className="sticky top-[72px] z-40 bg-bg-light/95 dark:bg-bg-dark/95 backdrop-blur-sm transition-colors shadow-sm border-b border-gray-100 dark:border-gray-800 pb-3">
-                <div className="px-4 py-3">
-                    <label className="flex flex-col h-12 w-full shadow-sm">
-                        <div className="flex w-full flex-1 items-stretch rounded-xl h-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 transition-all">
-                            <div className="text-primary flex items-center justify-center pl-4 pr-2">
-                                <span className="material-symbols-outlined text-xl">search</span>
-                            </div>
-                            <input
-                                value={search}
-                                onChange={(e) => setSearch(e.target.value)}
-                                className="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl bg-transparent text-slate-900 dark:text-white focus:outline-0 border-none ring-0 placeholder:text-gray-400 dark:placeholder:text-gray-500 px-2 text-base font-medium leading-normal"
-                                placeholder="Search name or hospital..."
-                            />
-                            {search && (
-                                <button onClick={() => setSearch('')} className="pr-4 text-gray-400">
-                                    <span className="material-symbols-outlined text-xl">close</span>
-                                </button>
-                            )}
-                        </div>
-                    </label>
+            {/* Title & Search */}
+            <div className="pt-4 px-4 space-y-4">
+                <div>
+                    <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Find Specialists</h1>
+                    <p className="text-gray-500 dark:text-gray-400 text-sm font-medium">Top doctors in your city</p>
                 </div>
 
-                {/* Sticky Specialty Filter Chips */}
+                <div className="relative">
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-gray-400">search</span>
+                    <input
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                        className="w-full h-12 pl-12 pr-4 rounded-xl border-none bg-gray-100 dark:bg-gray-800 focus:ring-2 focus:ring-primary transition-all font-medium text-sm"
+                        placeholder="Search doctor, hospital, specialty..."
+                    />
+                </div>
+            </div>
+
+            {/* Specialty Filter */}
+            <div className="sticky top-[73px] z-40 bg-bg-light/95 dark:bg-bg-dark/95 backdrop-blur-sm py-4 border-b border-gray-100 dark:border-gray-800 mb-2">
                 <div className="flex gap-2 px-4 overflow-x-auto no-scrollbar scroll-pl-4">
                     {specialties.map(specialty => (
                         <button
                             key={specialty}
                             onClick={() => setSelectedSpecialty(specialty)}
-                            className={`flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full px-4 shadow-sm whitespace-nowrap active:scale-95 transition-all ${selectedSpecialty === specialty
-                                ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-md ring-2 ring-primary/10'
+                            className={`flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full px-4 shadow-sm whitespace-nowrap active:scale-95 transition-all outline-none ${selectedSpecialty === specialty
+                                ? 'bg-primary text-white shadow-lg shadow-primary/30'
                                 : 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-slate-600 dark:text-gray-400'
                                 }`}
                         >
-                            <p className="text-[11px] font-black uppercase tracking-wider">{specialty}</p>
+                            <span className="text-[11px] font-black uppercase tracking-wider">{specialty}</span>
                         </button>
                     ))}
                 </div>
             </div>
 
-            {/* Doctor Listing */}
-            <main className="flex-1 flex flex-col gap-4 p-4">
-                {/* Results Summary */}
-                <div className="flex justify-between items-center mb-2 px-1">
-                    <p className="text-xs font-bold text-gray-400 uppercase tracking-[0.1em]">
-                        {isLoading ? 'Searching...' : `Available Doctors (${filteredDoctors.length})`}
+            {/* List */}
+            <main className="px-4 flex flex-col gap-4 max-w-lg mx-auto w-full">
+                <div className="flex justify-between items-center px-1">
+                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                        {isLoading ? 'Searching...' : `${filteredDoctors.length} Specialists Found`}
                     </p>
-                    {(selectedSpecialty !== 'All' || search) && (
-                        <button
-                            onClick={() => { setSelectedSpecialty('All'); setSearch(''); }}
-                            className="text-[10px] font-black text-primary uppercase underline underline-offset-4"
-                        >
-                            Clear
-                        </button>
-                    )}
                 </div>
 
-                <div className="flex flex-col gap-4">
-                    {isLoading ? (
-                        Array(4).fill(0).map((_, i) => <DoctorCardSkeleton key={i} />)
-                    ) : (
-                        filteredDoctors.map((doc) => (
-                            <div
-                                key={doc.id}
-                                onClick={() => router.push(`/doctors/${doc.id}`)}
-                                className="flex flex-col gap-3 rounded-[2rem] bg-white dark:bg-gray-800 p-5 shadow-glass border border-gray-100 dark:border-gray-700 transition-all cursor-pointer active:scale-[0.99] hover:shadow-float"
-                            >
-                                <div className="flex items-start gap-4">
-                                    <div className="relative shrink-0">
-                                        <div
-                                            className="size-20 rounded-2xl bg-gray-200 bg-center bg-cover border border-gray-100 dark:border-gray-700 shadow-sm"
-                                            style={{ backgroundImage: `url("${doc.image}")` }}
-                                        ></div>
-                                        <div className="absolute -bottom-1 -right-1 bg-green-500 text-white size-6 rounded-full border-2 border-white dark:border-gray-800 flex items-center justify-center shadow-sm">
-                                            <span className="material-symbols-outlined text-[14px] font-black">check</span>
-                                        </div>
-                                    </div>
-                                    <div className="flex flex-col flex-1 min-w-0">
-                                        <div className="flex justify-between items-start gap-2">
-                                            <h3 className="text-slate-900 dark:text-white text-lg font-black leading-tight truncate tracking-tight">{doc.name}</h3>
-                                            <div className="flex items-center gap-1 bg-amber-50 dark:bg-amber-900/20 px-1.5 py-0.5 rounded-lg text-[10px] font-black text-amber-600 border border-amber-100 dark:border-amber-800/30 shrink-0">
-                                                <span className="material-symbols-outlined text-[14px] filled">star</span>
-                                                {doc.rating}
+                {isLoading ? (
+                    Array(4).fill(0).map((_, i) => <DoctorCardSkeleton key={i} />)
+                ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {filteredDoctors.map((doc) => (
+                            <div key={doc.id} className="w-full">
+                                {/* Using a wrapper to make DoctorCard full width in this context if needed, 
+                                    but DoctorCard has fixed width. Let's override or use as is. 
+                                    DoctorCard is designed for horizontal scroll, might need adjustment for vertical list.
+                                    Actually, let's use a modified list item version or adjust DoctorCard. 
+                                    For now, let's duplicate the card style from the original file but cleaner, 
+                                    OR better yet, let's trust the DoctorCard but make it responsive width. 
+                                    
+                                    Wait, the previous DoctorCard component has w-[280px]. 
+                                    I should probably update DoctorCard to accept className for width.
+                                */}
+                                <div
+                                    onClick={() => router.push(`/doctors/${doc.id}`)}
+                                    className="flex flex-col gap-3 rounded-[2rem] bg-white dark:bg-gray-800 p-5 shadow-sm border border-gray-100 dark:border-gray-700 transition-all cursor-pointer active:scale-[0.99] hover:shadow-card-hover"
+                                >
+                                    <div className="flex items-start gap-4">
+                                        <div className="relative shrink-0">
+                                            <div className="size-20 rounded-2xl bg-gray-200 bg-center bg-cover" style={{ backgroundImage: `url("${doc.image}")` }} />
+                                            <div className="absolute -bottom-1 -right-1 bg-green-500 text-white size-6 rounded-full border-2 border-white dark:border-gray-800 flex items-center justify-center shadow-sm">
+                                                <span className="material-symbols-outlined text-[14px]">check</span>
                                             </div>
                                         </div>
-                                        <p className="text-primary text-xs font-black uppercase tracking-wider mt-0.5">{doc.specialty}</p>
-                                        <p className="text-gray-500 dark:text-gray-400 text-xs font-bold mt-1 line-clamp-1">{doc.qualification} • {doc.experience} Exp</p>
-                                        <div className="flex items-center gap-1 text-gray-400 text-[10px] font-bold mt-2 uppercase tracking-tight">
-                                            <span className="material-symbols-outlined text-[14px]">apartment</span>
-                                            <span className="truncate">{doc.hospital}</span>
+                                        <div className="flex-1 min-w-0">
+                                            <div className="flex justify-between items-start">
+                                                <h3 className="text-lg font-black text-slate-900 dark:text-white leading-tight truncate">{doc.name}</h3>
+                                                <div className="flex items-center gap-1 bg-amber-50 text-amber-600 px-1.5 py-0.5 rounded text-[10px] font-black border border-amber-100">
+                                                    {doc.rating} <span className="material-symbols-outlined text-[10px] filled">star</span>
+                                                </div>
+                                            </div>
+                                            <p className="text-primary text-[10px] font-black uppercase tracking-wider mt-1">{doc.specialty}</p>
+                                            <p className="text-xs text-gray-500 font-bold mt-0.5">{doc.experience} Experience • {doc.qualification}</p>
+                                            <div className="flex items-center gap-1 text-gray-400 text-[10px] font-bold mt-2 uppercase">
+                                                <span className="material-symbols-outlined text-[14px]">apartment</span>
+                                                {doc.hospital}
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-
-                                <div className="h-px bg-gray-100 dark:bg-gray-700/50 w-full mt-1"></div>
-
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <p className="text-gray-400 text-[9px] font-black uppercase tracking-widest">Consultation Fee</p>
-                                        <p className="text-slate-900 dark:text-white text-xl font-black tracking-tighter">₹{doc.fee}</p>
+                                    <div className="flex items-center justify-between pt-3 border-t border-gray-50 dark:border-gray-700/50 mt-1">
+                                        <div>
+                                            <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Consult Fee</p>
+                                            <p className="text-lg font-black text-slate-900 dark:text-white">₹{doc.fee}</p>
+                                        </div>
+                                        <button className="bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest shadow-lg active:scale-95 transition-transform">
+                                            Book Now
+                                        </button>
                                     </div>
-                                    <button className="flex-1 max-w-[140px] flex items-center justify-center rounded-xl h-11 bg-primary hover:bg-primary-dark text-white gap-2 text-xs font-black uppercase tracking-widest shadow-lg shadow-primary/25 transition-all">
-                                        Book Now
-                                    </button>
                                 </div>
                             </div>
-                        ))
-                    )}
-                </div>
-
-                {!isLoading && filteredDoctors.length === 0 && (
-                    <div className="flex flex-col items-center justify-center py-20 text-center gap-4 opacity-50">
-                        <div className="size-20 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center">
-                            <span className="material-symbols-outlined text-4xl">person_search</span>
-                        </div>
-                        <div>
-                            <p className="font-black uppercase tracking-widest">No results found</p>
-                            <p className="text-xs font-bold text-gray-500 mt-1">Try changing specialty or search term</p>
-                        </div>
+                        ))}
                     </div>
                 )}
             </main>
-
-            {/* Floating Filter Button (Optional Shortcut) */}
-            <button className="fixed bottom-28 right-6 z-40 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-full pl-5 pr-6 py-3 shadow-float flex items-center gap-3 font-black text-xs uppercase tracking-widest active:scale-95 transition-all">
-                <span className="material-symbols-outlined text-lg">tune</span>
-                Filter
-            </button>
         </div>
     );
 }

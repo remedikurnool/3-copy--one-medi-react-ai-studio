@@ -2,14 +2,14 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useSkinHairServices } from '@/hooks/useServices';
+import { useSkinHairTreatments } from '@/hooks/useServices';
 import type { ServiceMaster } from '@/hooks/useServices';
 
 export default function SkinHairPage() {
     const router = useRouter();
     const [search, setSearch] = useState('');
 
-    const { data: services, loading, error } = useSkinHairServices();
+    const { data: services, loading, error } = useSkinHairTreatments();
 
     const filteredServices = (services || []).filter((s: ServiceMaster) =>
         !search ||

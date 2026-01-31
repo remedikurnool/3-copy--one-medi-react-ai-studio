@@ -6,25 +6,16 @@ import { useLocationStore } from '../../store/locationStore';
 import LocationModal from '../../components/ui/LocationModal';
 import { ServiceCardSkeleton } from '../../components/ui/Skeletons';
 import { useLabTests, useLabTestSearch } from '../../hooks/useLabTests';
+import { LabTestCard } from '../../components/cards/LabTestCard';
 
-interface CategoryItemProps {
-    icon: string;
-    label: string;
-    onClick: () => void;
-    isActive: boolean;
-}
-
-const CategoryItem: React.FC<CategoryItemProps> = ({ icon, label, onClick, isActive }) => (
-    <button
-        onClick={onClick}
-        className="flex flex-col items-center gap-2 group shrink-0"
-    >
-        <div className={`size-16 rounded-2xl flex items-center justify-center border group-active:scale-95 transition-all duration-200 shadow-sm ${isActive ? 'bg-primary border-primary text-white' : 'bg-white dark:bg-gray-800 text-slate-600 border-gray-100 dark:border-gray-700'}`}>
-            <span className={`material-symbols-outlined text-3xl`}>{icon}</span>
-        </div>
-        <span className={`text-[10px] font-black uppercase tracking-widest text-center leading-tight ${isActive ? 'text-primary' : 'text-slate-500'}`}>{label}</span>
-    </button>
-);
+const CATEGORIES = [
+    { label: 'All', icon: 'grid_view' },
+    { label: 'Full Body', icon: 'accessibility_new' },
+    { label: 'Diabetes', icon: 'water_drop' },
+    { label: 'Thyroid', icon: 'science' },
+    { label: 'Fever', icon: 'thermometer' },
+    { label: 'Women Health', icon: 'pregnant_woman' },
+];
 
 export default function LabTestListPage() {
     const router = useRouter();
@@ -33,15 +24,6 @@ export default function LabTestListPage() {
     const [search, setSearch] = useState('');
     const [selectedCat, setSelectedCat] = useState('All');
 
-    const categories = [
-        { label: 'All', icon: 'grid_view' },
-        { label: 'Full Body', icon: 'accessibility_new' },
-        { label: 'Diabetes', icon: 'water_drop' },
-        { label: 'Thyroid', icon: 'science' },
-        { label: 'Fever', icon: 'thermometer' },
-        { label: 'Women Health', icon: 'pregnant_woman' },
-    ];
-
     const { data: allLabTests, loading: listLoading } = useLabTests();
     const { data: searchResults, loading: searchLoading } = useLabTestSearch(search);
 
@@ -49,91 +31,77 @@ export default function LabTestListPage() {
     const labTests = (search.length >= 2 ? searchResults : allLabTests) || [];
 
     const filteredTests = labTests.filter(test => {
-        const matchesCategory = selectedCat === 'All' || test.category === selectedCat;
-        return matchesCategory;
+        return selectedCat === 'All' || test.category === selectedCat;
     });
 
     return (
         <div className="min-h-screen bg-bg-light dark:bg-bg-dark text-slate-900 dark:text-white pb-32 font-sans relative overflow-x-hidden">
             <LocationModal isOpen={isLocationModalOpen} onClose={() => setIsLocationModalOpen(false)} />
 
-            <header className="sticky top-0 z-30 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md border-b border-gray-100 dark:border-gray-800 shadow-sm">
+            <header className="sticky top-0 z-40 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md border-b border-gray-100 dark:border-gray-800 shadow-sm transition-all pb-4">
                 <div className="flex items-center justify-between p-4">
                     <div className="flex items-center gap-3">
-                        <button onClick={() => router.push('/')} className="bg-primary/10 dark:bg-primary/20 p-2 rounded-full text-primary cursor-pointer hover:bg-primary/20 transition-colors">
+                        <button onClick={() => router.push('/')} className="bg-slate-100 dark:bg-slate-800 p-2.5 rounded-full text-slate-900 dark:text-white hover:bg-slate-200 transition-colors active:scale-95">
                             <span className="material-symbols-outlined text-2xl">arrow_back</span>
                         </button>
                         <div className="flex flex-col">
-                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Zone: Kurnool</span>
-                            <div onClick={() => setIsLocationModalOpen(true)} className="flex items-center gap-1 cursor-pointer">
-                                <h1 className="text-lg font-bold leading-none">{city || 'Kurnool'}</h1>
+                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Diagnostics</span>
+                            <div onClick={() => setIsLocationModalOpen(true)} className="flex items-center gap-1 cursor-pointer hover:text-primary transition-colors">
+                                <h1 className="text-lg font-black leading-none">{city || 'Kurnool'}</h1>
                                 <span className="material-symbols-outlined text-lg">expand_more</span>
                             </div>
                         </div>
                     </div>
-                    <button onClick={() => router.push('/cart')} className="size-10 rounded-full bg-slate-100 dark:bg-gray-800 flex items-center justify-center">
-                        <span className="material-symbols-outlined">shopping_cart</span>
-                    </button>
                 </div>
 
-                <div className="px-4 pb-3">
+                <div className="px-4 mb-4">
                     <div className="relative">
-                        <span className="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-slate-400">search</span>
+                        <span className="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-gray-400">search</span>
                         <input
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
-                            className="w-full h-12 pl-12 pr-4 rounded-xl border-none bg-gray-100 dark:bg-gray-800 focus:ring-2 focus:ring-primary transition-all font-medium"
-                            placeholder="Search health packages..."
+                            className="w-full h-12 pl-12 pr-4 rounded-xl border-none bg-gray-100 dark:bg-gray-800 focus:ring-2 focus:ring-primary transition-all font-semibold text-sm outline-none"
+                            placeholder="Search tests (e.g. CBC, Thyroid)..."
                         />
                     </div>
                 </div>
 
-                <div className="flex gap-4 px-4 py-4 overflow-x-auto no-scrollbar">
-                    {categories.map((c) => (
-                        <CategoryItem
+                <div className="flex gap-3 px-4 overflow-x-auto no-scrollbar scroll-pl-4">
+                    {CATEGORIES.map((c) => (
+                        <button
                             key={c.label}
-                            icon={c.icon}
-                            label={c.label}
-                            isActive={selectedCat === c.label}
                             onClick={() => setSelectedCat(c.label)}
-                        />
+                            className={`flex items-center gap-2 px-4 py-2 rounded-full border transition-all active:scale-95 whitespace-nowrap ${selectedCat === c.label
+                                    ? 'bg-teal-600 text-white border-teal-600 shadow-lg shadow-teal-500/30'
+                                    : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-slate-600 dark:text-gray-300'
+                                }`}
+                        >
+                            <span className="material-symbols-outlined text-lg">{c.icon}</span>
+                            <span className="text-[11px] font-black uppercase tracking-wider">{c.label}</span>
+                        </button>
                     ))}
                 </div>
             </header>
 
             <main className="p-4 flex flex-col gap-4 max-w-lg mx-auto w-full">
+                <div className="flex justify-between items-center px-1 mb-2">
+                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                        {isLoading ? 'Loading...' : `${filteredTests.length} Tests Available`}
+                    </p>
+                </div>
+
                 {isLoading ? (
                     Array(4).fill(0).map((_, i) => <ServiceCardSkeleton key={i} />)
                 ) : (
-                    filteredTests.map((test) => (
-                        <div
-                            key={test.id}
-                            onClick={() => router.push(`/lab-tests/${test.id}`)}
-                            className="bg-white dark:bg-gray-800 rounded-[2rem] p-5 border border-slate-100 dark:border-slate-700 shadow-sm relative overflow-hidden cursor-pointer active:scale-[0.98] transition-all"
-                        >
-                            <div className="absolute top-0 right-0 bg-emerald-500 text-white text-[10px] font-black px-3 py-1 rounded-bl-xl uppercase tracking-widest">20% OFF</div>
-                            <div className="size-12 rounded-2xl bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center text-primary mb-4 shadow-inner">
-                                <span className="material-symbols-outlined text-2xl">biotech</span>
-                            </div>
-                            <h4 className="text-xl font-black text-slate-900 dark:text-white mb-1 tracking-tight">{test.name}</h4>
-                            <p className="text-xs text-slate-500 dark:text-slate-400 font-bold mb-4 line-clamp-1">{test.description}</p>
-
-                            <div className="flex items-center gap-3 mb-5">
-                                <span className="px-2 py-0.5 bg-slate-50 dark:bg-gray-700 rounded-md text-[10px] font-black text-slate-400 uppercase tracking-tighter">{test.parameters?.length || 0} PARAMETERS</span>
-                                <span className="px-2 py-0.5 bg-blue-50 dark:bg-blue-900/20 rounded-md text-[10px] font-black text-blue-500 uppercase tracking-tighter">REPORT: {test.reportTime}</span>
-                            </div>
-
-                            <div className="pt-4 border-t border-slate-50 dark:border-slate-700 flex items-center justify-between">
-                                <div>
-                                    <p className="text-[10px] text-slate-400 line-through font-bold">₹{(test.price * 1.2).toFixed(0)}</p>
-                                    <p className="text-2xl font-black text-slate-900 dark:text-white tracking-tighter">₹{test.price}</p>
-                                </div>
-                                <button className="bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-6 h-11 rounded-xl font-black text-xs uppercase tracking-widest shadow-xl active:scale-95 transition-all">
-                                    Book
-                                </button>
-                            </div>
-                        </div>
-                    ))
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {filteredTests.map((test) => (
+                            <LabTestCard
+                                key={test.id}
+                                test={test}
+                                onClick={() => router.push(`/lab-tests/${test.id}`)}
+                            />
+                        ))}
+                    </div>
                 )}
             </main>
         </div>

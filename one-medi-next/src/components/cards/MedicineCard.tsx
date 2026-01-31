@@ -1,84 +1,86 @@
 'use client';
+
 import React from 'react';
-import { Medicine } from '../../types';
-import { useCartStore } from '../../store/cartStore';
-import { triggerCartAnimation } from '../ui/FlyingCartAnimation';
-import { LazyImage } from '../ui/LazyImage';
+import Image from 'next/image';
+import { motion } from 'framer-motion';
+import { useCartStore } from '@/store/cartStore';
 
-interface MedicineCardProps {
-  medicine: Medicine;
-  onClick: () => void;
-}
+// Helper for discount calculation
+const calculateDiscount = (mrp: number, sellingPrice: number) => {
+  if (!mrp || !sellingPrice || mrp <= sellingPrice) return 0;
+  return Math.round(((mrp - sellingPrice) / mrp) * 100);
+};
 
-export const MedicineCard: React.FC<MedicineCardProps> = ({ medicine, onClick }) => {
-  const addToCart = useCartStore((state) => state.addToCart);
+export const MedicineCard = ({ medicine, onClick }: { medicine: any, onClick?: () => void }) => {
+  const { addToCart: addItem } = useCartStore();
 
-  const handleAdd = (e: React.MouseEvent) => {
+  const discount = calculateDiscount(medicine.mrp, medicine.selling_price);
+
+  const handleAddToCart = (e: React.MouseEvent) => {
     e.stopPropagation();
-    triggerCartAnimation(e, medicine.image);
-    addToCart({
-      id: medicine.id,
-      type: 'medicine',
-      name: medicine.name,
-      price: medicine.price || 0,
-      mrp: medicine.mrp || 0,
-      image: medicine.image || '/placeholder.png',
-      packSize: medicine.packSize || '1 Pack',
-      qty: 1,
-      discount: medicine.discount,
-      isPrescriptionRequired: medicine.prescriptionRequired
-    });
+    addItem({ ...medicine, type: 'medicine' });
+    // TODO: Add toast notification here
   };
 
   return (
-    <div
+    <motion.div
+      className="group relative bg-white dark:bg-slate-800 rounded-[1.5rem] p-3 shadow-sm hover:shadow-card-hover border border-slate-100 dark:border-slate-700 transition-all duration-300 w-[160px] h-full flex flex-col"
+      whileHover={{ y: -4 }}
       onClick={onClick}
-      className="group relative min-w-[170px] w-[170px] bg-white dark:bg-slate-900/60 rounded-[2rem] p-4 shadow-glass border border-white/40 dark:border-slate-800/50 cursor-pointer transition-all duration-500 hover:-translate-y-2 hover:shadow-float active:scale-95 overflow-hidden"
     >
-      {/* Dynamic Background Glow */}
-      <div className="absolute -top-10 -right-10 size-24 bg-primary/10 blur-3xl group-hover:bg-primary/20 transition-colors duration-500"></div>
-
-      {/* Glassmorphic Discount Badge */}
-      {medicine.discount && (
-        <div className="absolute top-3 left-3 z-20 backdrop-blur-md bg-green-500/80 text-white text-[9px] font-black px-2 py-1 rounded-full shadow-sm border border-white/20">
-          {medicine.discount}
+      {/* Discount Badge */}
+      {discount > 0 && (
+        <div className="absolute top-3 left-3 z-10 bg-red-500 text-white text-[10px] font-black px-2 py-0.5 rounded-lg shadow-sm">
+          {discount}% OFF
         </div>
       )}
 
-      {/* Image Container with Floating Effect */}
-      <div className="relative h-32 w-full mb-4 flex items-center justify-center">
-        <div className="absolute inset-0 bg-slate-50 dark:bg-slate-800/50 rounded-2xl scale-90 group-hover:scale-100 transition-transform duration-500"></div>
-        <LazyImage
-          src={medicine.image}
+      {/* Image Container */}
+      <div className="relative w-full aspect-square rounded-2xl bg-slate-50 dark:bg-slate-700/50 mb-3 overflow-hidden group-hover:bg-slate-100 transition-colors">
+        <Image
+          src={medicine.image_url || 'https://images.unsplash.com/photo-1584308666746-953a5e66c7c9?auto=format&fit=crop&q=80&w=400'}
           alt={medicine.name}
-          wrapperClassName="h-28 w-28 z-10"
-          className="h-full w-full object-contain drop-shadow-2xl group-hover:scale-110 transition-transform duration-500"
+          fill
+          className="object-cover mix-blend-multiply dark:mix-blend-normal p-2 group-hover:scale-110 transition-transform duration-500"
         />
+
+        {/* Quick Add Button (Visible on Hover/Mobile) */}
+        <motion.button
+          onClick={handleAddToCart}
+          className="absolute bottom-2 right-2 size-8 bg-white dark:bg-slate-800 rounded-full shadow-md flex items-center justify-center text-primary group-hover:scale-100 scale-0 transition-transform duration-300 pointer-events-auto"
+          whileTap={{ scale: 0.9 }}
+        >
+          <span className="material-symbols-outlined text-lg">add</span>
+        </motion.button>
       </div>
 
-      {/* Product Details */}
-      <div className="flex flex-col gap-1">
-        <h3 className="text-sm font-extrabold text-slate-900 dark:text-white line-clamp-2 leading-tight h-9 group-hover:text-primary transition-colors">
+      {/* Content */}
+      <div className="flex-1 flex flex-col">
+        <h3 className="font-bold text-slate-800 dark:text-gray-100 text-sm leading-tight line-clamp-2 mb-1 group-hover:text-primary transition-colors">
           {medicine.name}
         </h3>
-        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">
-          {medicine.packSize}
+        <p className="text-[10px] text-slate-500 dark:text-slate-400 mb-2 line-clamp-1">
+          {medicine.manufacturer || 'Generic'}
         </p>
 
-        <div className="mt-3 flex items-end justify-between">
+        <div className="mt-auto flex items-end justify-between">
           <div className="flex flex-col">
-            <span className="text-[10px] text-slate-400 line-through font-bold">₹{medicine.mrp}</span>
-            <span className="text-lg font-black text-slate-900 dark:text-white tracking-tighter">₹{medicine.price}</span>
+            <span className="text-[10px] text-slate-400 line-through decoration-red-400/50">
+              ₹{medicine.mrp}
+            </span>
+            <span className="text-sm font-black text-slate-900 dark:text-white">
+              ₹{medicine.selling_price}
+            </span>
           </div>
 
           <button
-            onClick={handleAdd}
-            className="size-10 rounded-2xl bg-gradient-to-br from-primary to-primary-dark text-white flex items-center justify-center shadow-lg shadow-primary/25 hover:scale-110 active:scale-90 transition-all border border-white/20"
+            onClick={handleAddToCart}
+            className="lg:hidden size-7 rounded-lg bg-primary/10 text-primary flex items-center justify-center active:bg-primary active:text-white transition-colors"
           >
-            <span className="material-symbols-outlined text-xl">add</span>
+            <span className="material-symbols-outlined text-lg">add</span>
           </button>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };

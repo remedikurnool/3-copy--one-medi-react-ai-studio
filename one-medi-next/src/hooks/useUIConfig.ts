@@ -102,32 +102,49 @@ export function useMenus() {
 export function useCarousel(carouselKey: string) {
     return useSupabaseQuery<(UICarousel & { items: UICarouselItem[] }) | null>(
         async () => {
-            // First get the carousel
-            const { data: carousel, error: carouselError } = await supabase
-                .from('ui_carousels')
-                .select('*')
-                .eq('carousel_key', carouselKey)
-                .eq('is_active', true)
-                .single();
+            try {
+                // First get the carousel
+                const { data: carousel, error: carouselError } = await supabase
+                    .from('ui_carousels')
+                    .select('*')
+                    .eq('carousel_key', carouselKey)
+                    .eq('is_active', true)
+                    .single();
 
-            if (carouselError || !carousel) {
-                return { data: null, error: carouselError };
+                if (carouselError || !carousel) {
+                    console.warn(`Carousel ${carouselKey} not found, using mock`, carouselError);
+                    // Mock data for hero carousel
+                    if (carouselKey === 'hero_carousel') {
+                        const MOCK_CAROUSEL: any = {
+                            id: 'mock-1', carousel_key: 'hero_carousel', name: 'Home Hero',
+                            placement: 'home_hero', auto_play: true, interval_ms: 5000, is_active: true,
+                            items: [
+                                { id: 'slide-1', title: 'Flat 20% OFF', subtitle: 'On All Medicines', image_url: 'https://images.unsplash.com/photo-1631549916768-4119b2e5f926', link_type: 'internal', link_value: '/medicines', display_order: 1, is_active: true },
+                                { id: 'slide-2', title: 'Full Body Checkup', subtitle: 'Starting @ ₹999', image_url: 'https://images.unsplash.com/photo-1579154204601-01588f351e67', link_type: 'internal', link_value: '/lab-tests', display_order: 2, is_active: true },
+                            ]
+                        };
+                        return { data: MOCK_CAROUSEL, error: null };
+                    }
+                    return { data: null, error: null };
+                }
+
+                // Then get its items
+                const { data: items, error: itemsError } = await supabase
+                    .from('ui_carousel_items')
+                    .select('*')
+                    .eq('carousel_id', carousel.id)
+                    .eq('is_active', true)
+                    .order('display_order', { ascending: true });
+
+                if (itemsError) {
+                    console.error('Error fetching carousel items:', itemsError);
+                    return { data: { ...carousel, items: [] }, error: null };
+                }
+
+                return { data: { ...carousel, items: items || [] }, error: null };
+            } catch (e) {
+                return { data: null, error: null };
             }
-
-            // Then get its items
-            const { data: items, error: itemsError } = await supabase
-                .from('ui_carousel_items')
-                .select('*')
-                .eq('carousel_id', carousel.id)
-                .eq('is_active', true)
-                .order('display_order', { ascending: true });
-
-            if (itemsError) {
-                console.error('Error fetching carousel items:', itemsError);
-                return { data: { ...carousel, items: [] }, error: null };
-            }
-
-            return { data: { ...carousel, items: items || [] }, error: null };
         },
         [carouselKey]
     );

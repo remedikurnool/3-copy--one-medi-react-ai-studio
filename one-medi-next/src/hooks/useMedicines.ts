@@ -42,7 +42,7 @@ const mapMedicineNode = (data: DBMedicine): Medicine => ({
     price: data.price,
     mrp: data.mrp || data.price, // Fallback if mrp not in DB
     discount: data.discount || '0% OFF',
-    image: data.image_url || '/placeholder.png', // Fallback image
+    image: data.image_url || 'https://placehold.co/600x400/e2e8f0/64748b?text=Medicine', // Fallback image
     packSize: data.pack_size,
     prescriptionRequired: data.prescription_required,
     manufacturer: data.manufacturer,

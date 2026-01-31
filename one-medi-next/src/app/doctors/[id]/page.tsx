@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { useDoctor } from '../../hooks/useDoctors';
-import PrescriptionUpload from '../../components/ui/PrescriptionUpload';
+import { useDoctor } from '../../../hooks/useDoctors';
+import PrescriptionUpload from '../../../components/ui/PrescriptionUpload';
 
 export default function DoctorProfilePage() {
     const router = useRouter();

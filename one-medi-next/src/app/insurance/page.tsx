@@ -21,7 +21,7 @@ export default function InsuranceListPage() {
     const categories = ['All', 'Family', 'Individual', 'Senior', 'Critical'];
 
     const filteredPlans = (allPlans || []).filter((plan) =>
-        activeCategory === 'All' || plan.planType === activeCategory
+        activeCategory === 'All' || plan.plan_type === activeCategory
     );
 
     const handleToggleCompare = (id: string) => {
@@ -131,7 +131,7 @@ export default function InsuranceListPage() {
                             </div>
                             <div className="text-right">
                                 <p className="text-[9px] text-gray-500 uppercase font-black tracking-widest">Base Cover</p>
-                                <p className="text-xl font-black text-slate-900 dark:text-white">₹{(plan.sumInsured / 100000).toFixed(0)}L</p>
+                                <p className="text-xl font-black text-slate-900 dark:text-white">₹{(plan.sum_insured / 100000).toFixed(0)}L</p>
                             </div>
                         </div>
 
@@ -141,14 +141,14 @@ export default function InsuranceListPage() {
                                 <span className="material-symbols-outlined text-[10px] filled">bolt</span> Cashless
                             </div>
                             <div className="px-2 py-1 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 text-[9px] font-black uppercase rounded-lg border border-blue-100 dark:border-blue-800 whitespace-nowrap">
-                                {plan.networkHospitals.toLocaleString()}+ Hospitals
+                                {plan.network_hospitals.toLocaleString()}+ Hospitals
                             </div>
                             <div className="px-2 py-1 bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400 text-[9px] font-black uppercase rounded-lg border border-amber-100 dark:border-amber-800 whitespace-nowrap flex items-center gap-1">
-                                <span className="material-symbols-outlined text-[10px]">timer</span> {formatWaitingPeriod(plan.waitingPeriodDays)}
+                                <span className="material-symbols-outlined text-[10px]">timer</span> {formatWaitingPeriod(plan.waiting_period_days)}
                             </div>
-                            {plan.claimSettlementRatio >= 90 && (
+                            {plan.claim_settlement_ratio >= 90 && (
                                 <div className="px-2 py-1 bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-400 text-[9px] font-black uppercase rounded-lg border border-purple-100 dark:border-purple-800 whitespace-nowrap">
-                                    {plan.claimSettlementRatio}% CSR
+                                    {plan.claim_settlement_ratio}% CSR
                                 </div>
                             )}
                         </div>
@@ -168,10 +168,10 @@ export default function InsuranceListPage() {
                             <div>
                                 <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-0.5">Annual Premium</p>
                                 <div className="flex items-baseline gap-1">
-                                    <p className="text-lg font-black text-primary tracking-tighter">₹{plan.premiumYearly.toLocaleString('en-IN')}</p>
+                                    <p className="text-lg font-black text-primary tracking-tighter">₹{plan.premium_yearly.toLocaleString('en-IN')}</p>
                                     <span className="text-[10px] text-gray-500 font-bold">/yr</span>
                                 </div>
-                                {plan.premiumMonthly > 0 && <p className="text-[10px] text-emerald-600 font-black uppercase">₹{plan.premiumMonthly.toLocaleString('en-IN')}/mo EMI</p>}
+                                {plan.premium_monthly > 0 && <p className="text-[10px] text-emerald-600 font-black uppercase">₹{plan.premium_monthly.toLocaleString('en-IN')}/mo EMI</p>}
                             </div>
 
                             <div className="flex gap-2">
@@ -301,11 +301,11 @@ export default function InsuranceListPage() {
                                     {compareList.map(id => {
                                         const plan = (allPlans || []).find((p) => p.id === id);
                                         let val: any = '-';
-                                        if (feature === 'Cover Amount') val = `₹${((plan?.sumInsured || 0) / 100000).toFixed(0)}L`;
-                                        if (feature === 'Annual Premium') val = `₹${plan?.premiumYearly.toLocaleString('en-IN')}`;
-                                        if (feature === 'Network Hospitals') val = `${plan?.networkHospitals.toLocaleString()}+`;
-                                        if (feature === 'CSR') val = plan?.claimSettlementRatio ? `${plan.claimSettlementRatio}%` : '-';
-                                        if (feature === 'Waiting Period') val = plan?.waitingPeriodDays ? formatWaitingPeriod(plan.waitingPeriodDays) : '-';
+                                        if (feature === 'Cover Amount') val = `₹${((plan?.sum_insured || 0) / 100000).toFixed(0)}L`;
+                                        if (feature === 'Annual Premium') val = `₹${plan?.premium_yearly.toLocaleString('en-IN')}`;
+                                        if (feature === 'Network Hospitals') val = `${plan?.network_hospitals.toLocaleString()}+`;
+                                        if (feature === 'CSR') val = plan?.claim_settlement_ratio ? `${plan.claim_settlement_ratio}%` : '-';
+                                        if (feature === 'Waiting Period') val = plan?.waiting_period_days ? formatWaitingPeriod(plan.waiting_period_days) : '-';
 
                                         return <div key={id} className="text-sm font-bold text-center text-slate-700 dark:text-gray-200">{val}</div>;
                                     })}

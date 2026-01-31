@@ -1,44 +1,52 @@
 'use client';
+
 import React from 'react';
 import Image from 'next/image';
-import { MedicalScan } from '../../types';
+import { motion } from 'framer-motion';
 
-interface ScanCardProps {
-  scan: MedicalScan;
-  onClick: () => void;
-}
-
-export const ScanCard: React.FC<ScanCardProps> = ({ scan, onClick }) => {
+export const ScanCard = ({ scan, onClick }: { scan: any, onClick?: () => void }) => {
   return (
-    <div
+    <motion.div
+      className="group relative bg-white dark:bg-slate-800 rounded-[2rem] overflow-hidden shadow-sm hover:shadow-card-hover w-[280px] cursor-pointer"
+      whileHover={{ y: -2 }}
       onClick={onClick}
-      className="group relative min-w-[150px] w-[150px] bg-white dark:bg-slate-900 rounded-[2rem] p-3 shadow-glass border border-white dark:border-slate-800/80 cursor-pointer transition-all duration-500 hover:shadow-float active:scale-95 overflow-hidden snap-start"
     >
-      {/* Translucent Background Text/Icon Effect */}
-      <div className="absolute -bottom-2 -right-2 opacity-[0.03] dark:opacity-[0.05] pointer-events-none">
-        <span className="material-symbols-outlined text-[100px] font-black">{scan.category === 'MRI' ? 'radiology' : 'scanner'}</span>
-      </div>
-
-      <div className="h-28 rounded-[1.5rem] bg-slate-50 dark:bg-slate-800/50 flex items-center justify-center relative overflow-hidden mb-3 border border-slate-100/50 dark:border-slate-700/30">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent"></div>
+      {/* Top Image Section */}
+      <div className="relative h-32 w-full bg-indigo-100">
         <Image
-          src={scan.image}
-          alt={scan.name}
+          src={scan.image || 'https://images.unsplash.com/photo-1516549882906-589db74c94f7?auto=format&fit=crop&q=80&w=400'}
+          alt={scan.test_name}
           fill
-          className="object-contain relative z-10 transition-all duration-700 group-hover:scale-125 group-hover:-rotate-6 drop-shadow-xl p-2"
-          unoptimized
+          className="object-cover group-hover:scale-105 transition-transform duration-700"
         />
-      </div>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
 
-      <div className="px-1 text-center flex flex-col gap-1">
-        <h3 className="text-xs font-black text-slate-800 dark:text-slate-200 line-clamp-2 h-8 leading-tight tracking-tight uppercase">
-          {scan.name}
-        </h3>
-        <div className="mt-1">
-          <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Starting @</p>
-          <p className="text-base font-black text-primary tracking-tighter">₹{scan.price}</p>
+        <div className="absolute bottom-3 left-4 text-white">
+          <span className="inline-block px-1.5 py-0.5 rounded-md bg-white/20 backdrop-blur-md text-[10px] font-bold uppercase tracking-wider mb-1 border border-white/20">
+            Radiology
+          </span>
         </div>
       </div>
-    </div>
+
+      <div className="p-4">
+        <h3 className="font-bold text-base text-slate-900 dark:text-white leading-tight mb-1 group-hover:text-indigo-600 transition-colors">
+          {scan.test_name}
+        </h3>
+        <p className="text-xs text-slate-500 dark:text-slate-400 mb-4 line-clamp-1">
+          {scan.category || 'Advanced Imaging'}
+        </p>
+
+        <div className="flex items-center justify-between">
+          <div className="flex flex-col">
+            <span className="text-[10px] text-slate-400 line-through">₹{Number(scan.price) * 1.2}</span>
+            <span className="text-base font-black text-slate-900 dark:text-white">₹{scan.price}</span>
+          </div>
+
+          <button className="text-indigo-600 bg-indigo-50 dark:bg-indigo-900/30 hover:bg-indigo-600 hover:text-white p-2 rounded-xl transition-all">
+            <span className="material-symbols-outlined text-xl">event_available</span>
+          </button>
+        </div>
+      </div>
+    </motion.div>
   );
 };

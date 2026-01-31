@@ -10,16 +10,16 @@ import { useBookingStore } from '@/store/bookingStore';
 const getServicePlans = (service: ServiceMaster) => {
     if (service.category === 'Medical Equipment' || service.category === 'Equipment') {
         return [
-            { id: 'p1', name: 'Weekly Rental', duration: '7 Days', price: 2000, type: 'Rental' },
-            { id: 'p2', name: 'Monthly Rental', duration: '30 Days', price: 7000, savings: 1000, type: 'Rental' },
-            { id: 'p3', name: 'Purchase', duration: 'Lifetime', price: 45000, type: 'Purchase' }
+            { id: 'p1', name: 'Weekly Rental', duration: '7 Days', price: 2000, type: 'Rental' as const, title: 'Rental', savings: undefined },
+            { id: 'p2', name: 'Monthly Rental', duration: '30 Days', price: 7000, savings: 1000, type: 'Rental' as const, title: 'Value' },
+            { id: 'p3', name: 'Purchase', duration: 'Lifetime', price: 45000, type: 'Purchase' as const, title: 'Own It', savings: undefined }
         ];
     }
     // Default Home Care Plans
     return [
-        { id: 'p1', name: 'Short Term', duration: '7 Days', price: service.durationMinutes ? (service.durationMinutes * 7 / 60 * 500) : 3500, title: 'Trial' }, // Mock price calc
-        { id: 'p2', name: 'Medium Term', duration: '15 Days', price: service.durationMinutes ? (service.durationMinutes * 15 / 60 * 450) : 7000, savings: 500, title: 'Popular' },
-        { id: 'p3', name: 'Long Term', duration: '30 Days', price: service.durationMinutes ? (service.durationMinutes * 30 / 60 * 400) : 12000, savings: 2000, title: 'Best Value' }
+        { id: 'p1', name: 'Short Term', duration: '7 Days', price: service.durationMinutes ? (service.durationMinutes * 7 / 60 * 500) : 3500, title: 'Trial', type: 'Service' as const, savings: undefined },
+        { id: 'p2', name: 'Medium Term', duration: '15 Days', price: service.durationMinutes ? (service.durationMinutes * 15 / 60 * 450) : 7000, savings: 500, title: 'Popular', type: 'Service' as const },
+        { id: 'p3', name: 'Long Term', duration: '30 Days', price: service.durationMinutes ? (service.durationMinutes * 30 / 60 * 400) : 12000, savings: 2000, title: 'Best Value', type: 'Service' as const }
     ];
 };
 

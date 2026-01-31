@@ -1,62 +1,56 @@
+'use client';
+
 import React from 'react';
-import { Doctor } from '../../types';
+import Image from 'next/image';
+import { motion } from 'framer-motion';
 
-interface DoctorCardProps {
-  doctor: Doctor;
-  onClick: () => void;
-}
-
-export const DoctorCard: React.FC<DoctorCardProps> = ({ doctor, onClick }) => {
+export const DoctorCard = ({ doctor, onClick }: { doctor: any, onClick?: () => void }) => {
   return (
-    <div 
-      onClick={onClick} 
-      className="group relative min-w-[290px] bg-white dark:bg-slate-900 rounded-[2.25rem] p-5 shadow-glass border border-white dark:border-slate-800/80 cursor-pointer transition-all duration-500 hover:shadow-float active:scale-[0.99] flex gap-5 items-center snap-start"
+    <motion.div
+      className="group bg-white dark:bg-slate-800 rounded-[1.8rem] p-4 shadow-sm hover:shadow-card-hover border border-slate-100 dark:border-slate-700 w-[280px] cursor-pointer flex gap-4 items-center"
+      whileHover={{ y: -2 }}
+      onClick={onClick}
     >
-       {/* 3D Profile Section */}
-       <div className="relative shrink-0">
-          {/* Breathing Aura Indicator */}
-          <div className="absolute inset-0 bg-green-500/20 rounded-full animate-ping scale-110 opacity-70"></div>
-          
-          <div 
-            className="relative size-20 rounded-[1.75rem] bg-slate-200 dark:bg-slate-800 bg-cover bg-center border-2 border-white dark:border-slate-700 shadow-xl z-10 group-hover:scale-105 transition-transform duration-500" 
-            style={{backgroundImage: `url('${doctor.image}')`}}
-          ></div>
-          
-          {/* Rating Floating Tag */}
-          <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-white dark:bg-slate-800 px-2 py-0.5 rounded-full shadow-lg border border-slate-100 dark:border-slate-700 z-20 flex items-center gap-1">
-             <span className="text-[10px] font-black text-slate-900 dark:text-white">{doctor.rating}</span>
-             <span className="material-symbols-outlined text-[10px] filled text-amber-500">star</span>
-          </div>
-       </div>
-       
-       <div className="flex-1 min-w-0 flex flex-col gap-0.5">
-          <div className="flex items-center gap-1.5 mb-0.5">
-            <span className="size-1.5 rounded-full bg-green-500"></span>
-            <span className="text-[9px] font-black text-green-600 dark:text-green-400 uppercase tracking-widest">Available Now</span>
-          </div>
-          
-          <h3 className="font-black text-lg text-slate-900 dark:text-white truncate tracking-tight group-hover:text-primary transition-colors leading-tight">
+      {/* Doctor Image */}
+      <div className="relative size-20 rounded-2xl overflow-hidden shrink-0 shadow-sm">
+        <Image
+          src={doctor.image || 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?auto=format&fit=crop&q=80&w=200'}
+          alt={doctor.name}
+          fill
+          className="object-cover group-hover:scale-110 transition-transform duration-500"
+        />
+        <div className="absolute bottom-0 inset-x-0 h-1/2 bg-gradient-to-t from-black/50 to-transparent" />
+        <div className="absolute bottom-1 right-1 flex items-center gap-0.5 bg-white/90 dark:bg-slate-900/90 backdrop-blur rounded-md px-1 py-0.5">
+          <span className="material-symbols-outlined text-[10px] text-yellow-500 filled">star</span>
+          <span className="text-[10px] font-bold">{doctor.rating || '4.8'}</span>
+        </div>
+      </div>
+
+      {/* Info */}
+      <div className="flex-1 min-w-0 py-1">
+        <div className="mb-1">
+          <span className="inline-block px-2 py-0.5 rounded-md bg-primary/10 text-primary text-[10px] font-bold uppercase tracking-wide mb-1">
+            {doctor.specialty}
+          </span>
+          <h3 className="font-bold text-slate-900 dark:text-white text-base truncate group-hover:text-primary transition-colors">
             {doctor.name}
           </h3>
-          
-          <p className="text-[11px] text-primary font-black uppercase tracking-wider truncate mb-1">
-            {doctor.specialty}
+          <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
+            {doctor.experience} years exp • {doctor.qualification}
           </p>
-          
-          <p className="text-[10px] text-slate-400 font-bold truncate">
-            {doctor.qualification} • {doctor.experience} Exp
-          </p>
-          
-          <div className="flex items-center justify-between mt-3">
-             <div className="flex flex-col leading-none">
-                <span className="text-[8px] text-slate-400 font-black uppercase tracking-tighter mb-0.5">Fee</span>
-                <span className="text-base font-black text-slate-900 dark:text-white tracking-tighter">₹{doctor.fee}</span>
-             </div>
-             <button className="h-9 px-4 rounded-xl bg-blue-50 dark:bg-blue-900/30 text-primary dark:text-blue-400 font-black text-[10px] uppercase tracking-widest hover:bg-primary hover:text-white dark:hover:bg-primary dark:hover:text-white transition-all shadow-sm">
-                Book Visit
-             </button>
+        </div>
+
+        <div className="flex items-center justify-between mt-2">
+          <button className="bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-xs font-bold px-3 py-1.5 rounded-lg hover:opacity-90 transition-opacity">
+            Book
+          </button>
+
+          <div className="text-right">
+            <span className="text-[10px] text-slate-400 block -mb-1">Consult</span>
+            <span className="text-sm font-black text-slate-900 dark:text-white">₹{doctor.consultation_fee}</span>
           </div>
-       </div>
-    </div>
+        </div>
+      </div>
+    </motion.div>
   );
 };

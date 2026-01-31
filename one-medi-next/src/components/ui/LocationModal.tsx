@@ -1,119 +1,152 @@
-import React from 'react';
-import { useLocationStore } from '../../store/locationStore';
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useLocationStore } from '@/store/locationStore';
 
 interface LocationModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
+const POPULAR_CITIES = ['Kurnool', 'Nandyal', 'Adoni', 'Dhone', 'Hyderabad', 'Bangalore'];
+
 export default function LocationModal({ isOpen, onClose }: LocationModalProps) {
-  const { detectLocation, setManualLocation, isDetecting, error, city: currentCity } = useLocationStore();
+  const { city, address, setManualLocation } = useLocationStore();
+  const [detecting, setDetecting] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
 
-  const handleDetect = async () => {
-    await detectLocation();
-    onClose();
+  // close on escape
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
+  }, [onClose]);
+
+  const handleDetectLocation = () => {
+    setDetecting(true);
+    if ('geolocation' in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          // Mock reverse geocoding for now
+          // In real app, call Google Maps / Mapbox API here
+          setTimeout(() => {
+            setManualLocation('Kurnool', 'Near Raj Vihar Centre');
+            setDetecting(false);
+            onClose();
+          }, 1500);
+        },
+        (error) => {
+          console.error(error);
+          setDetecting(false);
+          alert('Could not detect location. Please select manually.');
+        }
+      );
+    } else {
+      setDetecting(false);
+      alert('Geolocation is not supported by your browser');
+    }
   };
 
-  const handleSelectCity = (city: string) => {
-    setManualLocation(city, `${city} City Center`);
+  const handleCitySelect = (selectedCity: string) => {
+    setManualLocation(selectedCity, address);
     onClose();
   };
-
-  if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-end justify-center sm:items-center p-0 sm:p-4">
-      {/* Backdrop */}
-      <div 
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" 
-        onClick={onClose}
-      ></div>
+    <AnimatePresence>
+      {isOpen && (
+        <div className="fixed inset-0 z-[100] flex items-end lg:items-center justify-center sm:p-4">
+          {/* Backdrop */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={onClose}
+            className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity"
+          />
 
-      {/* Modal Content */}
-      <div className="relative w-full max-w-md bg-white dark:bg-gray-900 rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden animate-in slide-in-from-bottom duration-300">
-        
-        {/* Header */}
-        <div className="flex items-center justify-between p-5 border-b border-gray-100 dark:border-gray-800">
-          <h3 className="text-lg font-bold text-slate-900 dark:text-white">Select Location</h3>
-          <button onClick={onClose} className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-            <span className="material-symbols-outlined text-gray-500">close</span>
-          </button>
-        </div>
-
-        <div className="p-5 max-h-[80vh] overflow-y-auto">
-          
-          {/* GPS Detection Button */}
-          <button 
-            onClick={handleDetect}
-            disabled={isDetecting}
-            className="w-full flex items-center gap-4 p-4 rounded-xl border-2 border-primary/10 bg-blue-50/50 dark:bg-blue-900/10 hover:border-primary/30 transition-all active:scale-[0.98] group"
+          {/* Modal Content */}
+          <motion.div
+            initial={{ y: '100%', opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: '100%', opacity: 0 }}
+            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+            className="relative w-full max-w-lg bg-white dark:bg-slate-900 rounded-t-[2rem] lg:rounded-[2rem] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
           >
-            <div className={`size-12 rounded-full flex items-center justify-center shrink-0 transition-colors ${isDetecting ? 'bg-gray-200 animate-pulse' : 'bg-white text-primary shadow-sm group-hover:bg-primary group-hover:text-white'}`}>
-              {isDetecting ? (
-                 <span className="material-symbols-outlined animate-spin">progress_activity</span>
-              ) : (
-                 <span className="material-symbols-outlined text-2xl">my_location</span>
-              )}
-            </div>
-            <div className="text-left">
-              <p className="text-base font-bold text-primary">
-                {isDetecting ? 'Detecting Location...' : 'Use Current Location'}
-              </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">Using GPS</p>
-            </div>
-            {!isDetecting && <span className="material-symbols-outlined text-gray-400 ml-auto">chevron_right</span>}
-          </button>
+            {/* Header */}
+            <div className="p-6 pb-2 border-b border-slate-100 dark:border-slate-800">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-black text-slate-900 dark:text-white">Select Location</h2>
+                <button
+                  onClick={onClose}
+                  className="size-8 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-red-500 flex items-center justify-center transition-colors"
+                >
+                  <span className="material-symbols-outlined text-xl">close</span>
+                </button>
+              </div>
 
-          {error && (
-            <div className="mt-3 p-3 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-300 text-xs font-medium rounded-lg flex items-center gap-2">
-              <span className="material-symbols-outlined text-base">error</span>
-              {error}
+              {/* Search Bar */}
+              <div className="relative mb-4">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 material-symbols-outlined">search</span>
+                <input
+                  type="text"
+                  placeholder="Search for area, street name..."
+                  className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl py-3 pl-10 pr-4 font-semibold text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
             </div>
-          )}
 
-          <div className="my-6 border-t border-gray-100 dark:border-gray-800 relative">
-             <span className="absolute left-1/2 -top-2.5 -translate-x-1/2 bg-white dark:bg-gray-900 px-3 text-xs font-bold text-gray-400 uppercase tracking-widest">OR</span>
-          </div>
+            {/* Content Scroll */}
+            <div className="flex-1 overflow-y-auto p-6 pt-2">
+              {/* Detect Location Button */}
+              <button
+                onClick={handleDetectLocation}
+                disabled={detecting}
+                className="w-full flex items-center gap-4 p-4 mb-6 rounded-2xl bg-primary/5 hover:bg-primary/10 border border-primary/20 text-primary transition-all group active:scale-[0.98]"
+              >
+                <div className={`size-10 rounded-full bg-primary text-white flex items-center justify-center shadow-lg shadow-primary/30 ${detecting ? 'animate-pulse' : ''}`}>
+                  <span className="material-symbols-outlined text-xl">
+                    {detecting ? 'location_searching' : 'my_location'}
+                  </span>
+                </div>
+                <div className="text-left">
+                  <h3 className="font-bold text-base leading-tight">Use Current Location</h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                    {detecting ? 'Detecting GPS...' : 'Using GPS'}
+                  </p>
+                </div>
+                {!detecting && (
+                  <span className="material-symbols-outlined ml-auto text-primary opacity-0 group-hover:opacity-100 transition-opacity">arrow_forward</span>
+                )}
+              </button>
 
-          {/* Saved Addresses (Mock) */}
-          <div className="mb-6">
-            <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Saved Addresses</h4>
-            <div className="flex flex-col gap-2">
-               <button onClick={() => handleSelectCity('Kurnool')} className="flex items-center gap-3 p-3 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl transition-colors text-left group">
-                  <span className="material-symbols-outlined text-gray-400 group-hover:text-primary">home</span>
-                  <div>
-                    <p className="text-sm font-bold text-slate-800 dark:text-white">Home</p>
-                    <p className="text-xs text-gray-500 truncate max-w-[200px]">Flat 402, Sai Residency, Kurnool</p>
-                  </div>
-               </button>
-               <button onClick={() => handleSelectCity('Hyderabad')} className="flex items-center gap-3 p-3 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl transition-colors text-left group">
-                  <span className="material-symbols-outlined text-gray-400 group-hover:text-primary">work</span>
-                  <div>
-                    <p className="text-sm font-bold text-slate-800 dark:text-white">Office</p>
-                    <p className="text-xs text-gray-500 truncate max-w-[200px]">Hitech City, Hyderabad</p>
-                  </div>
-               </button>
+              {/* Recent / Popular Cities */}
+              <div className="mb-4">
+                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Popular Cities</h3>
+                <div className="grid grid-cols-3 gap-3">
+                  {POPULAR_CITIES.filter(c => c.toLowerCase().includes(searchTerm.toLowerCase())).map((c) => (
+                    <button
+                      key={c}
+                      onClick={() => handleCitySelect(c)}
+                      className={`py-2 px-3 rounded-xl text-sm font-bold border transition-all ${city === c
+                        ? 'bg-primary text-white border-primary shadow-lg shadow-primary/20'
+                        : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-primary hover:text-primary'
+                        }`}
+                    >
+                      {c}
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
-          </div>
-
-          {/* Popular Cities */}
-          <div>
-            <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Popular Cities</h4>
-            <div className="grid grid-cols-3 gap-3">
-               {['Kurnool', 'Hyderabad', 'Bangalore', 'Vijayawada', 'Tirupati', 'Vizag'].map(city => (
-                 <button 
-                   key={city}
-                   onClick={() => handleSelectCity(city)}
-                   className={`px-2 py-2.5 rounded-lg text-sm font-bold border transition-all ${currentCity === city ? 'bg-slate-900 text-white border-slate-900 dark:bg-white dark:text-slate-900' : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:border-primary hover:text-primary'}`}
-                 >
-                   {city}
-                 </button>
-               ))}
-            </div>
-          </div>
-
+          </motion.div>
         </div>
-      </div>
-    </div>
+      )}
+    </AnimatePresence>
   );
 }

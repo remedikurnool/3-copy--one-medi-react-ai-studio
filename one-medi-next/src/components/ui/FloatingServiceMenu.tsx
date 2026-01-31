@@ -36,7 +36,7 @@ export default function FloatingServiceMenu() {
   }, [isOpen]);
 
   return (
-    <div ref={menuRef} className="fixed right-0 top-1/2 -translate-y-1/2 z-[90] flex items-center font-sans">
+    <div ref={menuRef} className="fixed right-0 top-[60%] -translate-y-1/2 z-[90] flex items-center font-sans">
       {/* Menu Content - Slides out from right */}
       <div
         className={`
