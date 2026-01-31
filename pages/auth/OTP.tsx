@@ -1,25 +1,27 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useUserStore } from '../../store/userStore';
+import { supabase } from '../../lib/supabase';
 
 export default function OTP() {
   const navigate = useNavigate();
   const location = useLocation();
   const { login } = useUserStore();
   const phone = location.state?.phone || '9876543210';
-  
+
   const [otp, setOtp] = useState(['', '', '', '']);
   const [timer, setTimer] = useState(30);
   const [isVerifying, setIsVerifying] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const inputsRef = useRef<(HTMLInputElement | null)[]>([]);
 
   useEffect(() => {
     // Focus first input
     inputsRef.current[0]?.focus();
-    
+
     // Simulate sending OTP
     const t = setTimeout(() => {
-        alert(`Your One Medi OTP is: 1234`);
+      alert(`Your One Medi OTP is: 1234`);
     }, 1000);
 
     return () => clearTimeout(t);
@@ -50,24 +52,33 @@ export default function OTP() {
     }
   };
 
-  const handleVerify = () => {
+  const handleVerify = async () => {
     const enteredOtp = otp.join('');
     if (enteredOtp.length !== 4) return;
 
     setIsVerifying(true);
-    
-    // Mock Verification
-    setTimeout(() => {
-      if (enteredOtp === '1234') {
-        login(phone);
-        navigate(-2); // Go back to where they came from (or Home)
-      } else {
-        alert('Invalid OTP. Please try again (Use 1234).');
-        setOtp(['', '', '', '']);
-        inputsRef.current[0]?.focus();
-        setIsVerifying(false);
+    setError(null);
+
+    try {
+      const { data: { session }, error: verifyError } = await supabase.auth.verifyOtp({
+        phone: `+91${phone}`,
+        token: enteredOtp,
+        type: 'sms',
+      });
+
+      if (verifyError) throw verifyError;
+
+      if (session) {
+        // AuthProvider syncUserData will handle the rest via onAuthStateChange listener
+        navigate('/'); // Or go back to where they were
       }
-    }, 1500);
+    } catch (err: any) {
+      setError(err.message || 'Invalid OTP. Please try again.');
+      setOtp(['', '', '', '']);
+      inputsRef.current[0]?.focus();
+    } finally {
+      setIsVerifying(false);
+    }
   };
 
   const handleResend = () => {
@@ -85,7 +96,7 @@ export default function OTP() {
         <div className="mb-10">
           <h1 className="text-3xl font-black text-slate-900 dark:text-white mb-2 tracking-tight">Verification</h1>
           <p className="text-slate-500 dark:text-gray-400 font-medium">
-            We've sent a 4-digit code to <br/>
+            We've sent a 4-digit code to <br />
             <span className="text-slate-900 dark:text-white font-bold">+91 {phone}</span>
             <button onClick={() => navigate(-1)} className="text-primary text-sm font-bold ml-2 hover:underline">Edit</button>
           </p>
@@ -107,7 +118,7 @@ export default function OTP() {
           ))}
         </div>
 
-        <button 
+        <button
           onClick={handleVerify}
           disabled={otp.join('').length < 4 || isVerifying}
           className="h-14 bg-primary hover:bg-primary-dark disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed text-white rounded-2xl font-black text-lg shadow-lg shadow-primary/30 active:scale-[0.98] transition-all flex items-center justify-center gap-2 mb-6"
@@ -127,7 +138,7 @@ export default function OTP() {
               Resend code in <span className="text-primary">{timer}s</span>
             </p>
           ) : (
-            <button 
+            <button
               onClick={handleResend}
               className="text-sm font-black text-primary hover:underline uppercase tracking-wide"
             >

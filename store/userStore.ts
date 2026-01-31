@@ -44,8 +44,10 @@ interface UserState {
 
   updateProfile: (profile: Partial<UserProfile>) => void;
   addAddress: (address: Address) => void;
+  setAddresses: (addresses: Address[]) => void;
   removeAddress: (id: string) => void;
   addFamilyMember: (member: FamilyMember) => void;
+  setFamilyMembers: (members: FamilyMember[]) => void;
   removeFamilyMember: (id: string) => void;
   setAuthenticated: (status: boolean) => void;
 }
@@ -125,14 +127,16 @@ export const useUserStore = create<UserState>()(
         profile: { ...state.profile, ...updates }
       })),
       addAddress: (address) => set((state) => ({
-        addresses: [...state.addresses, address]
+        addresses: [...state.addresses.filter(a => a.id !== address.id), address]
       })),
+      setAddresses: (addresses) => set({ addresses }),
       removeAddress: (id) => set((state) => ({
         addresses: state.addresses.filter(a => a.id !== id)
       })),
       addFamilyMember: (member) => set((state) => ({
-        familyMembers: [...state.familyMembers, member]
+        familyMembers: [...state.familyMembers.filter(f => f.id !== member.id), member]
       })),
+      setFamilyMembers: (members) => set({ familyMembers: members }),
       removeFamilyMember: (id) => set((state) => ({
         familyMembers: state.familyMembers.filter(f => f.id !== id)
       })),

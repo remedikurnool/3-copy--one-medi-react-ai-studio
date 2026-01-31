@@ -10,6 +10,7 @@ export interface MedicalScan {
     description: string;
     preparation_instructions: string;
     duration_minutes: number;
+    contrast_required: boolean;
     price: number;
     is_active: boolean;
     image_url?: string;

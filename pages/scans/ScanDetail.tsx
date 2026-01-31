@@ -32,14 +32,32 @@ export default function ScanDetail() {
   const navigate = useNavigate();
   const location = useLocation();
   const state = location.state as { scanId?: string } | null;
-  const scanId = state?.scanId || 'ms1';
+  const scanId = state?.scanId;
 
-  // Try to get from Supabase first, fall back to constants
-  const { data: dbScan } = useMedicalScan(scanId);
-  // Note: Constants schema differs from DB schema; using 'any' for fallback compatibility
-  const scan: any = dbScan || MEDICAL_SCANS.find(s => s.id === scanId) || MEDICAL_SCANS[0];
+  // Try to get from Supabase
+  const { data: dbScan, loading } = useMedicalScan(scanId);
 
-  const [selectedVariant, setSelectedVariant] = useState(scan.variants?.[0] || { centerId: 'c1', centerName: 'Diagnostic Center', price: 3500, mrp: 6000 });
+  // Mapping DB fields to UI fields
+  const scan = dbScan ? {
+    ...dbScan,
+    scanDuration: `${dbScan.duration_minutes} mins`,
+    preparationNotes: dbScan.preparation_instructions,
+    contrastRequired: dbScan.contrast_required,
+    // Add default variant for now if DB doesn't have vendors implemented here yet
+    variants: [{
+      centerId: 'c1',
+      centerName: 'One Medi Partner Center',
+      price: dbScan.price || 3500,
+      mrp: Math.round((dbScan.price || 3500) * 1.5),
+      centerImage: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&q=80',
+      distance: '1.2 km',
+      reportTime: 'Same Day',
+      nextSlot: 'Today, 10:30 AM',
+      nabl: true
+    }]
+  } : null;
+
+  const [selectedVariant, setSelectedVariant] = useState<any>(null);
   const [selectedSlot, setSelectedSlot] = useState('10:30 AM');
   const [selectedDate, setSelectedDate] = useState('');
   const [bookingError, setBookingError] = useState<string | null>(null);
@@ -50,12 +68,15 @@ export default function ScanDetail() {
   const dates = getNextDates();
   const slots = ['10:30 AM', '11:00 AM', '02:15 PM', '04:30 PM'];
 
-  // Initialize date on mount
+  // Initialize state when scan data is loaded
   useEffect(() => {
+    if (scan && !selectedVariant) {
+      setSelectedVariant(scan.variants[0]);
+    }
     if (!selectedDate && dates.length > 0) {
       setSelectedDate(dates[0].iso);
     }
-  }, []);
+  }, [scan]);
 
   // Update slots if variant changes
   useEffect(() => {
@@ -63,6 +84,9 @@ export default function ScanDetail() {
       setSelectedSlot(selectedVariant.nextSlot.split(', ')[1] || '10:30 AM');
     }
   }, [selectedVariant]);
+
+  if (loading) return <div className="p-8 text-center text-slate-900 dark:text-white">Loading scan details...</div>;
+  if (!scan || !selectedVariant) return <div className="p-8 text-center text-slate-900 dark:text-white">Scan not found</div>;
 
   // Handle booking
   const handleBook = async () => {
@@ -82,7 +106,7 @@ export default function ScanDetail() {
 
     const booking = await bookScan(
       user.id,
-      scanId,
+      scan.id,
       selectedVariant.centerId,
       selectedDate,
       selectedSlot

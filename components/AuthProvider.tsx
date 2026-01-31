@@ -31,7 +31,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         logout: storeLogout,
         updateProfile,
         addAddress,
+        setAddresses,
         addFamilyMember,
+        setFamilyMembers,
+        setAuthenticated,
         isAuthenticated
     } = useUserStore();
 
@@ -86,24 +89,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                     gender: profile.gender,
                     dob: profile.dob,
                     bloodGroup: profile.blood_group, // Note mapping
-                    height: profile.height,
-                    weight: profile.weight,
+                    height: profile.height?.toString(),
+                    weight: profile.weight?.toString(),
                     image: profile.image_url || authUser.user_metadata?.avatar_url
                 });
 
-                // Mark as authenticated in store if not already (this might call login mocked, careful)
-                // Actually login() in store sets mock data. We should probably bypass login() and set isAuthenticated directly
-                // But store doesn't expose setIsAuthenticated.
-                // We will ignore store.login() for now and rely on updateProfile to populate data.
-                // To set 'isAuthenticated' true, we might need to modify the store or just call login with phone
-                // Calling login() overrides data with MOCK_USER. This is BAD.
-                // TODO: We need to refactor userStore to have a proper 'setAuthenticated' or 'hydrate' action.
-                // For now, I'll temporarily assume updateProfile is enough if I can toggle auth state.
-
-                // TEMPORARY HACK: We need to set isAuthenticated = true in store without overwriting profile.
-                // Since I can't change store right now, I'll assume the user is using the app and `isAuthenticated` 
-                // in store is mainly for UI toggles. 
-                // Wait, I CAN change the store. I should add `syncUser` action to store.
+                setAuthenticated(true);
 
             }
 
@@ -114,21 +105,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                 .eq('profile_id', authUser.id);
 
             if (addresses) {
-                // Clear existing addresses first? Store doesn't have setAddresses.
-                // We'll iterate and add if not exists, or just rely on what we have.
-                // Ideally store should have setAddresses.
-                addresses.forEach(addr => {
-                    // Basic mapping
-                    addAddress({
-                        id: addr.id,
-                        tag: addr.tag,
-                        line1: addr.line1,
-                        line2: addr.line2,
-                        city: addr.city,
-                        pincode: addr.pincode,
-                        isDefault: addr.is_default
-                    });
-                });
+                const mappedAddresses = addresses.map(addr => ({
+                    id: addr.id,
+                    tag: addr.tag as 'Home' | 'Office' | 'Other',
+                    line1: addr.line1,
+                    line2: addr.line2,
+                    city: addr.city,
+                    pincode: addr.pincode,
+                    isDefault: addr.is_default
+                }));
+                setAddresses(mappedAddresses);
             }
 
             // C. Fetch Family Members
@@ -138,9 +124,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                 .eq('profile_id', authUser.id);
 
             if (family) {
-                family.forEach(member => {
-                    addFamilyMember(member);
-                });
+                setFamilyMembers(family as any);
             }
 
         } catch (error) {

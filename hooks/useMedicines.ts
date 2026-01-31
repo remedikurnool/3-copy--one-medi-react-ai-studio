@@ -5,6 +5,7 @@ import { useSupabaseList, useSupabaseRecord, useSupabaseQuery } from './useSupab
 export interface Medicine {
     id: string;
     name: string;
+    generic_name?: string;
     manufacturer: string;
     composition: string;
     dosage_form: string;
@@ -18,6 +19,16 @@ export interface Medicine {
     description: string;
     indications: string[];
     side_effects: string[];
+    contraindications?: string[];
+    storage_instructions?: string;
+    warnings?: string[];
+    dosage_instructions?: string;
+    route_of_administration?: string;
+    safety_advice?: {
+        pregnancy?: string;
+        alcohol?: string;
+        driving?: string;
+    };
 }
 
 // Hook to fetch all medicines (with optional limit for best sellers)

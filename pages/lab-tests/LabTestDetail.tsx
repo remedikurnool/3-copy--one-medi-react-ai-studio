@@ -48,10 +48,29 @@ export default function LabTestDetail() {
    const { id } = useParams();
    const navigate = useNavigate();
 
-   // Try to get from Supabase first, fall back to constants
+   // Try to get from Supabase
    const { data: dbTest, loading } = useLabTest(id);
-   // Use any type for compatibility between DB schema and constants schema
-   const test: any = dbTest || LAB_TESTS.find(t => t.id === id);
+
+   // Mapping DB fields to UI fields
+   const test = dbTest ? {
+      ...dbTest,
+      sampleType: dbTest.sample_type,
+      fastingRequired: dbTest.fasting_required,
+      preparationInstructions: dbTest.preparation_instructions,
+      reportTime: `${dbTest.turnaround_time_hours} Hours`,
+      discount: '20% OFF',
+      mrp: Math.round(dbTest.price * 1.5),
+      variants: [{
+         centerId: 'c1',
+         centerName: 'One Medi Partner Lab',
+         centerImage: 'https://images.unsplash.com/photo-1579152276506-0d60c41098ed?auto=format&fit=crop&q=80',
+         price: dbTest.price,
+         mrp: Math.round(dbTest.price * 1.5),
+         reportTime: `${dbTest.turnaround_time_hours} Hours`,
+         distance: '0.8 km',
+         rating: 4.8
+      }]
+   } : null;
 
    const addToCart = useCartStore((state) => state.addToCart);
    const cartItemsCount = useCartStore((state) => state.items.length);
@@ -59,7 +78,7 @@ export default function LabTestDetail() {
    const [selectedVariant, setSelectedVariant] = useState<any>(null);
 
    useEffect(() => {
-      if (test && test.variants && test.variants.length > 0) {
+      if (test && test.variants && test.variants.length > 0 && !selectedVariant) {
          setSelectedVariant(test.variants[0]);
       }
    }, [test]);
@@ -150,8 +169,8 @@ export default function LabTestDetail() {
                         key={variant.centerId}
                         onClick={() => setSelectedVariant(variant)}
                         className={`bg-white dark:bg-gray-800 rounded-xl p-3 border transition-all cursor-pointer flex gap-3 ${selectedVariant?.centerId === variant.centerId
-                              ? 'border-primary ring-1 ring-primary/20 shadow-md'
-                              : 'border-gray-100 dark:border-gray-700 opacity-80'
+                           ? 'border-primary ring-1 ring-primary/20 shadow-md'
+                           : 'border-gray-100 dark:border-gray-700 opacity-80'
                            }`}
                      >
                         <div className="size-14 rounded-lg bg-gray-50 dark:bg-gray-700 p-1 shrink-0 flex items-center justify-center overflow-hidden">

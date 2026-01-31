@@ -3,8 +3,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useCartStore } from '../../store/cartStore';
 import { triggerCartAnimation } from '../../components/ui/FlyingCartAnimation';
-import { MEDICINES } from '../../constants';
 import { MedicineCardSkeleton } from '../../components/ui/Skeletons';
+import { useMedicines, useMedicineSearch } from '../../hooks/useMedicines';
 
 const CATEGORY_GRID = [
   { name: 'Pain Relief', icon: 'https://cdn-icons-png.flaticon.com/128/3004/3004458.png', filter: 'Pain Relief', color: 'bg-red-50 text-red-600' },
@@ -27,80 +27,72 @@ export default function MedicineList() {
   const [searchParams] = useSearchParams();
   const cartItemsCount = useCartStore((state) => state.items.length);
   const addToCart = useCartStore((state) => state.addToCart);
-  
+
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState(searchParams.get('cat') || 'All');
   const [selectedConcern, setSelectedConcern] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+
+  // Real Database Fetching
+  const { data: allMedicines, loading: listLoading } = useMedicines();
+  const { data: searchResults, loading: searchLoading } = useMedicineSearch(search);
+
+  const isLoading = listLoading || (search.length >= 2 && searchLoading);
+  const medicines = (search.length >= 2 ? searchResults : allMedicines) || [];
 
   useEffect(() => {
     const cat = searchParams.get('cat');
     if (cat) {
-        if(cat === 'diabetes') setSelectedCategory('Diabetes');
-        else if(cat === 'cardiac') setSelectedCategory('Cardiac');
-        else if(cat === 'pain') setSelectedCategory('Pain Relief');
-        else if(cat === 'stomach') setSelectedCategory('Stomach Care');
-        else if(cat === 'supplements') setSelectedCategory('Vitamins');
-        else setSelectedCategory(cat.charAt(0).toUpperCase() + cat.slice(1));
+      if (cat === 'diabetes') setSelectedCategory('Diabetes');
+      else if (cat === 'cardiac') setSelectedCategory('Cardiac');
+      else if (cat === 'pain') setSelectedCategory('Pain Relief');
+      else if (cat === 'stomach') setSelectedCategory('Stomach Care');
+      else if (cat === 'supplements') setSelectedCategory('Vitamins');
+      else setSelectedCategory(cat.charAt(0).toUpperCase() + cat.slice(1));
     }
   }, [searchParams]);
 
-  // Simulate loading delay
-  useEffect(() => {
-    setIsLoading(true);
-    const timer = setTimeout(() => setIsLoading(false), 800);
-    return () => clearTimeout(timer);
-  }, [selectedCategory, selectedConcern, search]);
-
   const toggleCategory = (cat: string) => {
     if (selectedCategory === cat && !selectedConcern) {
-        // If clicking active category and no concern, do nothing or maybe reset?
-        // Let's allow resetting to 'All' if clicking the active 'All' is redundant, but clicking active filter usually toggles off or stays.
-        // If 'All' is active, stay.
-        if (cat !== 'All') setSelectedCategory('All');
+      if (cat !== 'All') setSelectedCategory('All');
     } else {
-        setSelectedCategory(cat);
-        setSelectedConcern(null); // Reset concern when switching categories
+      setSelectedCategory(cat);
+      setSelectedConcern(null);
     }
   };
 
   const toggleConcern = (query: string) => {
     if (selectedConcern === query) {
-        setSelectedConcern(null);
+      setSelectedConcern(null);
     } else {
-        setSelectedConcern(query);
-        setSelectedCategory('All'); // Reset category when a concern is selected
+      setSelectedConcern(query);
+      setSelectedCategory('All');
     }
   };
 
-  const filteredMedicines = MEDICINES.filter((med: any) => {
-    const matchesSearch = med.name.toLowerCase().includes(search.toLowerCase()) || 
-                          med.genericName.toLowerCase().includes(search.toLowerCase());
-    
-    const matchesCategory = selectedCategory === 'All' || med.category.toLowerCase() === selectedCategory.toLowerCase();
-    
-    // Concern Filter: Check indications or sub-category
-    const matchesConcern = !selectedConcern || 
-                           (med.indications && med.indications.some((i: string) => i.toLowerCase().includes(selectedConcern.toLowerCase()))) ||
-                           (med.category && med.category.toLowerCase().includes(selectedConcern.toLowerCase()));
+  const filteredMedicines = medicines.filter((med: any) => {
+    const matchesCategory = selectedCategory === 'All' || (med.category && med.category.toLowerCase() === selectedCategory.toLowerCase());
 
-    return matchesSearch && matchesCategory && matchesConcern;
+    const matchesConcern = !selectedConcern ||
+      (med.indications && med.indications.some((i: string) => i.toLowerCase().includes(selectedConcern.toLowerCase()))) ||
+      (med.category && med.category.toLowerCase().includes(selectedConcern.toLowerCase()));
+
+    return matchesCategory && matchesConcern;
   });
 
   const handleAdd = (e: React.MouseEvent, med: any) => {
     e.stopPropagation();
-    triggerCartAnimation(e, med.image);
+    triggerCartAnimation(e, med.image_url);
     addToCart({
       id: med.id,
       type: 'medicine',
       name: med.name,
       price: med.price,
-      mrp: med.mrp,
-      image: med.image,
-      packSize: med.packSize,
+      mrp: med.price * 1.2, // Assuming 20% discount if no mrp in DB
+      image: med.image_url,
+      packSize: med.pack_size,
       qty: 1,
-      discount: med.discount || '',
-      isPrescriptionRequired: med.prescriptionRequired
+      discount: '20% OFF',
+      isPrescriptionRequired: med.prescription_required
     });
   };
 
@@ -108,28 +100,28 @@ export default function MedicineList() {
     <div className="flex flex-col min-h-screen bg-bg-light dark:bg-bg-dark font-sans animate-fade-in pb-24">
       <header className="sticky top-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-2xl border-b border-white/40 dark:border-gray-800 shadow-glass">
         <div className="flex items-center justify-between px-4 py-3">
-           <div className="flex items-center gap-3">
-             <button onClick={() => navigate(-1)} className="text-slate-900 dark:text-white hover:bg-slate-100 dark:hover:bg-slate-800 size-10 rounded-full transition-all active:scale-90 flex items-center justify-center">
-               <span className="material-symbols-outlined text-2xl">arrow_back</span>
-             </button>
-             <h1 className="text-lg font-black uppercase tracking-tight">Pharmacy</h1>
-           </div>
-           <button id="cart-icon-target" onClick={() => navigate('/cart')} className="relative p-2.5 bg-slate-50 dark:bg-slate-800 rounded-2xl transition-all active:scale-95 shadow-soft border border-white dark:border-slate-700">
-             <span className="material-symbols-outlined text-2xl">shopping_cart</span>
-             {cartItemsCount > 0 && <span className="absolute -top-1 -right-1 flex items-center justify-center size-5 bg-red-500 rounded-full text-[10px] text-white font-black border-2 border-white dark:border-gray-900 shadow-md animate-bounce">{cartItemsCount}</span>}
-           </button>
+          <div className="flex items-center gap-3">
+            <button onClick={() => navigate(-1)} className="text-slate-900 dark:text-white hover:bg-slate-100 dark:hover:bg-slate-800 size-10 rounded-full transition-all active:scale-90 flex items-center justify-center">
+              <span className="material-symbols-outlined text-2xl">arrow_back</span>
+            </button>
+            <h1 className="text-lg font-black uppercase tracking-tight">Pharmacy</h1>
+          </div>
+          <button id="cart-icon-target" onClick={() => navigate('/cart')} className="relative p-2.5 bg-slate-50 dark:bg-slate-800 rounded-2xl transition-all active:scale-95 shadow-soft border border-white dark:border-slate-700">
+            <span className="material-symbols-outlined text-2xl">shopping_cart</span>
+            {cartItemsCount > 0 && <span className="absolute -top-1 -right-1 flex items-center justify-center size-5 bg-red-500 rounded-full text-[10px] text-white font-black border-2 border-white dark:border-gray-900 shadow-md animate-bounce">{cartItemsCount}</span>}
+          </button>
         </div>
-        
+
         <div className="px-4 pb-3">
-           <div className="flex w-full items-center rounded-2xl bg-slate-100 dark:bg-slate-800/50 border border-transparent focus-within:border-primary/50 focus-within:ring-4 focus-within:ring-primary/10 h-14 px-4 transition-all shadow-inner">
-              <span className="material-symbols-outlined text-gray-400 text-2xl">search</span>
-              <input 
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="w-full bg-transparent border-none focus:ring-0 ml-2 text-sm font-semibold text-slate-900 dark:text-white placeholder:text-gray-400" 
-                placeholder="Search Dolo, Metformin..." 
-              />
-           </div>
+          <div className="flex w-full items-center rounded-2xl bg-slate-100 dark:bg-slate-800/50 border border-transparent focus-within:border-primary/50 focus-within:ring-4 focus-within:ring-primary/10 h-14 px-4 transition-all shadow-inner">
+            <span className="material-symbols-outlined text-gray-400 text-2xl">search</span>
+            <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full bg-transparent border-none focus:ring-0 ml-2 text-sm font-semibold text-slate-900 dark:text-white placeholder:text-gray-400"
+              placeholder="Search Dolo, Metformin..."
+            />
+          </div>
         </div>
       </header>
 
@@ -138,13 +130,13 @@ export default function MedicineList() {
         <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Shop by Concern</h3>
         <div className="flex gap-4 overflow-x-auto no-scrollbar pb-2">
           {CONCERNS.map((concern) => (
-            <button 
+            <button
               key={concern.id}
               onClick={() => toggleConcern(concern.query)}
               className="flex flex-col items-center gap-2 shrink-0 group min-w-[60px]"
             >
               <div className={`size-14 rounded-full p-0.5 border-2 transition-all ${selectedConcern === concern.query ? 'border-primary ring-2 ring-primary/20 scale-105' : 'border-transparent group-hover:border-gray-200'}`}>
-                 <img src={concern.image} alt={concern.label} className="w-full h-full object-cover rounded-full shadow-sm" />
+                <img src={concern.image} alt={concern.label} className="w-full h-full object-cover rounded-full shadow-sm" />
               </div>
               <span className={`text-[10px] font-bold text-center leading-tight transition-colors ${selectedConcern === concern.query ? 'text-primary' : 'text-slate-600 dark:text-slate-400'}`}>
                 {concern.label}
@@ -157,19 +149,19 @@ export default function MedicineList() {
       {/* Category Selection */}
       <section className="px-4 py-4 overflow-x-auto no-scrollbar">
         <div className="flex gap-4">
-          <button 
-              onClick={() => toggleCategory('All')}
-              className={`flex flex-col items-center gap-2 shrink-0 group`}
-            >
-              <div className={`size-16 rounded-[1.5rem] flex items-center justify-center transition-all duration-500 border-2 ${selectedCategory === 'All' && !selectedConcern ? 'border-primary bg-primary/10 shadow-float scale-105' : 'border-white dark:border-slate-800 bg-white dark:bg-slate-800 shadow-soft'} group-active:scale-95`}>
-                <span className="material-symbols-outlined text-2xl text-gray-500">grid_view</span>
-              </div>
-              <span className={`text-[10px] font-black uppercase tracking-tighter text-center leading-tight max-w-[64px] transition-colors ${selectedCategory === 'All' && !selectedConcern ? 'text-primary' : 'text-gray-400'}`}>
-                All
-              </span>
-            </button>
+          <button
+            onClick={() => toggleCategory('All')}
+            className={`flex flex-col items-center gap-2 shrink-0 group`}
+          >
+            <div className={`size-16 rounded-[1.5rem] flex items-center justify-center transition-all duration-500 border-2 ${selectedCategory === 'All' && !selectedConcern ? 'border-primary bg-primary/10 shadow-float scale-105' : 'border-white dark:border-slate-800 bg-white dark:bg-slate-800 shadow-soft'} group-active:scale-95`}>
+              <span className="material-symbols-outlined text-2xl text-gray-500">grid_view</span>
+            </div>
+            <span className={`text-[10px] font-black uppercase tracking-tighter text-center leading-tight max-w-[64px] transition-colors ${selectedCategory === 'All' && !selectedConcern ? 'text-primary' : 'text-gray-400'}`}>
+              All
+            </span>
+          </button>
           {CATEGORY_GRID.map((cat) => (
-            <button 
+            <button
               key={cat.name}
               onClick={() => toggleCategory(cat.filter)}
               className="flex flex-col items-center gap-2 shrink-0 group"
@@ -188,72 +180,72 @@ export default function MedicineList() {
       {/* List */}
       <main className="flex-1 p-4 pt-0 flex flex-col gap-4 max-w-4xl mx-auto w-full">
         <div className="flex justify-between items-center mb-2 px-1">
-           <h3 className="text-sm font-bold text-slate-700 dark:text-slate-300">
-              {isLoading ? 'Loading...' : `${filteredMedicines.length} Products`}
-           </h3>
-           {(selectedCategory !== 'All' || selectedConcern) && (
-              <button 
-                onClick={() => { setSelectedCategory('All'); setSelectedConcern(null); }}
-                className="text-[10px] font-black text-red-500 uppercase tracking-widest hover:underline"
-              >
-                Clear Filters
-              </button>
-           )}
+          <h3 className="text-sm font-bold text-slate-700 dark:text-slate-300">
+            {isLoading ? 'Loading...' : `${filteredMedicines.length} Products`}
+          </h3>
+          {(selectedCategory !== 'All' || selectedConcern) && (
+            <button
+              onClick={() => { setSelectedCategory('All'); setSelectedConcern(null); }}
+              className="text-[10px] font-black text-red-500 uppercase tracking-widest hover:underline"
+            >
+              Clear Filters
+            </button>
+          )}
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {isLoading 
+          {isLoading
             ? Array(6).fill(0).map((_, i) => <MedicineCardSkeleton key={i} />)
             : filteredMedicines.map((med: any) => (
-            <div 
-              key={med.id} 
-              onClick={() => navigate(`/medicines/${med.id}`)} 
-              className="group bg-white dark:bg-slate-900 rounded-[2.5rem] p-5 shadow-glass border border-white dark:border-slate-800/50 flex gap-5 relative cursor-pointer active:scale-[0.99] transition-all hover:shadow-float overflow-hidden"
-            >
-               {med.prescriptionRequired && (
+              <div
+                key={med.id}
+                onClick={() => navigate(`/medicines/${med.id}`)}
+                className="group bg-white dark:bg-slate-900 rounded-[2.5rem] p-5 shadow-glass border border-white dark:border-slate-800/50 flex gap-5 relative cursor-pointer active:scale-[0.99] transition-all hover:shadow-float overflow-hidden"
+              >
+                {med.prescription_required && (
                   <div className="absolute top-0 right-0 bg-rose-500 text-white text-[10px] font-black px-3 py-1.5 rounded-bl-2xl z-20 shadow-sm flex items-center gap-1">
                     <span className="material-symbols-outlined text-[12px]">description</span> Rx
                   </div>
-               )}
+                )}
 
-               <div className="size-28 shrink-0 bg-slate-50 dark:bg-slate-800 rounded-3xl flex items-center justify-center p-3 border border-slate-100 dark:border-slate-700 relative overflow-hidden">
-                  <img src={med.image} alt={med.name} className="w-full h-full object-contain relative z-10 group-hover:scale-110 transition-transform duration-500" />
-               </div>
-               <div className="flex-1 flex flex-col justify-between py-1 min-w-0">
+                <div className="size-28 shrink-0 bg-slate-50 dark:bg-slate-800 rounded-3xl flex items-center justify-center p-3 border border-slate-100 dark:border-slate-700 relative overflow-hidden">
+                  <img src={med.image_url} alt={med.name} className="w-full h-full object-contain relative z-10 group-hover:scale-110 transition-transform duration-500" />
+                </div>
+                <div className="flex-1 flex flex-col justify-between py-1 min-w-0">
                   <div>
                     <h3 className="font-black text-base leading-tight text-slate-900 dark:text-white line-clamp-2 tracking-tight">{med.name}</h3>
                     <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1.5">{med.category}</p>
                   </div>
                   <div className="flex items-end justify-between mt-3">
-                     <div className="flex flex-col">
-                       <span className="text-xl font-black text-slate-900 dark:text-white tracking-tighter">₹{med.price}</span>
-                       <span className="text-[10px] text-slate-400 line-through font-bold">₹{med.mrp}</span>
-                     </div>
-                     <button 
+                    <div className="flex flex-col">
+                      <span className="text-xl font-black text-slate-900 dark:text-white tracking-tighter">₹{med.price}</span>
+                      <span className="text-[10px] text-slate-400 line-through font-bold">₹{(med.price * 1.2).toFixed(0)}</span>
+                    </div>
+                    <button
                       onClick={(e) => handleAdd(e, med)}
                       className="size-11 rounded-2xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 flex items-center justify-center shadow-xl active:scale-90 transition-all border border-white/10"
-                     >
-                       <span className="material-symbols-outlined text-2xl">add</span>
-                     </button>
+                    >
+                      <span className="material-symbols-outlined text-2xl">add</span>
+                    </button>
                   </div>
-               </div>
-            </div>
-          ))}
-        </div>
-        
-        {!isLoading && filteredMedicines.length === 0 && (
-            <div className="flex flex-col items-center justify-center py-10 text-center">
-                <div className="size-20 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mb-4">
-                    <span className="material-symbols-outlined text-4xl text-gray-400">search_off</span>
                 </div>
-                <p className="text-gray-500 font-bold text-sm">No medicines found for this filter.</p>
-                <button 
-                    onClick={() => { setSelectedCategory('All'); setSelectedConcern(null); }}
-                    className="mt-4 text-primary font-bold text-xs uppercase tracking-widest border border-primary/20 px-4 py-2 rounded-xl"
-                >
-                    Clear All Filters
-                </button>
+              </div>
+            ))}
+        </div>
+
+        {!isLoading && filteredMedicines.length === 0 && (
+          <div className="flex flex-col items-center justify-center py-10 text-center">
+            <div className="size-20 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mb-4">
+              <span className="material-symbols-outlined text-4xl text-gray-400">search_off</span>
             </div>
+            <p className="text-gray-500 font-bold text-sm">No medicines found for this filter.</p>
+            <button
+              onClick={() => { setSelectedCategory('All'); setSelectedConcern(null); }}
+              className="mt-4 text-primary font-bold text-xs uppercase tracking-widest border border-primary/20 px-4 py-2 rounded-xl"
+            >
+              Clear All Filters
+            </button>
+          </div>
         )}
       </main>
     </div>
