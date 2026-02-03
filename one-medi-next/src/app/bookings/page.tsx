@@ -2,9 +2,10 @@
 
 import React, { useState, Suspense } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '../../components/AuthProvider';
-import { useBookings } from '../../hooks';
+import { useAuth } from '@/components/AuthProvider';
+import { useBookings } from '@/hooks';
 import { motion, AnimatePresence } from 'framer-motion';
+import PageHeader from '@/components/ui/PageHeader';
 
 interface BookingCardProps {
     booking: {
@@ -17,9 +18,10 @@ interface BookingCardProps {
         notes?: string;
         created_at: string;
     };
+    className?: string;
 }
 
-const BookingCard: React.FC<BookingCardProps> = ({ booking }) => {
+const BookingCard: React.FC<BookingCardProps> = ({ booking, className = '' }) => {
     const getStatusStyle = (status: string) => {
         switch (status) {
             case 'confirmed': return 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 border-emerald-200/50';
@@ -51,7 +53,7 @@ const BookingCard: React.FC<BookingCardProps> = ({ booking }) => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             whileHover={{ y: -2 }}
-            className="bg-white dark:bg-gray-800 p-5 rounded-[2rem] shadow-sm hover:shadow-card-hover border border-slate-100 dark:border-slate-800/50 flex flex-col gap-4 group transition-shadow"
+            className={`bg-white dark:bg-gray-800 p-5 rounded-[2rem] shadow-sm hover:shadow-card-hover border border-slate-100 dark:border-slate-800/50 flex flex-col gap-4 group transition-shadow h-full ${className}`}
         >
             <div className="flex justify-between items-start">
                 <div className="flex gap-4">
@@ -72,7 +74,7 @@ const BookingCard: React.FC<BookingCardProps> = ({ booking }) => {
                 </span>
             </div>
 
-            <div className="flex items-center gap-2 text-sm bg-slate-50 dark:bg-slate-700/30 p-3 rounded-xl border border-dashed border-slate-200 dark:border-slate-700">
+            <div className="flex items-center gap-2 text-sm bg-slate-50 dark:bg-slate-700/30 p-3 rounded-xl border border-dashed border-slate-200 dark:border-slate-700 mt-auto">
                 <span className="material-symbols-outlined text-slate-400">calendar_month</span>
                 <span className="font-bold text-slate-700 dark:text-slate-200">
                     {formatDate(booking.booking_date)}
@@ -98,7 +100,7 @@ const BookingCard: React.FC<BookingCardProps> = ({ booking }) => {
 };
 
 const BookingSkeleton = () => (
-    <div className="bg-white dark:bg-gray-800 p-5 rounded-[2rem] shadow-sm border border-slate-100 dark:border-slate-800 animate-pulse">
+    <div className="bg-white dark:bg-gray-800 p-5 rounded-[2rem] shadow-sm border border-slate-100 dark:border-slate-800 animate-pulse h-full">
         <div className="flex gap-4 mb-4">
             <div className="size-12 rounded-2xl bg-slate-100 dark:bg-slate-700"></div>
             <div className="flex-1 space-y-2">
@@ -130,15 +132,13 @@ function BookingsContent() {
 
     return (
         <div className="min-h-screen bg-bg-light dark:bg-bg-dark pb-24 font-sans text-slate-900 dark:text-white">
-            <header className="sticky top-0 z-40 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-b border-slate-100 dark:border-gray-800 p-4 shadow-sm">
-                <div className="flex items-center gap-3 mb-4">
-                    <button onClick={() => router.back()} className="size-10 rounded-full bg-slate-50 dark:bg-gray-800 flex items-center justify-center hover:bg-slate-100 transition-colors">
-                        <span className="material-symbols-outlined text-slate-600 dark:text-slate-300">arrow_back</span>
-                    </button>
-                    <h1 className="text-xl font-black uppercase tracking-tight">My Bookings</h1>
-                </div>
+            <PageHeader
+                title="My Bookings"
+                className="lg:top-20"
+            />
 
-                <div className="flex p-1.5 bg-slate-100 dark:bg-gray-800 rounded-2xl">
+            <div className="sticky top-[72px] lg:top-[144px] z-30 bg-bg-light/95 dark:bg-bg-dark/95 backdrop-blur-sm p-4 pt-2 border-b border-slate-100 dark:border-gray-800">
+                <div className="flex p-1.5 bg-slate-100 dark:bg-gray-800 rounded-2xl max-w-lg mx-auto">
                     <button
                         onClick={() => setActiveTab('upcoming')}
                         className={`flex-1 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'upcoming' ? 'bg-white dark:bg-gray-700 shadow-md text-primary scale-[1.02]' : 'text-slate-400 hover:text-slate-600'}`}
@@ -152,15 +152,16 @@ function BookingsContent() {
                         History {historyBookings.length > 0 && `(${historyBookings.length})`}
                     </button>
                 </div>
-            </header>
+            </div>
 
-            <div className="p-4 flex flex-col gap-4 max-w-lg mx-auto w-full">
+            <div className="p-4 flex flex-col gap-4 max-w-7xl mx-auto w-full">
                 {loading ? (
-                    <>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         <BookingSkeleton />
                         <BookingSkeleton />
                         <BookingSkeleton />
-                    </>
+                        <BookingSkeleton />
+                    </div>
                 ) : error ? (
                     <div className="text-center py-20 opacity-50">
                         <span className="material-symbols-outlined text-5xl mb-2 text-red-400">wifi_off</span>
@@ -174,15 +175,15 @@ function BookingsContent() {
                             initial={{ opacity: 0, x: 20 }}
                             animate={{ opacity: 1, x: 0 }}
                             exit={{ opacity: 0, x: -20 }}
-                            className="flex flex-col gap-4"
+                            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
                         >
                             {activeTab === 'upcoming' ? (
                                 upcomingBookings.length > 0 ? (
                                     upcomingBookings.map(booking => (
-                                        <BookingCard key={booking.id} booking={booking} />
+                                        <BookingCard key={booking.id} booking={booking} className="w-full" />
                                     ))
                                 ) : (
-                                    <div className="text-center py-20 opacity-50">
+                                    <div className="col-span-full text-center py-20 opacity-50">
                                         <span className="material-symbols-outlined text-6xl mb-4 text-slate-300">event_busy</span>
                                         <p className="font-bold text-sm">No upcoming bookings</p>
                                         <p className="text-xs mt-1 max-w-[200px] mx-auto">Your schedule is clear. Book a service to get started.</p>
@@ -191,10 +192,10 @@ function BookingsContent() {
                             ) : (
                                 historyBookings.length > 0 ? (
                                     historyBookings.map(booking => (
-                                        <BookingCard key={booking.id} booking={booking} />
+                                        <BookingCard key={booking.id} booking={booking} className="w-full" />
                                     ))
                                 ) : (
-                                    <div className="text-center py-20 opacity-50">
+                                    <div className="col-span-full text-center py-20 opacity-50">
                                         <span className="material-symbols-outlined text-6xl mb-4 text-slate-300">history</span>
                                         <p className="font-bold text-sm">No booking history</p>
                                     </div>

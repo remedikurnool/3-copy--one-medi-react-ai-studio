@@ -4,6 +4,7 @@ import React from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { useCartStore } from '@/store/cartStore';
+import { LazyImage } from '../ui/LazyImage';
 
 // Helper for discount calculation
 const calculateDiscount = (mrp: number, sellingPrice: number) => {
@@ -37,10 +38,11 @@ export const MedicineCard = ({ medicine, onClick }: { medicine: any, onClick?: (
 
       {/* Image Container */}
       <div className="relative w-full aspect-square rounded-2xl bg-slate-50 dark:bg-slate-700/50 mb-3 overflow-hidden group-hover:bg-slate-100 transition-colors">
-        <Image
+        <LazyImage
           src={medicine.image_url || 'https://images.unsplash.com/photo-1584308666746-953a5e66c7c9?auto=format&fit=crop&q=80&w=400'}
-          alt={medicine.name}
+          alt={medicine.name || 'Medicine'}
           fill
+          sizes="160px"
           className="object-cover mix-blend-multiply dark:mix-blend-normal p-2 group-hover:scale-110 transition-transform duration-500"
         />
 

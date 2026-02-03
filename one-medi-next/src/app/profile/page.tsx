@@ -67,7 +67,7 @@ function ProfileContent() {
                 <div className="absolute top-0 right-0 -mr-20 -mt-20 size-64 bg-primary/5 rounded-full blur-3xl" />
                 <div className="absolute bottom-0 left-0 -ml-20 -mb-10 size-40 bg-blue-500/5 rounded-full blur-3xl" />
 
-                <div className="relative z-10 p-6 pt-safe">
+                <div className="relative z-10 p-6 pt-safe max-w-4xl mx-auto">
                     <div className="flex justify-between items-center mb-8">
                         <button onClick={() => router.back()} className="size-10 rounded-full bg-slate-50 dark:bg-gray-700/50 flex items-center justify-center hover:bg-slate-100 transition-colors">
                             <span className="material-symbols-outlined text-slate-600 dark:text-white">arrow_back</span>
@@ -103,7 +103,7 @@ function ProfileContent() {
                     </div>
 
                     {/* Quick Stats Cards */}
-                    <div className="grid grid-cols-3 gap-3 mt-8">
+                    <div className="grid grid-cols-3 gap-3 mt-8 max-w-md mx-auto w-full">
                         <div className="bg-blue-50 dark:bg-gray-700/30 p-4 rounded-[1.5rem] text-center border border-blue-100 dark:border-gray-600">
                             <span className="block text-xl font-black text-blue-600 dark:text-blue-400 mb-1">{profile.bloodGroup || 'O+'}</span>
                             <span className="text-[9px] font-black text-slate-400 uppercase tracking-wider">Blood Type</span>
@@ -120,10 +120,10 @@ function ProfileContent() {
                 </div>
             </div>
 
-            <div className="px-5 mt-6 flex flex-col gap-8">
+            <div className="px-5 mt-6 flex flex-col gap-8 max-w-4xl mx-auto w-full">
                 <section>
                     <h3 className="font-black text-slate-400 uppercase text-[10px] mb-4 px-2 tracking-[0.2em]">Health & Records</h3>
-                    <div className="rounded-[2rem] overflow-hidden shadow-card hover:shadow-card-hover transition-shadow border border-slate-100 dark:border-slate-800 bg-white dark:bg-gray-800">
+                    <div className="rounded-[2rem] overflow-hidden shadow-card hover:shadow-card-hover transition-shadow border border-slate-100 dark:border-slate-800 bg-white dark:bg-gray-800 grid grid-cols-1 md:grid-cols-2">
                         <MenuLink icon="shopping_bag" label="My Orders" sub="Track active orders" onClick={() => router.push('/orders')} color="text-violet-500" />
                         <MenuLink icon="calendar_month" label="Appointments" sub="Upcoming & Past" onClick={() => router.push('/bookings')} color="text-blue-500" />
                         <MenuLink icon="description" label="Prescriptions" sub="Digital Volt" onClick={() => router.push('/prescriptions')} color="text-teal-500" />
@@ -133,13 +133,13 @@ function ProfileContent() {
 
                 <section>
                     <h3 className="font-black text-slate-400 uppercase text-[10px] mb-4 px-2 tracking-[0.2em]">Settings</h3>
-                    <div className="rounded-[2rem] overflow-hidden shadow-card hover:shadow-card-hover transition-shadow border border-slate-100 dark:border-slate-800 bg-white dark:bg-gray-800">
+                    <div className="rounded-[2rem] overflow-hidden shadow-card hover:shadow-card-hover transition-shadow border border-slate-100 dark:border-slate-800 bg-white dark:bg-gray-800 grid grid-cols-1 md:grid-cols-2">
                         <MenuLink icon="location_on" label="Addresses" sub="Delivery locations" onClick={() => router.push('/profile/addresses')} color="text-indigo-500" />
                         <MenuLink icon="family_restroom" label="Family Members" sub="Manage dependents" onClick={() => router.push('/profile/family')} color="text-pink-500" />
                         <MenuLink icon="account_balance_wallet" label="Payments" sub="Cards & UPI" onClick={() => router.push('/profile/payments')} color="text-emerald-500" />
 
                         {/* Dark Mode Toggle */}
-                        <div className="flex items-center gap-4 w-full p-4 border-b border-gray-50 dark:border-gray-800/50 hover:bg-slate-50 dark:hover:bg-gray-700/30 transition-colors cursor-pointer" onClick={toggleDarkMode}>
+                        <div className="flex items-center gap-4 w-full p-4 border-b md:border-b-0 md:border-r border-gray-50 dark:border-gray-800/50 hover:bg-slate-50 dark:hover:bg-gray-700/30 transition-colors cursor-pointer" onClick={toggleDarkMode}>
                             <div className="size-12 rounded-[1rem] bg-slate-50 dark:bg-gray-700/50 flex items-center justify-center text-slate-600 dark:text-slate-300">
                                 <span className="material-symbols-outlined text-2xl">{isDark ? 'dark_mode' : 'light_mode'}</span>
                             </div>
@@ -155,7 +155,7 @@ function ProfileContent() {
                 </section>
 
                 <section>
-                    <div className="rounded-[2rem] overflow-hidden shadow-card border border-slate-100 dark:border-slate-800 bg-white dark:bg-gray-800">
+                    <div className="rounded-[2rem] overflow-hidden shadow-card border border-slate-100 dark:border-slate-800 bg-white dark:bg-gray-800 grid grid-cols-1 md:grid-cols-2">
                         <MenuLink icon="headset_mic" label="Help & Support" sub="24/7 Chat" onClick={() => router.push('/chat')} color="text-primary" />
                         <button
                             onClick={handleLogout}

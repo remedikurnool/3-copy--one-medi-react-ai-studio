@@ -22,41 +22,40 @@ export default function FloatingBottomNav() {
   const hiddenPaths = ['/checkout', '/login', '/register'];
   if (hiddenPaths.some(p => pathname.startsWith(p))) return null;
 
+  const leftItems = NAV_ITEMS.slice(0, 2);
+  const rightItems = NAV_ITEMS.slice(2, 4);
+
   return (
     <motion.div
-      className="lg:hidden fixed bottom-0 left-0 right-0 z-[100] px-4 pb-safe"
+      className="lg:hidden fixed bottom-0 left-0 right-0 z-[100] px-4 pb-safe pointer-events-none"
       initial={{ y: 100 }}
       animate={{ y: 0 }}
       transition={{ type: 'spring', stiffness: 300, damping: 30 }}
     >
       {/* Glassmorphism Container */}
-      <nav className="relative mx-auto max-w-md">
+      <nav className="relative mx-auto max-w-sm pointer-events-auto">
         {/* Background Blur Layer */}
         <div className="absolute inset-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-2xl rounded-[2rem] shadow-lg border border-white/50 dark:border-slate-700/50" />
 
         {/* Navigation Content */}
-        <div className="relative flex items-center justify-around px-2 py-2">
-          {NAV_ITEMS.map((item) => {
-            const isActive = pathname === item.path ||
-              (item.path !== '/' && pathname.startsWith(item.path));
+        <div className="relative flex items-center justify-between px-2 py-2">
 
-            return (
-              <NavItem
-                key={item.id}
-                item={item}
-                isActive={isActive}
-              />
-            );
-          })}
+          {/* Left Items */}
+          <div className="flex items-center gap-1">
+            {leftItems.map((item) => {
+              const isActive = pathname === item.path || (item.path !== '/' && pathname.startsWith(item.path));
+              return <NavItem key={item.id} item={item} isActive={isActive} />;
+            })}
+          </div>
 
           {/* Center Cart Button */}
           <Link
             href="/cart"
-            className="relative -mt-8"
+            className="relative -mt-12 mx-2"
           >
             <motion.div
               id="cart-icon-target"
-              className="relative flex items-center justify-center size-16 bg-gradient-to-br from-primary to-primary-dark rounded-full shadow-float"
+              className="relative flex items-center justify-center size-16 bg-gradient-to-br from-primary to-primary-dark rounded-full shadow-float border-4 border-slate-50 dark:border-slate-800 ring-2 ring-primary/20"
               whileHover={{ scale: 1.05, y: -2 }}
               whileTap={{ scale: 0.95 }}
             >
@@ -75,7 +74,7 @@ export default function FloatingBottomNav() {
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     exit={{ scale: 0 }}
-                    className="absolute -top-1 -right-1 size-6 bg-accent text-white text-xs font-black rounded-full flex items-center justify-center shadow-md z-20"
+                    className="absolute -top-1 -right-1 size-6 bg-red-500 text-white text-[10px] font-black rounded-full flex items-center justify-center shadow-md z-20 border-2 border-white dark:border-slate-900"
                   >
                     {cartCount > 9 ? '9+' : cartCount}
                   </motion.span>
@@ -83,6 +82,15 @@ export default function FloatingBottomNav() {
               </AnimatePresence>
             </motion.div>
           </Link>
+
+          {/* Right Items */}
+          <div className="flex items-center gap-1">
+            {rightItems.map((item) => {
+              const isActive = pathname === item.path || (item.path !== '/' && pathname.startsWith(item.path));
+              return <NavItem key={item.id} item={item} isActive={isActive} />;
+            })}
+          </div>
+
         </div>
       </nav>
     </motion.div>
@@ -113,8 +121,8 @@ function NavItem({ item, isActive }: { item: typeof NAV_ITEMS[0]; isActive: bool
         {/* Icon */}
         <span
           className={`material-symbols-outlined text-2xl transition-colors duration-300 relative z-10 ${isActive
-              ? 'text-primary filled'
-              : 'text-slate-400 dark:text-slate-500'
+            ? 'text-primary filled'
+            : 'text-slate-400 dark:text-slate-500'
             }`}
         >
           {item.icon}
@@ -124,8 +132,8 @@ function NavItem({ item, isActive }: { item: typeof NAV_ITEMS[0]; isActive: bool
       {/* Label */}
       <span
         className={`text-[10px] font-bold uppercase tracking-wider transition-colors duration-300 ${isActive
-            ? 'text-primary'
-            : 'text-slate-400 dark:text-slate-500'
+          ? 'text-primary'
+          : 'text-slate-400 dark:text-slate-500'
           }`}
       >
         {item.label}

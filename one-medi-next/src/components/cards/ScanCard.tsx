@@ -15,8 +15,9 @@ export const ScanCard = ({ scan, onClick }: { scan: any, onClick?: () => void })
       <div className="relative h-32 w-full bg-indigo-100">
         <Image
           src={scan.image || 'https://images.unsplash.com/photo-1516549882906-589db74c94f7?auto=format&fit=crop&q=80&w=400'}
-          alt={scan.test_name}
+          alt={scan.test_name || 'Medical Scan'}
           fill
+          sizes="280px"
           className="object-cover group-hover:scale-105 transition-transform duration-700"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />

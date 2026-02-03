@@ -2,9 +2,10 @@
 
 import React, { Suspense } from 'react';
 import { useRouter } from 'next/navigation';
-import { useUserStore } from '../../store/userStore';
-import { useMyOrders } from '../../hooks';
+import { useUserStore } from '@/store/userStore';
+import { useMyOrders } from '@/hooks';
 import { motion, AnimatePresence } from 'framer-motion';
+import PageHeader from '@/components/ui/PageHeader';
 
 const OrderStatusBadge = ({ status }: { status: string }) => {
     const getStatusStyle = () => {
@@ -43,14 +44,19 @@ function OrderListContent() {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-bg-light dark:bg-bg-dark p-4 pt-20 flex flex-col gap-4">
-                {[1, 2, 3, 4].map(i => (
-                    <div key={i} className="bg-white dark:bg-gray-800 rounded-[2rem] p-6 shadow-sm border border-slate-50 dark:border-slate-800 animate-pulse h-40">
-                        <div className="h-4 bg-slate-100 dark:bg-slate-700 w-1/3 rounded mb-4"></div>
-                        <div className="h-10 bg-slate-100 dark:bg-slate-700 w-full rounded-xl mb-4"></div>
-                        <div className="h-4 bg-slate-100 dark:bg-slate-700 w-1/2 rounded"></div>
+            <div className="min-h-screen bg-bg-light dark:bg-bg-dark text-slate-900 dark:text-white pb-32">
+                <PageHeader title="My Orders" className="lg:top-20" />
+                <div className="p-4 flex flex-col gap-4 max-w-7xl mx-auto w-full">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {[1, 2, 3, 4, 5, 6].map(i => (
+                            <div key={i} className="bg-white dark:bg-gray-800 rounded-[2rem] p-6 shadow-sm border border-slate-50 dark:border-slate-800 animate-pulse h-40">
+                                <div className="h-4 bg-slate-100 dark:bg-slate-700 w-1/3 rounded mb-4"></div>
+                                <div className="h-10 bg-slate-100 dark:bg-slate-700 w-full rounded-xl mb-4"></div>
+                                <div className="h-4 bg-slate-100 dark:bg-slate-700 w-1/2 rounded"></div>
+                            </div>
+                        ))}
                     </div>
-                ))}
+                </div>
             </div>
         );
     }
@@ -73,17 +79,12 @@ function OrderListContent() {
 
     return (
         <div className="min-h-screen bg-bg-light dark:bg-bg-dark pb-32 font-sans text-slate-900 dark:text-white">
-            <header className="sticky top-0 z-40 bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl border-b border-white/20 dark:border-gray-800 p-4 flex items-center gap-3">
-                <button
-                    onClick={() => router.back()}
-                    className="size-10 flex items-center justify-center rounded-full bg-slate-50 dark:bg-gray-800 hover:bg-slate-100 dark:hover:bg-gray-700 transition-colors"
-                >
-                    <span className="material-symbols-outlined text-slate-700 dark:text-slate-200 text-lg">arrow_back</span>
-                </button>
-                <h1 className="text-xl font-black uppercase tracking-tight">My Orders</h1>
-            </header>
+            <PageHeader
+                title="My Orders"
+                className="lg:top-20"
+            />
 
-            <div className="p-4 flex flex-col gap-4 max-w-lg mx-auto w-full">
+            <div className="p-4 flex flex-col gap-4 max-w-7xl mx-auto w-full">
                 {orders.length === 0 ? (
                     <motion.div
                         initial={{ opacity: 0, scale: 0.9 }}
@@ -104,56 +105,55 @@ function OrderListContent() {
                     </motion.div>
                 ) : (
                     <AnimatePresence>
-                        {orders.map((order, index) => (
-                            <motion.div
-                                key={order.id}
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: index * 0.05 }}
-                                onClick={() => router.push(`/orders/${order.id}`)}
-                                className="bg-white dark:bg-gray-800 rounded-[2rem] p-5 shadow-sm hover:shadow-card-hover border border-slate-100 dark:border-slate-800 active:scale-[0.99] transition-all cursor-pointer group"
-                            >
-                                <div className="flex justify-between items-start mb-4">
-                                    <div className="flex gap-4 items-center">
-                                        <div className={`size-12 rounded-2xl flex items-center justify-center ${order.prescription_url
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {orders.map((order, index) => (
+                                <motion.div
+                                    key={order.id}
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: index * 0.05 }}
+                                    onClick={() => router.push(`/orders/${order.id}`)}
+                                    className="bg-white dark:bg-gray-800 rounded-[2rem] p-5 shadow-sm hover:shadow-card-hover border border-slate-100 dark:border-slate-800 active:scale-[0.99] transition-all cursor-pointer group h-full flex flex-col"
+                                >
+                                    <div className="flex justify-between items-start mb-4">
+                                        <div className="flex gap-4 items-center">
+                                            <div className={`size-12 rounded-2xl flex items-center justify-center ${order.prescription_url
                                                 ? 'bg-purple-50 text-purple-600 dark:bg-purple-900/20 dark:text-purple-400'
                                                 : 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400'
-                                            }`}>
-                                            <span className="material-symbols-outlined text-2xl">
-                                                {order.prescription_url ? 'file_upload' : 'shopping_basket'}
-                                            </span>
+                                                }`}>
+                                                <span className="material-symbols-outlined text-2xl">
+                                                    {order.prescription_url ? 'file_upload' : 'shopping_basket'}
+                                                </span>
+                                            </div>
+                                            <div>
+                                                <h3 className="font-black text-sm uppercase tracking-wider text-slate-400">Order #{order.id.slice(0, 8)}</h3>
+                                                <p className="text-sm font-bold text-slate-900 dark:text-white mt-0.5">
+                                                    {formatDate(order.created_at)}
+                                                </p>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <h3 className="font-black text-sm uppercase tracking-wider text-slate-400">Order #{order.id.slice(0, 8)}</h3>
-                                            <p className="text-sm font-bold text-slate-900 dark:text-white mt-0.5">
-                                                {formatDate(order.created_at)}
-                                            </p>
+                                        <OrderStatusBadge status={order.status} />
+                                    </div>
+
+                                    <div className="bg-slate-50 dark:bg-slate-700/30 rounded-xl p-3 mb-4 flex gap-2 overflow-hidden relative flex-1">
+                                        <div className="flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-300">
+                                            <span className="material-symbols-outlined text-base">receipt_long</span>
+                                            <span>Contains medicines & health products</span>
                                         </div>
                                     </div>
-                                    <OrderStatusBadge status={order.status} />
-                                </div>
 
-                                <div className="bg-slate-50 dark:bg-slate-700/30 rounded-xl p-3 mb-4 flex gap-2 overflow-hidden relative">
-                                    {/* Preview of first few items is tricky without explicit item data here unless joined. 
-                                    Assuming order object might just be summary. If we have items count or abstract, show that. 
-                                    For now just show generic summary */}
-                                    <div className="flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-300">
-                                        <span className="material-symbols-outlined text-base">receipt_long</span>
-                                        <span>Contains medicines & health products</span>
+                                    <div className="flex items-center justify-between pt-2 mt-auto">
+                                        <div className="flex flex-col">
+                                            <span className="text-[10px] text-slate-400 font-black uppercase tracking-wider">Total Amount</span>
+                                            <span className="font-black text-xl text-slate-900 dark:text-white">₹{order.final_amount}</span>
+                                        </div>
+                                        <div className="size-10 rounded-full bg-slate-100 dark:bg-slate-700/50 flex items-center justify-center text-slate-400 group-hover:bg-primary group-hover:text-white transition-colors shadow-sm">
+                                            <span className="material-symbols-outlined text-xl">arrow_forward</span>
+                                        </div>
                                     </div>
-                                </div>
-
-                                <div className="flex items-center justify-between pt-2">
-                                    <div className="flex flex-col">
-                                        <span className="text-[10px] text-slate-400 font-black uppercase tracking-wider">Total Amount</span>
-                                        <span className="font-black text-xl text-slate-900 dark:text-white">₹{order.final_amount}</span>
-                                    </div>
-                                    <div className="size-10 rounded-full bg-slate-100 dark:bg-slate-700/50 flex items-center justify-center text-slate-400 group-hover:bg-primary group-hover:text-white transition-colors shadow-sm">
-                                        <span className="material-symbols-outlined text-xl">arrow_forward</span>
-                                    </div>
-                                </div>
-                            </motion.div>
-                        ))}
+                                </motion.div>
+                            ))}
+                        </div>
                     </AnimatePresence>
                 )}
             </div>

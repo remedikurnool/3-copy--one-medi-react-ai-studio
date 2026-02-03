@@ -2,11 +2,12 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useLocationStore } from '../../store/locationStore';
-import LocationModal from '../../components/ui/LocationModal';
-import { ServiceCardSkeleton } from '../../components/ui/Skeletons';
-import { useLabTests, useLabTestSearch } from '../../hooks/useLabTests';
-import { LabTestCard } from '../../components/cards/LabTestCard';
+import { useLocationStore } from '@/store/locationStore';
+import LocationModal from '@/components/ui/LocationModal';
+import { ServiceCardSkeleton } from '@/components/ui/Skeletons';
+import { useLabTests, useLabTestSearch } from '@/hooks/useLabTests';
+import { LabTestCard } from '@/components/cards/LabTestCard';
+import PageHeader from '@/components/ui/PageHeader';
 
 const CATEGORIES = [
     { label: 'All', icon: 'grid_view' },
@@ -38,42 +39,28 @@ export default function LabTestListPage() {
         <div className="min-h-screen bg-bg-light dark:bg-bg-dark text-slate-900 dark:text-white pb-32 font-sans relative overflow-x-hidden">
             <LocationModal isOpen={isLocationModalOpen} onClose={() => setIsLocationModalOpen(false)} />
 
-            <header className="sticky top-0 z-40 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md border-b border-gray-100 dark:border-gray-800 shadow-sm transition-all pb-4">
-                <div className="flex items-center justify-between p-4">
-                    <div className="flex items-center gap-3">
-                        <button onClick={() => router.push('/')} className="bg-slate-100 dark:bg-slate-800 p-2.5 rounded-full text-slate-900 dark:text-white hover:bg-slate-200 transition-colors active:scale-95">
-                            <span className="material-symbols-outlined text-2xl">arrow_back</span>
-                        </button>
-                        <div className="flex flex-col">
-                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Diagnostics</span>
-                            <div onClick={() => setIsLocationModalOpen(true)} className="flex items-center gap-1 cursor-pointer hover:text-primary transition-colors">
-                                <h1 className="text-lg font-black leading-none">{city || 'Kurnool'}</h1>
-                                <span className="material-symbols-outlined text-lg">expand_more</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            {/* Unified Page Header */}
+            <PageHeader
+                title="Diagnostics"
+                showLocation={true}
+                showSearch={true}
+                searchPlaceholder="Search tests (e.g. CBC, Thyroid)..."
+                searchValue={search}
+                onSearchChange={setSearch}
+                onLocationClick={() => setIsLocationModalOpen(true)}
+                className="lg:top-20"
+            />
 
-                <div className="px-4 mb-4">
-                    <div className="relative">
-                        <span className="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-gray-400">search</span>
-                        <input
-                            value={search}
-                            onChange={(e) => setSearch(e.target.value)}
-                            className="w-full h-12 pl-12 pr-4 rounded-xl border-none bg-gray-100 dark:bg-gray-800 focus:ring-2 focus:ring-primary transition-all font-semibold text-sm outline-none"
-                            placeholder="Search tests (e.g. CBC, Thyroid)..."
-                        />
-                    </div>
-                </div>
-
-                <div className="flex gap-3 px-4 overflow-x-auto no-scrollbar scroll-pl-4">
+            {/* Category selection */}
+            <div className="sticky top-[136px] md:top-[88px] z-30 bg-bg-light/95 dark:bg-bg-dark/95 backdrop-blur-sm py-4 border-b border-gray-100 dark:border-gray-800 mb-6 transition-all">
+                <div className="flex gap-3 px-4 max-w-7xl mx-auto overflow-x-auto no-scrollbar scroll-pl-4">
                     {CATEGORIES.map((c) => (
                         <button
                             key={c.label}
                             onClick={() => setSelectedCat(c.label)}
-                            className={`flex items-center gap-2 px-4 py-2 rounded-full border transition-all active:scale-95 whitespace-nowrap ${selectedCat === c.label
-                                    ? 'bg-teal-600 text-white border-teal-600 shadow-lg shadow-teal-500/30'
-                                    : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-slate-600 dark:text-gray-300'
+                            className={`flex items-center gap-2 px-4 py-2 rounded-full border transition-all active:scale-95 whitespace-nowrap outline-none ${selectedCat === c.label
+                                ? 'bg-primary text-white border-primary shadow-lg shadow-primary/30'
+                                : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-slate-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
                                 }`}
                         >
                             <span className="material-symbols-outlined text-lg">{c.icon}</span>
@@ -81,9 +68,10 @@ export default function LabTestListPage() {
                         </button>
                     ))}
                 </div>
-            </header>
+            </div>
 
-            <main className="p-4 flex flex-col gap-4 max-w-lg mx-auto w-full">
+            {/* List */}
+            <main className="p-4 flex flex-col gap-4 max-w-7xl mx-auto w-full">
                 <div className="flex justify-between items-center px-1 mb-2">
                     <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
                         {isLoading ? 'Loading...' : `${filteredTests.length} Tests Available`}
@@ -91,16 +79,37 @@ export default function LabTestListPage() {
                 </div>
 
                 {isLoading ? (
-                    Array(4).fill(0).map((_, i) => <ServiceCardSkeleton key={i} />)
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                        {Array(8).fill(0).map((_, i) => <ServiceCardSkeleton key={i} />)}
+                    </div>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
                         {filteredTests.map((test) => (
                             <LabTestCard
                                 key={test.id}
                                 test={test}
                                 onClick={() => router.push(`/lab-tests/${test.id}`)}
+                                className="w-full"
                             />
                         ))}
+                    </div>
+                )}
+
+                {!isLoading && filteredTests.length === 0 && (
+                    <div className="flex flex-col items-center justify-center py-20 text-center">
+                        <div className="size-24 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mb-4">
+                            <span className="material-symbols-outlined text-4xl text-gray-400">biotech</span>
+                        </div>
+                        <h3 className="text-lg font-bold text-slate-900 dark:text-white">No Tests Found</h3>
+                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 max-w-xs mx-auto">
+                            We couldn't find any lab tests matching your criteria.
+                        </p>
+                        <button
+                            onClick={() => { setSearch(''); setSelectedCat('All'); }}
+                            className="mt-6 px-6 py-2 bg-primary/10 text-primary rounded-xl font-bold text-sm hover:bg-primary hover:text-white transition-all"
+                        >
+                            Clear Filters
+                        </button>
                     </div>
                 )}
             </main>

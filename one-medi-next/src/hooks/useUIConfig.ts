@@ -17,7 +17,7 @@ interface UIMenuItem {
     icon?: string;
     route?: string;
     external_url?: string;
-    display_order: number;
+    sort_order: number;
     is_active: boolean;
     roles_allowed?: string[];
 }
@@ -40,7 +40,7 @@ interface UICarouselItem {
     image_url: string;
     link_type?: 'internal' | 'external' | 'deeplink';
     link_value?: string;
-    display_order: number;
+    sort_order: number;
     is_active: boolean;
     starts_at?: string;
     ends_at?: string;
@@ -77,7 +77,7 @@ export function useMenu(menuKey: string) {
                 .select('*')
                 .eq('menu_id', menu.id)
                 .eq('is_active', true)
-                .order('display_order', { ascending: true });
+                .order('sort_order', { ascending: true });
 
             if (itemsError) {
                 console.error('Error fetching menu items:', itemsError);
@@ -107,7 +107,7 @@ export function useCarousel(carouselKey: string) {
                 const { data: carousel, error: carouselError } = await supabase
                     .from('ui_carousels')
                     .select('*')
-                    .eq('carousel_key', carouselKey)
+                    .eq('name', carouselKey)
                     .eq('is_active', true)
                     .single();
 
@@ -119,8 +119,8 @@ export function useCarousel(carouselKey: string) {
                             id: 'mock-1', carousel_key: 'hero_carousel', name: 'Home Hero',
                             placement: 'home_hero', auto_play: true, interval_ms: 5000, is_active: true,
                             items: [
-                                { id: 'slide-1', title: 'Flat 20% OFF', subtitle: 'On All Medicines', image_url: 'https://images.unsplash.com/photo-1631549916768-4119b2e5f926', link_type: 'internal', link_value: '/medicines', display_order: 1, is_active: true },
-                                { id: 'slide-2', title: 'Full Body Checkup', subtitle: 'Starting @ ₹999', image_url: 'https://images.unsplash.com/photo-1579154204601-01588f351e67', link_type: 'internal', link_value: '/lab-tests', display_order: 2, is_active: true },
+                                { id: 'slide-1', title: 'Flat 20% OFF', subtitle: 'On All Medicines', image_url: 'https://images.unsplash.com/photo-1631549916768-4119b2e5f926', link_type: 'internal', link_value: '/medicines', sort_order: 1, is_active: true },
+                                { id: 'slide-2', title: 'Full Body Checkup', subtitle: 'Starting @ ₹999', image_url: 'https://images.unsplash.com/photo-1579154204601-01588f351e67', link_type: 'internal', link_value: '/lab-tests', sort_order: 2, is_active: true },
                             ]
                         };
                         return { data: MOCK_CAROUSEL, error: null };
@@ -134,7 +134,7 @@ export function useCarousel(carouselKey: string) {
                     .select('*')
                     .eq('carousel_id', carousel.id)
                     .eq('is_active', true)
-                    .order('display_order', { ascending: true });
+                    .order('sort_order', { ascending: true });
 
                 if (itemsError) {
                     console.error('Error fetching carousel items:', itemsError);
@@ -154,7 +154,7 @@ export function useCarousel(carouselKey: string) {
 export function useCarouselsByPlacement(placement: string) {
     return useSupabaseList<UICarousel>('ui_carousels', {
         filters: { placement, is_active: true },
-        orderBy: { column: 'display_order', ascending: true },
+        orderBy: { column: 'name', ascending: true },
     });
 }
 

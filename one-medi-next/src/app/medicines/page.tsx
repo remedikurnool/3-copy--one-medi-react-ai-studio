@@ -6,6 +6,9 @@ import { useCartStore } from '@/store/cartStore';
 import { MedicineCardSkeleton } from '@/components/ui/Skeletons';
 import { useMedicines, useMedicineSearch } from '@/hooks/useMedicines';
 import { MedicineCard } from '@/components/cards/MedicineCard';
+import PageHeader from '@/components/ui/PageHeader';
+import { useLocationStore } from '@/store/locationStore';
+import LocationModal from '@/components/ui/LocationModal';
 
 const CATEGORY_GRID = [
     { name: 'Pain Relief', icon: 'health_and_safety', filter: 'Pain Relief', color: 'text-red-500' },
@@ -28,6 +31,8 @@ function MedicinesContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const cartItemsCount = useCartStore((state) => state.items.length);
+    const { city } = useLocationStore();
+    const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
 
     const [search, setSearch] = useState('');
     const [selectedCategory, setSelectedCategory] = useState(searchParams.get('cat') || 'All');
@@ -80,32 +85,19 @@ function MedicinesContent() {
 
     return (
         <div className="flex flex-col min-h-screen bg-bg-light dark:bg-bg-dark font-sans animate-fade-in pb-24 text-slate-900 dark:text-white">
-            <header className="sticky top-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-2xl border-b border-white/40 dark:border-gray-800 shadow-glass">
-                <div className="flex items-center justify-between px-4 py-3">
-                    <div className="flex items-center gap-3">
-                        <button onClick={() => router.push('/')} className="text-slate-900 dark:text-white hover:bg-slate-100 dark:hover:bg-slate-800 size-10 rounded-full transition-all active:scale-90 flex items-center justify-center">
-                            <span className="material-symbols-outlined text-2xl">arrow_back</span>
-                        </button>
-                        <h1 className="text-lg font-black uppercase tracking-tight">Pharmacy</h1>
-                    </div>
-                    <button onClick={() => router.push('/cart')} className="relative p-2.5 bg-slate-50 dark:bg-slate-800 rounded-2xl transition-all active:scale-95 shadow-soft border border-white dark:border-slate-700 hover:bg-slate-100">
-                        <span className="material-symbols-outlined text-2xl">shopping_cart</span>
-                        {cartItemsCount > 0 && <span className="absolute -top-1 -right-1 flex items-center justify-center size-5 bg-red-500 rounded-full text-[10px] text-white font-black border-2 border-white dark:border-gray-900 shadow-md animate-bounce">{cartItemsCount}</span>}
-                    </button>
-                </div>
+            <LocationModal isOpen={isLocationModalOpen} onClose={() => setIsLocationModalOpen(false)} />
 
-                <div className="px-4 pb-3">
-                    <div className="flex w-full items-center rounded-2xl bg-slate-100 dark:bg-slate-800/50 border border-transparent focus-within:border-primary/50 focus-within:ring-4 focus-within:ring-primary/10 h-14 px-4 transition-all shadow-inner">
-                        <span className="material-symbols-outlined text-gray-400 text-2xl">search</span>
-                        <input
-                            value={search}
-                            onChange={(e) => setSearch(e.target.value)}
-                            className="w-full bg-transparent border-none focus:ring-0 ml-2 text-sm font-semibold text-slate-900 dark:text-white placeholder:text-gray-400 outline-none"
-                            placeholder="Search Dolo, Metformin..."
-                        />
-                    </div>
-                </div>
-            </header>
+            {/* Unified Page Header */}
+            <PageHeader
+                title="Pharmacy"
+                showLocation={true}
+                showSearch={true}
+                searchPlaceholder="Search Dolo, Metformin..."
+                searchValue={search}
+                onSearchChange={setSearch}
+                onLocationClick={() => setIsLocationModalOpen(true)}
+                className="lg:top-20"
+            />
 
             {/* Shop by Concern Section */}
             <section className="px-4 py-4 border-b border-gray-100 dark:border-gray-800/50">
@@ -129,7 +121,7 @@ function MedicinesContent() {
             </section>
 
             {/* Category Selection */}
-            <section className="px-4 py-4 overflow-x-auto no-scrollbar">
+            <section className="sticky top-[136px] md:top-[88px] z-30 bg-bg-light/95 dark:bg-bg-dark/95 backdrop-blur-sm px-4 py-4 overflow-x-auto no-scrollbar border-b border-gray-100 dark:border-gray-800 mb-2">
                 <div className="flex gap-4">
                     <button
                         onClick={() => toggleCategory('All')}
@@ -160,7 +152,7 @@ function MedicinesContent() {
             </section>
 
             {/* List */}
-            <main className="flex-1 p-4 pt-0 flex flex-col gap-4 max-w-4xl mx-auto w-full">
+            <main className="flex-1 p-4 pt-0 flex flex-col gap-4 max-w-7xl mx-auto w-full">
                 <div className="flex justify-between items-center mb-2 px-1">
                     <h3 className="text-sm font-bold text-slate-700 dark:text-slate-300">
                         {isLoading ? 'Loading...' : `${filteredMedicines.length} Products`}

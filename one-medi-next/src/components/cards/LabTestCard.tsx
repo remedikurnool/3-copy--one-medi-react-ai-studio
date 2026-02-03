@@ -4,10 +4,10 @@ import React from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 
-export const LabTestCard = ({ test, onClick }: { test: any, onClick?: () => void }) => {
+export const LabTestCard = ({ test, onClick, className = '' }: { test: any, onClick?: () => void, className?: string }) => {
   return (
     <motion.div
-      className="group relative bg-white dark:bg-slate-800 rounded-[2rem] p-5 shadow-sm hover:shadow-card-hover border border-slate-100 dark:border-slate-700 w-full cursor-pointer overflow-hidden flex flex-col h-full"
+      className={`group relative bg-white dark:bg-slate-800 rounded-[2rem] p-5 shadow-sm hover:shadow-card-hover border border-slate-100 dark:border-slate-700 w-full cursor-pointer overflow-hidden flex flex-col h-full ${className}`}
       whileHover={{ y: -2 }}
       onClick={onClick}
     >
