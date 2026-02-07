@@ -41,9 +41,9 @@ export default function FloatingServiceMenu() {
       <div
         className={`
           flex flex-col gap-2 p-3 
-          bg-white/80 dark:bg-slate-900/80 backdrop-blur-2xl 
+          glass-panel
+          shadow-soft-lg
           border-y border-l border-white/40 dark:border-slate-700/50 
-          shadow-[0_8px_32px_0_rgba(13,148,136,0.15)] 
           rounded-l-[2rem] transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] origin-right
           ${isOpen ? 'translate-x-0 opacity-100 mr-0 scale-100' : 'translate-x-[120%] opacity-0 pointer-events-none scale-95'}
         `}
@@ -92,10 +92,10 @@ export default function FloatingServiceMenu() {
         onClick={() => setIsOpen(!isOpen)}
         className={`
           flex items-center justify-center w-10 h-32 
-          bg-primary/90 dark:bg-primary/80 backdrop-blur-xl 
-          shadow-[0_4px_20px_rgba(13,148,136,0.3)] 
+          bg-primary-600/90 dark:bg-primary-900/90 backdrop-blur-xl 
+          shadow-lg shadow-primary-500/20
           border-y border-l border-white/40 dark:border-slate-700/50
-          rounded-l-2xl transition-all duration-500 relative z-50 hover:w-12 group -ml-[1px]
+          rounded-l-2xl transition-all duration-500 relative z-50 hover:w-12 group -ml-[1px] cursor-pointer
           ${isOpen ? 'translate-x-full opacity-0 pointer-events-none' : 'translate-x-0 opacity-100'}
         `}
       >

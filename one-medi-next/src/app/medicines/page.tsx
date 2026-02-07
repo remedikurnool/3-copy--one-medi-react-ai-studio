@@ -84,7 +84,7 @@ function MedicinesContent() {
     });
 
     return (
-        <div className="flex flex-col min-h-screen bg-bg-light dark:bg-bg-dark font-sans animate-fade-in pb-24 text-slate-900 dark:text-white">
+        <div className="flex flex-col min-h-screen bg-surface-50 dark:bg-surface-950 font-sans animate-fade-in pb-24 text-slate-900 dark:text-white">
             <LocationModal isOpen={isLocationModalOpen} onClose={() => setIsLocationModalOpen(false)} />
 
             {/* Unified Page Header */}
@@ -121,7 +121,7 @@ function MedicinesContent() {
             </section>
 
             {/* Category Selection */}
-            <section className="sticky top-[136px] md:top-[88px] z-30 bg-bg-light/95 dark:bg-bg-dark/95 backdrop-blur-sm px-4 py-4 overflow-x-auto no-scrollbar border-b border-gray-100 dark:border-gray-800 mb-2">
+            <section className="sticky top-[136px] md:top-[88px] z-30 bg-surface-50/95 dark:bg-surface-950/95 backdrop-blur-md px-4 py-4 overflow-x-auto no-scrollbar border-b border-gray-100 dark:border-gray-800 mb-2">
                 <div className="flex gap-4">
                     <button
                         onClick={() => toggleCategory('All')}
@@ -202,7 +202,7 @@ function MedicinesContent() {
 export default function MedicinesPage() {
     return (
         <Suspense fallback={
-            <div className="min-h-screen bg-bg-light dark:bg-bg-dark flex items-center justify-center">
+            <div className="min-h-screen bg-surface-50 dark:bg-surface-950 flex items-center justify-center">
                 <div className="animate-pulse text-center">
                     <span className="material-symbols-outlined text-4xl text-gray-400 animate-spin">sync</span>
                     <p className="text-sm font-medium text-gray-500 mt-2">Loading pharmacy...</p>

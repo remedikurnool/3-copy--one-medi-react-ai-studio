@@ -16,7 +16,7 @@ function OrderSuccessContent() {
         : '#OM-PENDING';
 
     return (
-        <div className="min-h-screen bg-bg-light dark:bg-bg-dark flex flex-col items-center justify-center p-6 text-center font-sans relative overflow-hidden">
+        <div className="min-h-screen bg-surface-50 dark:bg-surface-950 flex flex-col items-center justify-center p-6 text-center font-sans relative overflow-hidden">
             {/* Background Decorations */}
             <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
                 <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-emerald-100 dark:bg-emerald-900/10 rounded-full blur-3xl opacity-50"></div>
@@ -84,7 +84,7 @@ function OrderSuccessContent() {
 export default function OrderSuccessPage() {
     return (
         <Suspense fallback={
-            <div className="min-h-screen bg-bg-light dark:bg-bg-dark flex items-center justify-center">
+            <div className="min-h-screen bg-surface-50 dark:bg-surface-950 flex items-center justify-center">
                 <span className="material-symbols-outlined text-4xl text-slate-300 animate-spin">sync</span>
             </div>
         }>

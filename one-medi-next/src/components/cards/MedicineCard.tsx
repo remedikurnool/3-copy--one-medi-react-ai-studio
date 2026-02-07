@@ -25,19 +25,18 @@ export const MedicineCard = ({ medicine, onClick }: { medicine: any, onClick?: (
 
   return (
     <motion.div
-      className="group relative bg-white dark:bg-slate-800 rounded-[1.5rem] p-3 shadow-sm hover:shadow-card-hover border border-slate-100 dark:border-slate-700 transition-all duration-300 w-[160px] h-full flex flex-col"
-      whileHover={{ y: -4 }}
+      className="group relative card-modern p-3 w-[160px] h-full flex flex-col cursor-pointer"
       onClick={onClick}
     >
       {/* Discount Badge */}
       {discount > 0 && (
-        <div className="absolute top-3 left-3 z-10 bg-red-500 text-white text-[10px] font-black px-2 py-0.5 rounded-lg shadow-sm">
+        <div className="absolute top-3 left-3 z-10 bg-red-500/90 backdrop-blur-sm text-white text-[10px] font-black px-2 py-0.5 rounded-lg shadow-sm border border-white/10">
           {discount}% OFF
         </div>
       )}
 
       {/* Image Container */}
-      <div className="relative w-full aspect-square rounded-2xl bg-slate-50 dark:bg-slate-700/50 mb-3 overflow-hidden group-hover:bg-slate-100 transition-colors">
+      <div className="relative w-full aspect-square rounded-2xl bg-surface-50 dark:bg-surface-800 mb-3 overflow-hidden group-hover:bg-surface-100 transition-colors">
         <LazyImage
           src={medicine.image_url || 'https://images.unsplash.com/photo-1584308666746-953a5e66c7c9?auto=format&fit=crop&q=80&w=400'}
           alt={medicine.name || 'Medicine'}
@@ -49,23 +48,24 @@ export const MedicineCard = ({ medicine, onClick }: { medicine: any, onClick?: (
         {/* Quick Add Button (Visible on Hover/Mobile) */}
         <motion.button
           onClick={handleAddToCart}
-          className="absolute bottom-2 right-2 size-8 bg-white dark:bg-slate-800 rounded-full shadow-md flex items-center justify-center text-primary group-hover:scale-100 scale-0 transition-transform duration-300 pointer-events-auto"
+          className="absolute bottom-2 right-2 size-9 bg-white dark:bg-surface-700 rounded-full shadow-lg flex items-center justify-center text-primary-600 group-hover:scale-100 scale-0 transition-transform duration-300 pointer-events-auto border border-surface-100 dark:border-surface-600"
           whileTap={{ scale: 0.9 }}
+          whileHover={{ scale: 1.1 }}
         >
-          <span className="material-symbols-outlined text-lg">add</span>
+          <span className="material-symbols-outlined text-xl">add_shopping_cart</span>
         </motion.button>
       </div>
 
       {/* Content */}
       <div className="flex-1 flex flex-col">
-        <h3 className="font-bold text-slate-800 dark:text-gray-100 text-sm leading-tight line-clamp-2 mb-1 group-hover:text-primary transition-colors">
+        <h3 className="font-bold text-slate-800 dark:text-gray-100 text-sm leading-tight line-clamp-2 mb-1 group-hover:text-primary-600 transition-colors font-manrope">
           {medicine.name}
         </h3>
-        <p className="text-[10px] text-slate-500 dark:text-slate-400 mb-2 line-clamp-1">
+        <p className="text-[10px] text-slate-500 dark:text-slate-400 mb-2 line-clamp-1 font-medium">
           {medicine.manufacturer || 'Generic'}
         </p>
 
-        <div className="mt-auto flex items-end justify-between">
+        <div className="mt-auto flex items-end justify-between border-t border-dashed border-slate-100 dark:border-slate-700 pt-2">
           <div className="flex flex-col">
             <span className="text-[10px] text-slate-400 line-through decoration-red-400/50">
               ₹{medicine.mrp}
@@ -77,7 +77,7 @@ export const MedicineCard = ({ medicine, onClick }: { medicine: any, onClick?: (
 
           <button
             onClick={handleAddToCart}
-            className="lg:hidden size-7 rounded-lg bg-primary/10 text-primary flex items-center justify-center active:bg-primary active:text-white transition-colors"
+            className="lg:hidden size-8 rounded-xl bg-primary-50 text-primary-600 flex items-center justify-center active:bg-primary-600 active:text-white transition-colors"
           >
             <span className="material-symbols-outlined text-lg">add</span>
           </button>

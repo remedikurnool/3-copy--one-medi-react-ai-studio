@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useHospitals, useHospitalSearch } from '@/hooks/useHospitals';
+import PageHeader from '@/components/ui/PageHeader';
 
 export default function HospitalsPage() {
     const router = useRouter();
@@ -16,29 +17,15 @@ export default function HospitalsPage() {
     const displayHospitals = searchQuery.length >= 2 ? searchResults : hospitals;
 
     return (
-        <div className="min-h-screen bg-bg-light dark:bg-bg-dark text-slate-900 dark:text-white pb-24 font-sans">
-            <div className="sticky top-0 z-50 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm border-b border-gray-100 dark:border-gray-800">
-                <div className="flex items-center px-4 py-3 justify-between">
-                    <button onClick={() => router.push('/')} className="flex size-10 shrink-0 items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-                        <span className="material-symbols-outlined">arrow_back</span>
-                    </button>
-                    <h1 className="text-xl font-bold leading-tight flex-1 text-center pr-10">Find Hospitals</h1>
-                </div>
-
-                <div className="px-4 pb-3">
-                    <div className="flex w-full items-stretch rounded-xl h-14 bg-gray-100 dark:bg-gray-800 border border-transparent focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 transition-all">
-                        <div className="text-gray-500 flex items-center justify-center pl-4 pr-2">
-                            <span className="material-symbols-outlined text-2xl">search</span>
-                        </div>
-                        <input
-                            className="flex w-full min-w-0 flex-1 bg-transparent border-none focus:ring-0 text-base h-full placeholder:text-gray-500 outline-none"
-                            placeholder="Search hospital or specialty..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                        />
-                    </div>
-                </div>
-            </div>
+        <div className="min-h-screen bg-surface-50 dark:bg-surface-950 text-slate-900 dark:text-white pb-24 font-sans">
+            <PageHeader
+                title="Find Hospitals"
+                showSearch={true}
+                searchPlaceholder="Search hospital or specialty..."
+                searchValue={searchQuery}
+                onSearchChange={setSearchQuery}
+                className="lg:top-20"
+            />
 
             <div className="flex flex-col gap-4 p-4">
                 {loading && (

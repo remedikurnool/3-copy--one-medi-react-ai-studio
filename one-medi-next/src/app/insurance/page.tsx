@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useInsurancePlans } from '@/hooks/useInsurance';
+import PageHeader from '@/components/ui/PageHeader';
 
 export default function InsuranceListPage() {
     const router = useRouter();
@@ -55,38 +56,36 @@ export default function InsuranceListPage() {
     };
 
     return (
-        <div className="min-h-screen bg-bg-light dark:bg-bg-dark font-sans text-slate-900 dark:text-white pb-24 relative animate-fade-in">
+        <div className="min-h-screen bg-surface-50 dark:bg-surface-950 font-sans text-slate-900 dark:text-white pb-24 relative animate-fade-in">
             {/* Header */}
-            <header className="sticky top-0 z-40 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm border-b border-gray-100 dark:border-gray-800 p-4">
-                <div className="flex items-center gap-3 mb-3">
-                    <button onClick={() => router.back()} className="size-10 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center justify-center transition-colors">
-                        <span className="material-symbols-outlined text-2xl">arrow_back</span>
-                    </button>
-                    <div className="flex-1">
-                        <h1 className="text-xl font-bold leading-none">Health Insurance</h1>
-                        <p className="text-xs text-gray-500 font-medium mt-1">Secure your family&apos;s future</p>
-                    </div>
+            <PageHeader
+                title="Health Insurance"
+                subtitle="Secure your family's future"
+                actions={
                     <button
                         onClick={() => setShowQuoteWizard(true)}
                         className="bg-primary/10 text-primary px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest active:scale-95 transition-transform"
                     >
                         Get Quote
                     </button>
-                </div>
+                }
+                className="lg:top-20"
+            />
 
-                {/* Category Tabs */}
-                <div className="flex gap-2 overflow-x-auto no-scrollbar">
+            {/* Category Tabs */}
+            <div className="sticky top-[72px] lg:top-[144px] z-30 bg-surface-50/95 dark:bg-surface-950/95 backdrop-blur-sm border-b border-surface-200 dark:border-surface-800 py-2">
+                <div className="flex gap-2 px-4 overflow-x-auto no-scrollbar">
                     {categories.map(cat => (
                         <button
                             key={cat}
                             onClick={() => setActiveCategory(cat as any)}
-                            className={`px-4 py-2 rounded-full text-xs font-bold transition-all whitespace-nowrap ${activeCategory === cat ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900' : 'bg-gray-100 dark:bg-gray-800 text-gray-500'}`}
+                            className={`px-4 py-2 rounded-full text-xs font-bold transition-all whitespace-nowrap ${activeCategory === cat ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900' : 'bg-surface-200 dark:bg-surface-800 text-gray-500'}`}
                         >
                             {cat} Plans
                         </button>
                     ))}
                 </div>
-            </header>
+            </div>
 
             <main className="p-4 flex flex-col gap-5">
                 {/* Loading State */}

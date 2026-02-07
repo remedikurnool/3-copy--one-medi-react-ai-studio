@@ -36,7 +36,7 @@ export default function LabTestListPage() {
     });
 
     return (
-        <div className="min-h-screen bg-bg-light dark:bg-bg-dark text-slate-900 dark:text-white pb-32 font-sans relative overflow-x-hidden">
+        <div className="min-h-screen bg-surface-50 dark:bg-surface-950 text-slate-900 dark:text-white pb-32 font-sans relative overflow-x-hidden">
             <LocationModal isOpen={isLocationModalOpen} onClose={() => setIsLocationModalOpen(false)} />
 
             {/* Unified Page Header */}
@@ -52,7 +52,7 @@ export default function LabTestListPage() {
             />
 
             {/* Category selection */}
-            <div className="sticky top-[136px] md:top-[88px] z-30 bg-bg-light/95 dark:bg-bg-dark/95 backdrop-blur-sm py-4 border-b border-gray-100 dark:border-gray-800 mb-6 transition-all">
+            <div className="sticky top-[136px] md:top-[88px] z-30 bg-surface-50/95 dark:bg-surface-950/95 backdrop-blur-sm py-4 border-b border-surface-200 dark:border-surface-800 mb-6 transition-all">
                 <div className="flex gap-3 px-4 max-w-7xl mx-auto overflow-x-auto no-scrollbar scroll-pl-4">
                     {CATEGORIES.map((c) => (
                         <button

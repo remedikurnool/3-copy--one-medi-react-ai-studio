@@ -35,9 +35,9 @@ export default function DesktopHeader() {
       <LocationModal isOpen={isLocationModalOpen} onClose={() => setIsLocationModalOpen(false)} />
 
       <motion.header
-        className={`sticky top-0 z-50 hidden lg:block transition-all duration-300 ${isScrolled
-            ? 'bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl shadow-lg'
-            : 'bg-white dark:bg-slate-900'
+        className={`sticky top-0 z-[40] hidden lg:block transition-all duration-300 ${isScrolled
+          ? 'glass border-b border-surface-200/50 dark:border-surface-800/50'
+          : 'bg-transparent'
           }`}
         initial={{ y: -100 }}
         animate={{ y: 0 }}
@@ -69,17 +69,17 @@ export default function DesktopHeader() {
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3 group shrink-0">
             <motion.div
-              className="size-12 rounded-2xl bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center text-white shadow-float"
+              className="size-11 rounded-2xl bg-gradient-to-br from-primary-600 to-primary-800 flex items-center justify-center text-white shadow-lg shadow-primary-500/30"
               whileHover={{ scale: 1.05, rotate: 5 }}
               whileTap={{ scale: 0.95 }}
             >
-              <span className="material-symbols-outlined text-2xl">local_hospital</span>
+              <span className="material-symbols-outlined text-[26px]">local_hospital</span>
             </motion.div>
             <div className="flex flex-col">
-              <h1 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white leading-none">
+              <h1 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white leading-none font-lexend">
                 ONE MEDI
               </h1>
-              <span className="text-[10px] font-black text-primary tracking-[0.25em] uppercase mt-0.5">
+              <span className="text-[10px] font-black text-primary-600 tracking-[0.25em] uppercase mt-0.5">
                 Kurnool
               </span>
             </div>
@@ -91,8 +91,8 @@ export default function DesktopHeader() {
             <div className="relative" onMouseEnter={() => setIsMegaMenuOpen(true)}>
               <motion.button
                 className={`flex items-center gap-2 px-5 py-3 rounded-2xl font-bold text-sm transition-all ${isMegaMenuOpen
-                    ? 'bg-primary text-white shadow-button'
-                    : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-white hover:bg-slate-200 dark:hover:bg-slate-700'
+                  ? 'bg-primary text-white shadow-button'
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-white hover:bg-slate-200 dark:hover:bg-slate-700'
                   }`}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}

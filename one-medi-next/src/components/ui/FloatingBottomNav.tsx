@@ -35,7 +35,7 @@ export default function FloatingBottomNav() {
       {/* Glassmorphism Container */}
       <nav className="relative mx-auto max-w-sm pointer-events-auto">
         {/* Background Blur Layer */}
-        <div className="absolute inset-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-2xl rounded-[2rem] shadow-lg border border-white/50 dark:border-slate-700/50" />
+        <div className="absolute inset-0 glass-panel rounded-[2rem] shadow-soft-lg border border-white/40 dark:border-slate-700/50" />
 
         {/* Navigation Content */}
         <div className="relative flex items-center justify-between px-2 py-2">
@@ -55,7 +55,7 @@ export default function FloatingBottomNav() {
           >
             <motion.div
               id="cart-icon-target"
-              className="relative flex items-center justify-center size-16 bg-gradient-to-br from-primary to-primary-dark rounded-full shadow-float border-4 border-slate-50 dark:border-slate-800 ring-2 ring-primary/20"
+              className="relative flex items-center justify-center size-16 bg-gradient-to-br from-primary-500 to-primary-700 rounded-full shadow-lg shadow-primary-500/40 border-4 border-surface-50 dark:border-surface-900 ring-2 ring-primary/20"
               whileHover={{ scale: 1.05, y: -2 }}
               whileTap={{ scale: 0.95 }}
             >

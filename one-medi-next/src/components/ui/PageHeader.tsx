@@ -51,7 +51,7 @@ export default function PageHeader({
     };
 
     return (
-        <header className={`sticky top-0 z-40 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md border-b border-gray-100 dark:border-gray-800 transition-all ${className}`}>
+        <header className={`sticky top-0 z-40 bg-surface-50/95 dark:bg-surface-950/95 backdrop-blur-md border-b border-surface-200 dark:border-surface-800 transition-all ${className}`}>
             {/* Top Bar: Back + Title + Actions */}
             <div className="flex items-center justify-between p-4 pb-2">
                 <div className="flex items-center gap-3">
@@ -118,7 +118,7 @@ export default function PageHeader({
                         <input
                             value={searchValue}
                             onChange={(e) => onSearchChange?.(e.target.value)}
-                            className="w-full h-12 pl-12 pr-4 rounded-xl border-none bg-gray-100 dark:bg-gray-800 group-focus-within:ring-2 group-focus-within:ring-primary/50 transition-all font-semibold text-sm outline-none text-slate-900 dark:text-white placeholder:text-gray-400"
+                            className="w-full h-12 pl-12 pr-4 rounded-xl border-none bg-surface-200 dark:bg-surface-800 group-focus-within:ring-2 group-focus-within:ring-primary/50 transition-all font-semibold text-sm outline-none text-slate-900 dark:text-white placeholder:text-gray-400"
                             placeholder={searchPlaceholder}
                         />
                     </div>

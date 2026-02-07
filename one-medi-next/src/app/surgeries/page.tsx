@@ -19,7 +19,7 @@ export default function SurgeriesPage() {
     });
 
     return (
-        <div className="min-h-screen bg-bg-light dark:bg-bg-dark font-sans text-slate-900 dark:text-white pb-24">
+        <div className="min-h-screen bg-surface-50 dark:bg-surface-950 font-sans text-slate-900 dark:text-white pb-24">
             <PageHeader
                 title="Surgeries"
                 subtitle="Expert Care & Packages"
@@ -39,7 +39,7 @@ export default function SurgeriesPage() {
             />
 
             {/* Specialty Filter */}
-            <div className="sticky top-[72px] lg:top-[144px] z-30 bg-bg-light/95 dark:bg-bg-dark/95 backdrop-blur-sm border-b border-slate-100 dark:border-gray-800">
+            <div className="sticky top-[72px] lg:top-[144px] z-30 bg-surface-50/95 dark:bg-surface-950/95 backdrop-blur-sm border-b border-surface-200 dark:border-surface-800">
                 <div className="flex gap-3 px-4 py-4 overflow-x-auto no-scrollbar max-w-7xl mx-auto w-full">
                     {SURGERY_SPECIALTIES.map((spec) => (
                         <button

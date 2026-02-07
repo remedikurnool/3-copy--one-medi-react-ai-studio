@@ -31,7 +31,7 @@ export default function RootLayout({
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-25..0&display=block" />
       </head>
       <body
-        className={`${lexend.variable} ${manrope.variable} antialiased bg-bg-light dark:bg-bg-dark text-slate-900 dark:text-slate-100 selection:bg-primary/20`}
+        className={`${lexend.variable} ${manrope.variable} antialiased bg-surface-50 dark:bg-surface-950 text-slate-900 dark:text-slate-100 selection:bg-primary/20`}
       >
         <AuthProvider>
           <Layout>

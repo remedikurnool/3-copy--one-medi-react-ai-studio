@@ -6,19 +6,21 @@ import { useRouter } from 'next/navigation';
 export default function Footer() {
   const router = useRouter();
   return (
-    <footer className="bg-slate-900 text-white pt-12 pb-32 px-6 mt-20 rounded-t-[2.5rem] relative overflow-hidden z-0">
+    <footer className="bg-surface-950 text-white pt-16 pb-32 px-6 mt-20 rounded-t-[3rem] relative overflow-hidden z-0 border-t border-white/5">
       {/* Decorative background element in footer */}
-      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary to-transparent opacity-50"></div>
+      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary-500 to-transparent opacity-50"></div>
+      <div className="absolute -top-24 -right-24 w-64 h-64 bg-primary-900/20 rounded-full blur-[80px]"></div>
+
 
       <div className="flex flex-col gap-8">
         <div>
           <div className="flex items-center gap-2 mb-4">
-            <div className="size-10 rounded-xl bg-primary/20 flex items-center justify-center text-primary border border-primary/20">
-              <span className="material-symbols-outlined text-2xl">local_hospital</span>
+            <div className="size-12 rounded-2xl bg-gradient-to-br from-primary-900 to-primary-800 flex items-center justify-center text-primary-400 border border-primary-700/50 shadow-inner">
+              <span className="material-symbols-outlined text-3xl">local_hospital</span>
             </div>
-            <h2 className="text-2xl font-bold tracking-tight">ONE MEDI</h2>
+            <h2 className="text-2xl font-black tracking-tight font-lexend">ONE MEDI</h2>
           </div>
-          <p className="text-slate-400 text-sm leading-relaxed max-w-xs">
+          <p className="text-slate-400 text-sm leading-relaxed max-w-xs font-medium">
             Kurnool's most trusted healthcare companion. Medicines, doctors, and diagnostics at your fingertips.
           </p>
         </div>

@@ -19,7 +19,7 @@ export default function WellnessPage() {
     );
 
     return (
-        <div className="min-h-screen bg-bg-light dark:bg-bg-dark text-slate-900 dark:text-white pb-24 font-sans animate-fade-in">
+        <div className="min-h-screen bg-surface-50 dark:bg-surface-950 text-slate-900 dark:text-white pb-24 font-sans animate-fade-in">
             <PageHeader
                 title="Wellness Programs"
                 subtitle="Your Health Partner"
@@ -50,7 +50,7 @@ export default function WellnessPage() {
                             <div
                                 key={service.id}
                                 onClick={() => router.push(`/home-care/${service.id}`)} // Redirect to specific page logic if separate wellness detail exists
-                                className="group relative bg-white dark:bg-gray-800 rounded-[2rem] shadow-sm hover:shadow-xl transition-all overflow-hidden border border-slate-100 dark:border-slate-700 cursor-pointer active:scale-[0.98] hover:-translate-y-1 block h-full"
+                                className="group relative card-modern h-full cursor-pointer flex flex-col p-0 overflow-hidden"
                             >
                                 <div className="absolute top-0 right-0 p-4 opacity-50 group-hover:opacity-100 transition-opacity z-10">
                                     <span className="material-symbols-outlined text-slate-300 dark:text-slate-600 group-hover:text-primary transition-colors">arrow_outward</span>

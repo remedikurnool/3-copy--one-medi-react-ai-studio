@@ -28,7 +28,7 @@ export default function DoctorListPage() {
     });
 
     return (
-        <div className="min-h-screen bg-bg-light dark:bg-bg-dark font-sans text-slate-900 dark:text-white pb-24 relative">
+        <div className="min-h-screen bg-surface-50 dark:bg-surface-950 font-sans text-slate-900 dark:text-white pb-24 relative">
             <LocationModal isOpen={isLocationModalOpen} onClose={() => setIsLocationModalOpen(false)} />
 
             {/* Unified Page Header */}
@@ -44,7 +44,7 @@ export default function DoctorListPage() {
             />
 
             {/* Specialty Filter */}
-            <div className="sticky top-[136px] md:top-[88px] z-30 bg-bg-light/95 dark:bg-bg-dark/95 backdrop-blur-sm py-4 border-b border-gray-100 dark:border-gray-800 mb-6">
+            <div className="sticky top-[136px] md:top-[88px] z-30 bg-surface-50/95 dark:bg-surface-950/95 backdrop-blur-sm py-4 border-b border-surface-200 dark:border-surface-800 mb-6">
                 {/* 
                     Note: Top offset depends on Header height. 
                     Header is approx 60px (top bar) + 72px (search container) = 132px on mobile with search.

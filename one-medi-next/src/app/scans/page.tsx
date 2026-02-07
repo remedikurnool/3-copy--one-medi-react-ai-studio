@@ -36,7 +36,7 @@ function ScansContent() {
     });
 
     return (
-        <div className="min-h-screen bg-bg-light dark:bg-bg-dark pb-32 font-sans text-slate-900 dark:text-white overflow-x-hidden">
+        <div className="min-h-screen bg-surface-50 dark:bg-surface-950 pb-32 font-sans text-slate-900 dark:text-white overflow-x-hidden">
             <PageHeader
                 title="Medical Scans"
                 showSearch={true}

@@ -84,14 +84,14 @@ export default function CheckoutPage() {
         setTimeout(() => {
             clearCart();
             setIsOrderPlacing(false);
-            router.push('/checkout/success');
+            router.push('/order-success');
         }, 2000);
     };
 
     // Concierge checkout handling
     if (isConciergeMode) {
         return (
-            <div className="relative flex flex-col min-h-screen bg-bg-light dark:bg-bg-dark font-sans text-slate-900 dark:text-white">
+            <div className="relative flex flex-col min-h-screen bg-surface-50 dark:bg-surface-950 font-sans text-slate-900 dark:text-white transition-colors duration-300">
                 <PageHeader title="Submit Order" subtitle="Pharmacist Review" showCart={false} showLocation={false} />
                 <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
                     <div className="size-24 bg-teal-50 dark:bg-teal-900/30 rounded-full flex items-center justify-center mb-6 animate-pulse">
@@ -146,11 +146,11 @@ export default function CheckoutPage() {
     }
 
     return (
-        <div className="relative flex flex-col min-h-screen mx-auto w-full bg-bg-light dark:bg-bg-dark pb-32 font-sans text-slate-900 dark:text-white">
+        <div className="relative flex flex-col min-h-screen mx-auto w-full bg-surface-50 dark:bg-surface-950 pb-32 font-sans text-slate-900 dark:text-white transition-colors duration-300">
             <PageHeader title="Checkout" subtitle="Secure Payment" showCart={false} showLocation={false} className="lg:top-20" />
 
             {/* Progress Stepper - Mobile Only */}
-            <div className="sticky top-[72px] lg:top-[144px] z-30 bg-bg-light/95 dark:bg-bg-dark/95 backdrop-blur-sm pb-6 pt-2 px-4 shadow-sm border-b border-slate-100 dark:border-gray-800 lg:hidden">
+            <div className="sticky top-[72px] lg:top-[144px] z-30 bg-surface-50/95 dark:bg-surface-950/95 backdrop-blur-md pb-6 pt-2 px-4 shadow-sm border-b border-surface-200 dark:border-surface-800 lg:hidden transition-all">
                 <div className="flex items-center justify-between relative max-w-sm mx-auto">
                     <div className="absolute top-1/2 left-0 w-full h-1 bg-gray-100 dark:bg-gray-800 -z-10 -translate-y-1/2 rounded-full"></div>
                     <div className="absolute top-1/2 left-0 w-2/3 h-1 bg-primary -z-10 -translate-y-1/2 rounded-full"></div>
@@ -178,7 +178,7 @@ export default function CheckoutPage() {
                 {/* Left Column: Delivery & Items */}
                 <div className="lg:col-span-2 flex flex-col gap-6">
                     {/* Delivery Address Section */}
-                    <section className="bg-white dark:bg-gray-800 rounded-[2rem] p-6 shadow-sm border border-slate-100 dark:border-slate-700">
+                    <section className="bg-white dark:bg-surface-900 rounded-[2rem] p-6 shadow-sm border border-surface-200 dark:border-surface-800">
                         <div className="flex justify-between items-center mb-6">
                             <h2 className="text-lg font-black uppercase tracking-tight flex items-center gap-2">
                                 <span className="material-symbols-outlined text-primary">location_on</span>
@@ -194,7 +194,7 @@ export default function CheckoutPage() {
                                 <div
                                     key={addr.id}
                                     onClick={() => setSelectedAddress(addr.id)}
-                                    className={`relative p-5 rounded-2xl border-2 transition-all cursor-pointer group hover:shadow-md ${selectedAddress === addr.id ? 'border-primary bg-primary/5 dark:bg-primary/10' : 'border-slate-100 dark:border-slate-700 hover:border-slate-200 dark:hover:border-slate-600'}`}
+                                    className={`relative p-5 rounded-2xl border-2 transition-all cursor-pointer group hover:shadow-md ${selectedAddress === addr.id ? 'border-primary bg-primary/5 dark:bg-primary/10' : 'border-surface-200 dark:border-surface-700 hover:border-surface-300 dark:hover:border-surface-600'}`}
                                 >
                                     <div className="flex justify-between items-start mb-2">
                                         <div className="flex items-center gap-2">
@@ -222,7 +222,7 @@ export default function CheckoutPage() {
                     </section>
 
                     {/* Order Items Review */}
-                    <section className="bg-white dark:bg-gray-800 rounded-[2rem] p-6 shadow-sm border border-slate-100 dark:border-slate-700">
+                    <section className="bg-white dark:bg-surface-900 rounded-[2rem] p-6 shadow-sm border border-surface-200 dark:border-surface-800">
                         <h2 className="text-lg font-black uppercase tracking-tight flex items-center gap-2 mb-6">
                             <span className="material-symbols-outlined text-primary">shopping_bag</span>
                             Order Items ({items.length})
@@ -257,7 +257,7 @@ export default function CheckoutPage() {
                 <div className="lg:col-span-1">
                     <div className="space-y-6 lg:sticky lg:top-32">
                         {/* Coupon Section */}
-                        <div className="bg-white dark:bg-gray-800 rounded-[2rem] p-5 shadow-sm border border-slate-100 dark:border-slate-700">
+                        <div className="bg-white dark:bg-surface-900 rounded-[2rem] p-5 shadow-sm border border-surface-200 dark:border-surface-800">
                             <h3 className="text-xs font-black uppercase tracking-widest text-slate-400 mb-3 flex items-center gap-2">
                                 <span className="material-symbols-outlined text-base">local_offer</span> Offers & Benefits
                             </h3>
@@ -294,7 +294,7 @@ export default function CheckoutPage() {
                         </div>
 
                         {/* Bill Summary */}
-                        <div className="bg-white dark:bg-gray-800 rounded-[2rem] p-6 shadow-sm border border-slate-100 dark:border-slate-700 relative overflow-hidden">
+                        <div className="bg-white dark:bg-surface-900 rounded-[2rem] p-6 shadow-sm border border-surface-200 dark:border-surface-800 relative overflow-hidden">
                             <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-transparent via-slate-200 to-transparent opacity-50" />
                             <h3 className="text-xs font-black uppercase tracking-widest text-slate-400 mb-4">Bill Details</h3>
 
@@ -332,18 +332,18 @@ export default function CheckoutPage() {
                                 <p className="text-xs font-black uppercase tracking-widest text-slate-400 mb-2">Preferred Payment</p>
                                 <div
                                     onClick={() => setSelectedPayment('cod')}
-                                    className={`p-3 rounded-xl border flex items-center gap-3 cursor-pointer transition-colors ${selectedPayment === 'cod' ? 'border-primary bg-primary/5' : 'border-slate-100 bg-slate-50 dark:border-slate-700 dark:bg-slate-700/50'}`}
+                                    className={`p-3 rounded-xl border flex items-center gap-3 cursor-pointer transition-colors ${selectedPayment === 'cod' ? 'border-primary bg-primary/5' : 'border-surface-200 bg-surface-50 dark:border-surface-700 dark:bg-surface-800/50'}`}
                                 >
-                                    <div className={`size-4 rounded-full border-2 flex items-center justify-center ${selectedPayment === 'cod' ? 'border-primary' : 'border-slate-300'}`}>
+                                    <div className={`size-4 rounded-full border-2 flex items-center justify-center ${selectedPayment === 'cod' ? 'border-primary' : 'border-slate-300 dark:border-slate-600'}`}>
                                         {selectedPayment === 'cod' && <div className="size-2 rounded-full bg-primary" />}
                                     </div>
                                     <span className="text-sm font-bold">Cash on Delivery</span>
                                 </div>
                                 <div
                                     onClick={() => setSelectedPayment('upi')}
-                                    className={`p-3 rounded-xl border flex items-center gap-3 cursor-pointer transition-colors ${selectedPayment === 'upi' ? 'border-primary bg-primary/5' : 'border-slate-100 bg-slate-50 dark:border-slate-700 dark:bg-slate-700/50'}`}
+                                    className={`p-3 rounded-xl border flex items-center gap-3 cursor-pointer transition-colors ${selectedPayment === 'upi' ? 'border-primary bg-primary/5' : 'border-surface-200 bg-surface-50 dark:border-surface-700 dark:bg-surface-800/50'}`}
                                 >
-                                    <div className={`size-4 rounded-full border-2 flex items-center justify-center ${selectedPayment === 'upi' ? 'border-primary' : 'border-slate-300'}`}>
+                                    <div className={`size-4 rounded-full border-2 flex items-center justify-center ${selectedPayment === 'upi' ? 'border-primary' : 'border-slate-300 dark:border-slate-600'}`}>
                                         {selectedPayment === 'upi' && <div className="size-2 rounded-full bg-primary" />}
                                     </div>
                                     <span className="text-sm font-bold">UPI / Online Payment</span>
@@ -371,7 +371,7 @@ export default function CheckoutPage() {
             </div>
 
             {/* Mobile Footer */}
-            <div className="lg:hidden fixed bottom-0 left-0 w-full z-50 bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl border-t border-slate-100 dark:border-slate-800 p-4 pb-safe shadow-2xl">
+            <div className="lg:hidden fixed bottom-0 left-0 w-full z-50 bg-white/90 dark:bg-surface-900/90 backdrop-blur-xl border-t border-surface-200 dark:border-surface-800 p-4 pb-safe shadow-2xl">
                 <div className="max-w-md mx-auto flex gap-4 items-center">
                     <div className="flex flex-col">
                         <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Total</span>

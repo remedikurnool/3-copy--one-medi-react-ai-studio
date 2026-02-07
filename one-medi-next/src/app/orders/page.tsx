@@ -44,7 +44,7 @@ function OrderListContent() {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-bg-light dark:bg-bg-dark text-slate-900 dark:text-white pb-32">
+            <div className="min-h-screen bg-surface-50 dark:bg-surface-950 text-slate-900 dark:text-white pb-32">
                 <PageHeader title="My Orders" className="lg:top-20" />
                 <div className="p-4 flex flex-col gap-4 max-w-7xl mx-auto w-full">
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -63,7 +63,7 @@ function OrderListContent() {
 
     if (error) {
         return (
-            <div className="min-h-screen bg-bg-light dark:bg-bg-dark p-6 flex items-center justify-center">
+            <div className="min-h-screen bg-surface-50 dark:bg-surface-950 p-6 flex items-center justify-center">
                 <div className="text-center">
                     <div className="size-20 bg-red-50 dark:bg-red-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
                         <span className="material-symbols-outlined text-4xl text-red-500">error_outline</span>
@@ -78,7 +78,7 @@ function OrderListContent() {
     }
 
     return (
-        <div className="min-h-screen bg-bg-light dark:bg-bg-dark pb-32 font-sans text-slate-900 dark:text-white">
+        <div className="min-h-screen bg-surface-50 dark:bg-surface-950 pb-32 font-sans text-slate-900 dark:text-white">
             <PageHeader
                 title="My Orders"
                 className="lg:top-20"
@@ -113,7 +113,7 @@ function OrderListContent() {
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: index * 0.05 }}
                                     onClick={() => router.push(`/orders/${order.id}`)}
-                                    className="bg-white dark:bg-gray-800 rounded-[2rem] p-5 shadow-sm hover:shadow-card-hover border border-slate-100 dark:border-slate-800 active:scale-[0.99] transition-all cursor-pointer group h-full flex flex-col"
+                                    className="bg-white dark:bg-surface-900 rounded-[2rem] p-5 shadow-sm hover:shadow-card-hover border border-surface-200 dark:border-surface-800 active:scale-[0.99] transition-all cursor-pointer group h-full flex flex-col"
                                 >
                                     <div className="flex justify-between items-start mb-4">
                                         <div className="flex gap-4 items-center">
@@ -164,7 +164,7 @@ function OrderListContent() {
 export default function OrderListPage() {
     return (
         <Suspense fallback={
-            <div className="min-h-screen bg-bg-light dark:bg-bg-dark flex items-center justify-center">
+            <div className="min-h-screen bg-surface-50 dark:bg-surface-950 flex items-center justify-center">
                 <span className="material-symbols-outlined text-4xl text-slate-300 animate-spin">refresh</span>
             </div>
         }>
