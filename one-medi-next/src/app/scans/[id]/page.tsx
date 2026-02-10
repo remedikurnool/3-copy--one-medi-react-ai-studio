@@ -1,365 +1,73 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { useRouter, useParams } from 'next/navigation';
+import React from 'react';
+import { useRouter } from 'next/navigation';
+import PageHeader from '@/components/ui/PageHeader';
+import { SCANS_CONTENT_MASTER } from '@/data/scans-content';
+import TestDetailView from '@/components/scans/TestDetailView';
+import LabPartnerList from '@/components/scans/LabPartnerList';
+import UploadPrescription from '@/components/scans/UploadPrescription';
 import { useCartStore } from '@/store/cartStore';
-import { useScanBooking } from '@/hooks/useBookings';
-import { useMedicalScan } from '@/hooks/useMedicalScans';
-import { supabase } from '@/lib/supabase';
 
-// Mock Gallery Data
-const SCAN_GALLERY = [
-    { id: 1, title: 'Advanced MRI Unit', image: 'https://images.unsplash.com/photo-1516549655169-df83a0774514?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80' },
-    { id: 2, title: 'Sample Scan Output', image: 'https://images.unsplash.com/photo-1559757175-5700dde675bc?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80' },
-    { id: 3, title: 'Comfort Patient Lounge', image: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80' },
-];
-
-// Helper to generate next 3 dates
-const getNextDates = () => {
-    const dates = [];
-    const today = new Date();
-    for (let i = 0; i < 3; i++) {
-        const date = new Date(today);
-        date.setDate(today.getDate() + i);
-        const day = date.toLocaleDateString('en-US', { weekday: 'short' });
-        const num = date.getDate();
-        const isoDate = date.toISOString().split('T')[0];
-        dates.push({ display: `${day}, ${num}`, iso: isoDate });
-    }
-    return dates;
-};
-
-export default function ScanDetailPage() {
+export default function ScanDetailPage({ params }: { params: { id: string } }) {
     const router = useRouter();
-    const params = useParams();
-    const scanId = params?.id as string;
+    const { addToCart } = useCartStore();
 
-    // Try to get from Supabase
-    const { data: dbScan, loading } = useMedicalScan(scanId);
+    // Use mock data or first item as fallback
+    const test = SCANS_CONTENT_MASTER.popularTests.find(t => t.id === params.id) || SCANS_CONTENT_MASTER.popularTests[0];
 
-    // Mapping DB fields to UI fields
-    const scan = dbScan ? {
-        ...dbScan,
-        // Ensure these fields exist or map them
-        scanDuration: (dbScan as any).scanDuration || `${(dbScan as any).duration_minutes || 30} mins`,
-        preparationNotes: (dbScan as any).preparationNotes || (dbScan as any).preparation_instructions,
-        contrastRequired: (dbScan as any).contrastRequired || (dbScan as any).contrast_required,
-        // Add default variant for now if DB doesn't have vendors implemented here yet
-        variants: [{
-            centerId: 'c1',
-            centerName: 'One Medi Partner Center',
-            price: dbScan.price || 3500,
-            mrp: Math.round((dbScan.price || 3500) * 1.5),
-            centerImage: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&q=80',
-            distance: '1.2 km',
-            reportTime: 'Same Day',
-            nextSlot: 'Today, 10:30 AM',
-            nabl: true
-        }]
-    } : null;
-
-    const [selectedVariant, setSelectedVariant] = useState<any>(null);
-    const [selectedSlot, setSelectedSlot] = useState('10:30 AM');
-    const [selectedDate, setSelectedDate] = useState('');
-    const [bookingError, setBookingError] = useState<string | null>(null);
-
-    const addToCart = useCartStore((state) => state.addToCart);
-    const { bookScan, loading: bookingLoading, error: bookingHookError } = useScanBooking();
-
-    const dates = getNextDates();
-    const slots = ['10:30 AM', '11:00 AM', '02:15 PM', '04:30 PM'];
-
-    // Initialize state when scan data is loaded
-    useEffect(() => {
-        if (scan && !selectedVariant) {
-            setSelectedVariant(scan.variants[0]);
-        }
-        if (!selectedDate && dates.length > 0) {
-            setSelectedDate(dates[0].iso);
-        }
-    }, [scan]); // eslint-disable-line react-hooks/exhaustive-deps
-
-    // Update slots if variant changes
-    useEffect(() => {
-        if (selectedVariant?.nextSlot) {
-            setSelectedSlot(selectedVariant.nextSlot.split(', ')[1] || '10:30 AM');
-        }
-    }, [selectedVariant]);
-
-    if (loading) return (
-        <div className="min-h-screen bg-bg-light dark:bg-bg-dark flex items-center justify-center">
-            <div className="animate-spin rounded-full h-10 w-10 border-2 border-primary border-t-transparent"></div>
-        </div>
-    );
-
-    if (!scan || !selectedVariant) return <div className="p-8 text-center text-slate-900 dark:text-white">Scan not found</div>;
-
-    // Handle booking
-    const handleBook = async () => {
-        setBookingError(null);
-
-        // Get current user
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) {
-            setBookingError('Please login to book a scan');
-            // Optionally redirect to login
-            return;
-        }
-
-        if (!selectedDate || !selectedSlot) {
-            setBookingError('Please select date and time');
-            return;
-        }
-
-        const booking = await bookScan(
-            user.id,
-            scan.id,
-            selectedVariant.centerId,
-            selectedDate,
-            selectedSlot
-        );
-
-        if (booking) {
-            router.push(`/bookings?newBookingId=${booking.id}`);
-        } else {
-            setBookingError(bookingHookError || 'Failed to create booking');
-        }
+    const handleAddToCart = () => {
+        addToCart({
+            id: test.id,
+            name: test.name,
+            price: test.price,
+            mrp: test.mrp,
+            image: test.image,
+            type: 'lab', // Note: Make sure CartItem interface in store supports 'lab'
+            qty: 1,
+            discount: test.discount,
+        });
     };
 
     return (
-        <div className="bg-bg-light dark:bg-bg-dark text-slate-900 dark:text-white min-h-screen flex flex-col relative overflow-x-hidden font-sans pb-32">
-            {/* Sticky Header */}
-            <header className="sticky top-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-2xl shadow-glass transition-colors duration-300 border-b border-white/20 dark:border-gray-800">
-                <div className="flex items-center px-4 py-3 justify-between h-16">
-                    <button
-                        onClick={() => router.back()}
-                        className="flex items-center justify-center size-10 rounded-2xl bg-white dark:bg-gray-800 text-slate-900 dark:text-white shadow-soft hover:scale-110 active:scale-95 transition-all"
-                    >
-                        <span className="material-symbols-outlined">arrow_back</span>
-                    </button>
-                    <h1 className="text-xl font-black uppercase tracking-tight flex-1 text-center pr-10">Scan Details</h1>
+        <div className="min-h-screen bg-surface-50 dark:bg-surface-950 font-sans text-slate-900 dark:text-white pb-32 animate-fade-in">
+            <PageHeader
+                title="Test Details"
+                showSearch={false}
+                className="lg:top-20"
+            />
+
+            <main className="p-4 max-w-4xl mx-auto w-full flex flex-col gap-6">
+                <div className="bg-white dark:bg-gray-800 rounded-[2.5rem] p-6 shadow-sm border border-slate-100 dark:border-gray-700">
+                    <TestDetailView test={test} />
                 </div>
-            </header>
 
-            {/* Main Content */}
-            <main className="flex-1 flex flex-col gap-6 px-4 pt-5">
-                {/* Scan Info Card */}
-                <section className="bg-white dark:bg-slate-900/60 rounded-[2.5rem] p-6 shadow-glass border border-white/40 dark:border-slate-800/50">
-                    <div className="flex justify-between items-start mb-2">
-                        <h2 className="text-2xl font-black leading-tight text-slate-900 dark:text-white">{scan.name}</h2>
-                        <span className="bg-primary/10 text-primary text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest border border-primary/20">{scan.category}</span>
-                    </div>
-                    <p className="text-slate-500 dark:text-slate-400 text-sm font-bold leading-relaxed mt-2 uppercase tracking-wide">
-                        {scan.description}
-                    </p>
-                    <div className="flex gap-4 mt-4">
-                        <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700">
-                            <span className="material-symbols-outlined text-slate-400 text-lg">timer</span>
-                            <span className="text-xs font-bold">{scan.scanDuration}</span>
-                        </div>
-                        {scan.contrastRequired && (
-                            <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-orange-50 dark:bg-orange-900/20 border border-orange-100 dark:border-orange-900/30">
-                                <span className="material-symbols-outlined text-orange-500 text-lg">contrast</span>
-                                <span className="text-xs font-bold text-orange-600 dark:text-orange-400">Contrast Required</span>
-                            </div>
-                        )}
-                    </div>
-                </section>
+                <LabPartnerList />
 
-                {/* FACILITY IMAGES GALLERY SECTION */}
-                <section className="animate-slide-up" style={{ animationDelay: '0.1s' }}>
-                    <h3 className="text-sm font-black text-slate-400 uppercase tracking-[0.2em] mb-4 px-1">Facility & Technology</h3>
-                    <div className="flex gap-4 overflow-x-auto no-scrollbar pb-2 snap-x snap-mandatory">
-                        {SCAN_GALLERY.map((item) => (
-                            <div
-                                key={item.id}
-                                className="relative min-w-[280px] h-44 rounded-[2rem] overflow-hidden snap-center shadow-float group"
-                            >
-                                {/* eslint-disable-next-line @next/next/no-img-element */}
-                                <img
-                                    src={item.image}
-                                    alt={item.title}
-                                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                                />
-                                {/* 3D Glassmorphic Overlay */}
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
-                                <div className="absolute bottom-4 left-4 right-4 backdrop-blur-md bg-white/10 border border-white/20 p-3 rounded-2xl flex items-center justify-between">
-                                    <span className="text-xs font-black text-white uppercase tracking-wider">{item.title}</span>
-                                    <button className="size-8 rounded-full bg-white/20 flex items-center justify-center text-white">
-                                        <span className="material-symbols-outlined text-sm">visibility</span>
-                                    </button>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </section>
-
-                {/* Preparation Guide */}
-                <section className="bg-white dark:bg-slate-900/60 rounded-[2.5rem] p-6 shadow-glass border border-white/40 dark:border-slate-800/50">
-                    <h3 className="text-lg font-black text-slate-900 dark:text-white mb-5 flex items-center gap-3">
-                        <div className="size-8 rounded-xl bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center text-blue-500">
-                            <span className="material-symbols-outlined">medical_information</span>
-                        </div>
-                        Preparation Guide
-                    </h3>
-                    <div className="flex flex-col gap-5">
-                        <div className="flex items-start gap-4 group">
-                            <div className={`flex items-center justify-center rounded-2xl bg-orange-50 dark:bg-orange-900/20 shrink-0 size-12 shadow-sm`}>
-                                <span className="material-symbols-outlined text-orange-600 dark:text-orange-400">info</span>
-                            </div>
-                            <div className="flex-1">
-                                <p className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-tight">Instructions</p>
-                                <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mt-1 leading-relaxed">
-                                    {scan.preparationNotes || "No specific preparation required. Wear loose comfortable clothing."}
-                                </p>
-                            </div>
-                        </div>
-                        {scan.contrastRequired && (
-                            <div className="flex items-start gap-4 group">
-                                <div className={`flex items-center justify-center rounded-2xl bg-purple-50 dark:bg-purple-900/20 shrink-0 size-12 shadow-sm`}>
-                                    <span className="material-symbols-outlined text-purple-600 dark:text-purple-400">bloodtype</span>
-                                </div>
-                                <div className="flex-1">
-                                    <p className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-tight">Creatinine Test</p>
-                                    <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mt-1 leading-relaxed">
-                                        A recent Serum Creatinine report is mandatory for contrast studies.
-                                    </p>
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                </section>
-
-                {/* Diagnostic Centers List */}
-                <section>
-                    <h3 className="text-sm font-black text-slate-400 uppercase tracking-[0.2em] mb-4 px-1">Select Laboratory</h3>
-                    <div className="flex flex-col gap-4">
-                        {scan.variants.map((variant: any) => {
-                            const isSelected = selectedVariant.centerId === variant.centerId;
-                            return (
-                                <div
-                                    key={variant.centerId}
-                                    onClick={() => setSelectedVariant(variant)}
-                                    className={`relative bg-white dark:bg-slate-900 rounded-[2.5rem] p-5 shadow-glass border transition-all duration-500 cursor-pointer ${isSelected
-                                        ? 'border-primary ring-4 ring-primary/5 shadow-float'
-                                        : 'border-white dark:border-slate-800/80 opacity-90 hover:opacity-100 hover:-translate-y-1'
-                                        }`}
-                                >
-                                    <div className="flex gap-5 items-start">
-                                        <div className="size-20 shrink-0 rounded-[1.5rem] bg-slate-50 dark:bg-slate-800 overflow-hidden relative p-3 flex items-center justify-center border border-white dark:border-slate-700/50">
-                                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                                            <img
-                                                alt={variant.centerName}
-                                                className={`w-full h-full object-contain transition-all duration-500 ${!isSelected && 'grayscale opacity-50 group-hover:grayscale-0'}`}
-                                                src={variant.centerImage}
-                                            />
-                                        </div>
-                                        <div className="flex-1 min-w-0">
-                                            <div className="flex items-center gap-1.5 mb-1">
-                                                <h4 className="text-lg font-black text-slate-900 dark:text-white truncate tracking-tight">{variant.centerName}</h4>
-                                                {variant.nabl && <span className="material-symbols-outlined filled text-blue-500 text-[18px]">verified</span>}
-                                            </div>
-                                            <div className="flex items-center gap-1.5 text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-3">
-                                                <span className="material-symbols-outlined text-[14px]">location_on</span>
-                                                <span className="truncate">{variant.distance} • {variant.reportTime} Report</span>
-                                            </div>
-                                            <div className="flex items-center justify-between mt-2">
-                                                <div className="flex flex-col">
-                                                    <span className="text-xs text-slate-400 line-through font-bold">₹{variant.mrp}</span>
-                                                    <span className="text-xl font-black text-primary tracking-tighter">₹{variant.price}</span>
-                                                </div>
-                                                {isSelected ? (
-                                                    <div className="size-10 rounded-2xl bg-primary text-white flex items-center justify-center shadow-lg animate-in zoom-in duration-300">
-                                                        <span className="material-symbols-outlined">check</span>
-                                                    </div>
-                                                ) : (
-                                                    <button className="h-10 px-6 rounded-2xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-black text-xs uppercase tracking-widest shadow-xl">Select</button>
-                                                )}
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* Time Slots for Selected Center */}
-                                    {isSelected && (
-                                        <div className="animate-in fade-in slide-in-from-top-2 duration-500">
-                                            <div className="h-px bg-slate-50 dark:bg-slate-800 w-full my-5"></div>
-                                            <div>
-                                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Availability: {variant.nextSlot}</p>
-                                                <div className="flex gap-3 overflow-x-auto no-scrollbar pb-1">
-                                                    {slots.map((slot) => (
-                                                        <button
-                                                            key={slot}
-                                                            onClick={(e) => { e.stopPropagation(); setSelectedSlot(slot); }}
-                                                            className={`shrink-0 flex flex-col items-center justify-center min-w-[85px] h-[70px] rounded-2xl transition-all duration-300 active:scale-90 border-2 ${selectedSlot === slot
-                                                                ? 'bg-primary text-white shadow-float border-primary'
-                                                                : 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white border-slate-50 dark:border-slate-700 hover:border-primary/30'
-                                                                }`}
-                                                        >
-                                                            <span className="text-sm font-black tracking-tight">{slot.split(' ')[0]}</span>
-                                                            <span className={`text-[10px] font-bold uppercase ${selectedSlot === slot ? 'opacity-90' : 'text-slate-500'}`}>{slot.split(' ')[1]}</span>
-                                                        </button>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-                            );
-                        })}
-                    </div>
-                </section>
-
-                {/* Trust Indicators */}
-                <div className="flex justify-center gap-8 py-6 grayscale opacity-50">
-                    {['security', 'verified_user', 'support_agent'].map((icon, i) => (
-                        <div key={i} className="flex flex-col items-center gap-1.5">
-                            <span className="material-symbols-outlined text-2xl">{icon}</span>
-                            <span className="text-[9px] font-black uppercase tracking-[0.2em]">{['Secure', 'Verified', '24/7 Help'][i]}</span>
-                        </div>
-                    ))}
-                </div>
+                <UploadPrescription />
             </main>
 
-            {/* Error Message */}
-            {bookingError && (
-                <div className="fixed bottom-24 left-4 right-4 max-w-md mx-auto p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl z-50">
-                    <p className="text-sm text-red-600 dark:text-red-400 flex items-center gap-2">
-                        <span className="material-symbols-outlined text-lg">error</span>
-                        {bookingError}
-                    </p>
-                </div>
-            )}
-
-            {/* Sticky Bottom Action Bar */}
-            <footer className="fixed bottom-0 left-0 w-full bg-white/80 dark:bg-slate-900/80 backdrop-blur-2xl border-t border-white/20 dark:border-slate-800/50 shadow-glass p-4 z-50 pb-6">
-                <div className="flex items-center gap-5 max-w-md mx-auto w-full">
-                    <div className="flex flex-col">
-                        <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">Total Due</span>
-                        <div className="flex items-baseline gap-1.5">
-                            <span className="text-2xl font-black text-slate-900 dark:text-white tracking-tighter">₹{selectedVariant?.price || 0}</span>
-                            <span className="text-xs text-slate-400 line-through font-bold">₹{selectedVariant?.mrp || 0}</span>
+            {/* Bottom Cart Bar */}
+            <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 p-4 pb-6 z-50">
+                <div className="max-w-4xl mx-auto flex items-center justify-between gap-4">
+                    <div>
+                        <div className="flex items-baseline gap-2">
+                            <span className="text-2xl font-black text-slate-900 dark:text-white">₹{test.price}</span>
+                            <span className="text-sm font-bold text-slate-400 line-through">₹{test.mrp}</span>
+                            <span className="bg-indigo-50 text-indigo-500 text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-wider">{test.discount}</span>
                         </div>
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Included with Report</p>
                     </div>
+
                     <button
-                        onClick={handleBook}
-                        disabled={bookingLoading}
-                        className="flex-1 h-14 rounded-2xl bg-gradient-to-br from-primary to-primary-dark disabled:opacity-50 disabled:cursor-not-allowed text-white font-black text-sm uppercase tracking-widest shadow-float hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-3 overflow-hidden relative group/btn"
+                        onClick={handleAddToCart}
+                        className="h-14 px-8 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-black text-sm uppercase tracking-widest shadow-xl shadow-indigo-500/30 hover:shadow-2xl hover:-translate-y-1 active:scale-95 transition-all flex items-center gap-2"
                     >
-                        <div className="absolute inset-0 bg-white/10 translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-1000"></div>
-                        {bookingLoading ? (
-                            <>
-                                <span className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></span>
-                                Booking...
-                            </>
-                        ) : (
-                            <>
-                                <span>Confirm Booking</span>
-                                <span className="material-symbols-outlined group-hover/btn:translate-x-1 transition-transform">arrow_forward</span>
-                            </>
-                        )}
+                        <span className="material-symbols-outlined">add_task</span>
+                        Book Test
                     </button>
                 </div>
-            </footer>
+            </div>
         </div>
     );
 }

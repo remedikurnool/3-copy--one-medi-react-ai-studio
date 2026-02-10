@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { PHYSIO_SERVICES } from '@/constants';
+import PageHeader from '@/components/ui/PageHeader';
 
 export default function PhysioDetailPage() {
     const params = useParams();
@@ -34,16 +35,18 @@ export default function PhysioDetailPage() {
     };
 
     return (
-        <div className="bg-bg-light dark:bg-bg-dark text-slate-900 dark:text-white font-sans min-h-screen relative flex flex-col">
-            <header className="sticky top-0 z-30 flex items-center bg-white/95 dark:bg-gray-900/95 backdrop-blur-md p-4 pb-3 justify-between shadow-sm border-b border-gray-100 dark:border-gray-800">
-                <button onClick={() => router.back()} className="flex size-10 shrink-0 items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-                    <span className="material-symbols-outlined text-2xl">arrow_back</span>
-                </button>
-                <h2 className="text-lg font-bold leading-tight flex-1 text-center pr-10">Details</h2>
-                <button className="flex size-10 shrink-0 items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-                    <span className="material-symbols-outlined text-xl">share</span>
-                </button>
-            </header>
+        <div className="bg-surface-50 dark:bg-surface-950 text-slate-900 dark:text-white font-sans min-h-screen relative flex flex-col">
+            <PageHeader
+                title="Details"
+                showSearch={false}
+                showLocation={false}
+                className="lg:top-20"
+                actions={
+                    <button className="flex size-10 shrink-0 items-center justify-center rounded-full hover:bg-surface-100 dark:hover:bg-surface-800 transition-colors">
+                        <span className="material-symbols-outlined text-xl">share</span>
+                    </button>
+                }
+            />
 
             <main className="flex-1 overflow-y-auto pb-32">
                 {/* Hero Image Section */}
@@ -78,7 +81,7 @@ export default function PhysioDetailPage() {
 
                 {/* TRUST SIGNAL: SPECIALIST VERIFICATION */}
                 <div className="p-4 mt-2">
-                    <section className="bg-white dark:bg-gray-800 rounded-[2.5rem] p-6 shadow-sm border border-emerald-50 dark:border-emerald-900/30 overflow-hidden relative">
+                    <section className="bg-white dark:bg-surface-900 rounded-[2.5rem] p-6 shadow-sm border border-emerald-50 dark:border-emerald-900/30 overflow-hidden relative">
                         <div className="absolute top-[-20px] right-[-20px] p-4 opacity-[0.05]">
                             <span className="material-symbols-outlined text-[120px]">badge</span>
                         </div>
@@ -113,8 +116,8 @@ export default function PhysioDetailPage() {
                                 key={plan.id}
                                 onClick={() => setSelectedPlan(plan)}
                                 className={`relative p-5 rounded-3xl border-2 transition-all flex justify-between items-center cursor-pointer ${selectedPlan?.id === plan.id
-                                        ? 'border-primary bg-primary/5 shadow-md'
-                                        : 'border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800'
+                                    ? 'border-primary bg-primary/5 shadow-md'
+                                    : 'border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800'
                                     }`}
                             >
                                 {plan.label && (
@@ -150,7 +153,7 @@ export default function PhysioDetailPage() {
                 {/* Toggle Home Visit */}
                 {service.homeVisitAvailable && service.visitDuration !== 'Rental' && (
                     <div className="px-4 mb-4">
-                        <div className="bg-white dark:bg-gray-800 p-5 rounded-[2rem] shadow-sm border border-gray-100 dark:border-gray-700 flex items-center justify-between">
+                        <div className="bg-white dark:bg-surface-900 p-5 rounded-[2rem] shadow-sm border border-surface-200 dark:border-surface-800 flex items-center justify-between">
                             <div className="flex items-center gap-4">
                                 <div className={`size-12 rounded-full flex items-center justify-center transition-all ${homeVisit ? 'bg-primary text-white shadow-lg shadow-primary/30' : 'bg-gray-100 dark:bg-gray-700 text-gray-400'}`}>
                                     <span className="material-symbols-outlined text-2xl">home_health</span>
@@ -170,14 +173,14 @@ export default function PhysioDetailPage() {
 
                 {/* Description & Features */}
                 <div className="px-4 flex flex-col gap-6 mt-2">
-                    <section className="bg-white dark:bg-gray-800 p-6 rounded-[2.5rem] shadow-sm border border-gray-100 dark:border-gray-700">
+                    <section className="bg-white dark:bg-surface-900 p-6 rounded-[2.5rem] shadow-sm border border-surface-200 dark:border-surface-800">
                         <h3 className="text-lg font-black mb-3">Description</h3>
-                        <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed font-medium">
+                        <p className="text-slate-600 dark:text-slate-300 text-sm leading-relaxed font-medium">
                             {service.description}
                         </p>
                     </section>
 
-                    <section className="bg-white dark:bg-gray-800 p-6 rounded-[2.5rem] shadow-sm border border-gray-100 dark:border-gray-700">
+                    <section className="bg-white dark:bg-surface-900 p-6 rounded-[2.5rem] shadow-sm border border-surface-200 dark:border-surface-800">
                         <h3 className="text-lg font-black mb-4">Key Inclusions</h3>
                         <div className="grid grid-cols-1 gap-3">
                             {(service.features || ['Manual Therapy', 'Exercise Plan', 'Progress Tracking']).map((f, i) => (
@@ -202,7 +205,7 @@ export default function PhysioDetailPage() {
                             { id: 'rev1', author: 'Anil Kumar', rating: 5, comment: 'Dr. Srinivas was very professional. My back pain reduced significantly in just 3 sessions.', date: 'Oct 10, 2023', isVerified: true },
                             { id: 'rev2', author: 'Latha M.', rating: 4, comment: 'Punctual staff and well-explained exercises.', date: 'Sep 28, 2023', isVerified: true }
                         ]).map(review => (
-                            <div key={review.id} className="bg-white dark:bg-gray-800 p-6 rounded-[2rem] border border-gray-100 dark:border-gray-700 shadow-sm relative">
+                            <div key={review.id} className="bg-white dark:bg-surface-900 p-6 rounded-[2rem] border border-surface-200 dark:border-surface-800 shadow-sm relative">
                                 <div className="flex justify-between items-start mb-4">
                                     <div className="flex items-center gap-3">
                                         <div className="size-10 rounded-xl bg-slate-100 dark:bg-slate-700 flex items-center justify-center font-black text-slate-500 dark:text-slate-300">
@@ -235,7 +238,7 @@ export default function PhysioDetailPage() {
             </main>
 
             {/* Sticky Action Footer */}
-            <footer className="fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800 p-4 pb-6 shadow-[0_-4px_20px_rgba(0,0,0,0.1)]">
+            <footer className="fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-surface-900 border-t border-surface-200 dark:border-surface-800 p-4 pb-6 shadow-[0_-4px_20px_rgba(0,0,0,0.1)]">
                 <div className="max-w-lg mx-auto flex items-center gap-6">
                     <div className="flex flex-col">
                         <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">Total Amount</span>

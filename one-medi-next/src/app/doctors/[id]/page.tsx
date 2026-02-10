@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useDoctor } from '../../../hooks/useDoctors';
 import PrescriptionUpload from '../../../components/ui/PrescriptionUpload';
+import PageHeader from '@/components/ui/PageHeader';
 
 export default function DoctorProfilePage() {
     const router = useRouter();
@@ -57,42 +58,41 @@ export default function DoctorProfilePage() {
     const currentVariant = defaultVariants.find((v: any) => v.type === selectedType) || { price: doctor.fee, nextSlot: 'Tomorrow', type: 'Clinic Visit' };
 
     return (
-        <div className="min-h-screen bg-bg-light dark:bg-bg-dark pb-24 font-sans text-slate-900 dark:text-white">
+        <div className="min-h-screen bg-surface-50 dark:bg-surface-950 pb-24 font-sans text-slate-900 dark:text-white">
             {/* Top App Bar */}
-            <div className="sticky top-0 z-50 flex items-center bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm p-4 border-b border-gray-100 dark:border-gray-800 justify-between">
-                <button
-                    onClick={() => router.back()}
-                    className="flex size-10 shrink-0 items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                >
-                    <span className="material-symbols-outlined text-2xl">arrow_back</span>
-                </button>
-                <h2 className="text-lg font-bold leading-tight tracking-tight">Doctor Profile</h2>
-                <div className="flex w-20 items-center justify-end gap-1">
-                    <button className="flex size-10 items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-                        <span className="material-symbols-outlined text-xl">share</span>
-                    </button>
-                    <button className="flex size-10 items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-                        <span className="material-symbols-outlined text-xl">favorite</span>
-                    </button>
-                </div>
-            </div>
+            <PageHeader
+                title="Doctor Profile"
+                showSearch={false}
+                showLocation={false}
+                className="lg:top-20"
+                actions={
+                    <div className="flex items-center gap-1">
+                        <button className="flex size-10 items-center justify-center rounded-full hover:bg-surface-100 dark:hover:bg-surface-800 transition-colors">
+                            <span className="material-symbols-outlined text-xl">share</span>
+                        </button>
+                        <button className="flex size-10 items-center justify-center rounded-full hover:bg-surface-100 dark:hover:bg-surface-800 transition-colors">
+                            <span className="material-symbols-outlined text-xl">favorite</span>
+                        </button>
+                    </div>
+                }
+            />
 
             {/* Doctor Header Profile */}
-            <div className="relative flex flex-col items-center pt-6 pb-2 px-4 bg-white dark:bg-gray-900">
+            <div className="relative flex flex-col items-center pt-6 pb-2 px-4 bg-surface-50 dark:bg-surface-950">
                 <div className="flex flex-col items-center gap-4">
                     <div className="relative">
                         <div
-                            className="bg-center bg-no-repeat bg-cover rounded-full h-32 w-32 border-4 border-white dark:border-gray-800 shadow-lg"
+                            className="bg-center bg-no-repeat bg-cover rounded-full h-32 w-32 border-4 border-surface-50 dark:border-surface-900 shadow-glass"
                             style={{ backgroundImage: `url("${doctor.image}")` }}
                         >
                         </div>
-                        <div className="absolute bottom-1 right-1 bg-secondary text-white p-1.5 rounded-full border-2 border-white dark:border-gray-800 flex items-center justify-center shadow-sm">
+                        <div className="absolute bottom-1 right-1 bg-secondary text-white p-1.5 rounded-full border-2 border-surface-50 dark:border-surface-900 flex items-center justify-center shadow-sm">
                             <span className="material-symbols-outlined text-[16px] font-bold">check</span>
                         </div>
                     </div>
                     <div className="flex flex-col items-center justify-center text-center">
-                        <h1 className="text-2xl font-bold leading-tight tracking-tight">{doctor.name}</h1>
-                        <p className="text-gray-500 dark:text-gray-400 text-base font-normal mt-1">{doctor.specialty}, {doctor.qualification}</p>
+                        <h1 className="text-2xl font-black leading-tight tracking-tight text-slate-900 dark:text-white">{doctor.name}</h1>
+                        <p className="text-slate-500 dark:text-slate-400 text-base font-medium mt-1">{doctor.specialty}, {doctor.qualification}</p>
                         <div className="flex items-center gap-2 mt-2">
                             <span className="px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-900/30 text-primary text-xs font-bold border border-blue-100 dark:border-blue-800">Reg: APMC-48291</span>
                             <span className="px-2 py-0.5 rounded-full bg-green-50 dark:bg-green-900/30 text-secondary text-xs font-bold border border-green-100 dark:border-blue-800 flex items-center gap-1">
@@ -112,36 +112,36 @@ export default function DoctorProfilePage() {
             </div>
 
             {/* Stats Row */}
-            <div className="bg-white dark:bg-gray-900 px-4 py-4 mb-2">
+            <div className="bg-surface-50 dark:bg-surface-950 px-4 py-4 mb-2">
                 <div className="flex gap-3 overflow-x-auto no-scrollbar">
-                    <div className="flex min-w-[100px] flex-1 flex-col gap-1 rounded-xl bg-gray-50 dark:bg-gray-800 p-4 items-center text-center border border-gray-100 dark:border-gray-700">
+                    <div className="flex min-w-[100px] flex-1 flex-col gap-1 rounded-2xl bg-white dark:bg-surface-900 p-4 items-center text-center border border-surface-200 dark:border-surface-800 shadow-sm">
                         <div className="bg-blue-100 dark:bg-blue-900/50 p-2 rounded-full mb-1 text-primary">
                             <span className="material-symbols-outlined text-xl">medical_services</span>
                         </div>
-                        <p className="text-xl font-bold">{doctor.experience}</p>
-                        <p className="text-gray-500 dark:text-gray-400 text-xs font-medium">Years Exp.</p>
+                        <p className="text-xl font-black text-slate-900 dark:text-white">{doctor.experience}</p>
+                        <p className="text-slate-400 text-xs font-bold uppercase tracking-wide">Years Exp.</p>
                     </div>
-                    <div className="flex min-w-[100px] flex-1 flex-col gap-1 rounded-xl bg-gray-50 dark:bg-gray-800 p-4 items-center text-center border border-gray-100 dark:border-gray-700">
+                    <div className="flex min-w-[100px] flex-1 flex-col gap-1 rounded-2xl bg-white dark:bg-surface-900 p-4 items-center text-center border border-surface-200 dark:border-surface-800 shadow-sm">
                         <div className="bg-teal-100 dark:bg-teal-900/50 p-2 rounded-full mb-1 text-secondary">
                             <span className="material-symbols-outlined text-xl">groups</span>
                         </div>
-                        <p className="text-xl font-bold">5k+</p>
-                        <p className="text-gray-500 dark:text-gray-400 text-xs font-medium">Patients</p>
+                        <p className="text-xl font-black text-slate-900 dark:text-white">5k+</p>
+                        <p className="text-slate-400 text-xs font-bold uppercase tracking-wide">Patients</p>
                     </div>
-                    <div className="flex min-w-[100px] flex-1 flex-col gap-1 rounded-xl bg-gray-50 dark:bg-gray-800 p-4 items-center text-center border border-gray-100 dark:border-gray-700">
+                    <div className="flex min-w-[100px] flex-1 flex-col gap-1 rounded-2xl bg-white dark:bg-surface-900 p-4 items-center text-center border border-surface-200 dark:border-surface-800 shadow-sm">
                         <div className="bg-amber-100 dark:bg-amber-900/50 p-2 rounded-full mb-1 text-amber-600">
                             <span className="material-symbols-outlined text-xl filled">star</span>
                         </div>
-                        <p className="text-xl font-bold">{doctor.rating}</p>
-                        <p className="text-gray-500 dark:text-gray-400 text-xs font-medium">Rating</p>
+                        <p className="text-xl font-black text-slate-900 dark:text-white">{doctor.rating}</p>
+                        <p className="text-slate-400 text-xs font-bold uppercase tracking-wide">Rating</p>
                     </div>
                 </div>
             </div>
 
             {/* Enhanced About Section */}
             <div className="px-4 py-2">
-                <section className="flex flex-col gap-5 rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-6 shadow-sm">
-                    <div className="flex items-center gap-2 text-primary border-b border-gray-100 dark:border-gray-800 pb-3">
+                <section className="flex flex-col gap-5 rounded-[2rem] border border-surface-200 dark:border-surface-800 bg-white dark:bg-surface-900 p-6 shadow-sm">
+                    <div className="flex items-center gap-2 text-primary border-b border-surface-100 dark:border-surface-800 pb-3">
                         <span className="material-symbols-outlined filled">info</span>
                         <h3 className="text-lg font-black uppercase tracking-tight">Biography</h3>
                     </div>
@@ -190,9 +190,9 @@ export default function DoctorProfilePage() {
                         <button
                             key={v.type}
                             onClick={() => setSelectedType(v.type)}
-                            className={`flex flex-col items-start gap-2 p-4 rounded-xl border min-w-[140px] transition-all relative ${selectedType === v.type
-                                ? 'bg-primary text-white border-primary shadow-md'
-                                : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-slate-700 dark:text-gray-300'
+                            className={`flex flex-col items-start gap-2 p-4 rounded-2xl border min-w-[140px] transition-all relative ${selectedType === v.type
+                                ? 'bg-primary text-white border-primary shadow-lg shadow-primary/30'
+                                : 'bg-white dark:bg-surface-900 border-surface-200 dark:border-surface-800 text-slate-700 dark:text-slate-300'
                                 }`}
                         >
                             {selectedType === v.type && (
@@ -200,14 +200,14 @@ export default function DoctorProfilePage() {
                                     <span className="material-symbols-outlined text-[16px] font-bold">check</span>
                                 </div>
                             )}
-                            <div className={`p-2 rounded-full flex items-center justify-center ${selectedType === v.type ? 'bg-white/20' : 'bg-gray-100 dark:bg-gray-700'}`}>
+                            <div className={`p-2 rounded-full flex items-center justify-center ${selectedType === v.type ? 'bg-white/20' : 'bg-surface-100 dark:bg-surface-800'}`}>
                                 <span className="material-symbols-outlined text-xl">{v.icon}</span>
                             </div>
-                            <div>
+                            <div className="text-left">
                                 <p className="text-sm font-bold leading-tight">{v.type}</p>
-                                <p className={`text-xs mt-0.5 ${selectedType === v.type ? 'text-blue-100' : 'text-gray-500'}`}>{v.duration}</p>
+                                <p className={`text-xs mt-0.5 font-medium ${selectedType === v.type ? 'text-blue-100' : 'text-slate-400'}`}>{v.duration}</p>
                             </div>
-                            <div className="mt-1 font-bold text-lg">₹{v.price}</div>
+                            <div className="mt-1 font-black text-lg">₹{v.price}</div>
                         </button>
                     ))}
                 </div>
@@ -215,7 +215,7 @@ export default function DoctorProfilePage() {
 
             {/* Prescription Upload Section */}
             <div className="px-4 py-2 mb-2">
-                <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 p-5 shadow-sm">
+                <div className="bg-white dark:bg-surface-900 rounded-[2rem] border border-surface-200 dark:border-surface-800 p-5 shadow-sm">
                     <PrescriptionUpload
                         label="Upload Medical Records"
                         subLabel="Share past prescriptions or reports with the doctor (Optional)"
@@ -228,7 +228,7 @@ export default function DoctorProfilePage() {
             {/* Clinic & Fees Card */}
             <div className="px-4 py-2">
                 <h3 className="text-lg font-bold leading-tight mb-3 px-1">Hospital Details</h3>
-                <div className="flex flex-col gap-0 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
+                <div className="flex flex-col gap-0 rounded-[2rem] bg-white dark:bg-surface-900 border border-surface-200 dark:border-surface-800 shadow-sm overflow-hidden">
                     {/* Map / Image Area */}
                     <div className="relative h-40 w-full bg-gray-100">
                         <div
@@ -260,7 +260,7 @@ export default function DoctorProfilePage() {
             {/* Availability / Timings */}
             <div className="px-4 py-2 mb-4">
                 <h3 className="text-lg font-bold leading-tight mb-3 px-1">Availability</h3>
-                <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-4 shadow-sm">
+                <div className="rounded-[2rem] border border-surface-200 dark:border-surface-800 bg-white dark:bg-surface-900 p-4 shadow-sm">
                     <div className="flex items-center gap-4 mb-3">
                         <div className="size-10 rounded-full bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center text-primary shrink-0">
                             <span className="material-symbols-outlined">calendar_month</span>
@@ -283,7 +283,7 @@ export default function DoctorProfilePage() {
             </div>
 
             {/* Bottom Sticky Action Bar */}
-            <div className="fixed bottom-0 left-0 right-0 p-4 bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800 z-40 pb-6 shadow-[0_-4px_20px_-4px_rgba(0,0,0,0.05)]">
+            <div className="fixed bottom-0 left-0 right-0 p-4 bg-white/90 dark:bg-surface-950/90 backdrop-blur-md border-t border-surface-200 dark:border-surface-800 z-40 pb-6 shadow-[0_-4px_20px_-4px_rgba(0,0,0,0.05)]">
                 <div className="flex gap-4 items-center max-w-md mx-auto">
                     <div className="hidden xs:flex flex-col">
                         <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">Next Slot</span>

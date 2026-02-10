@@ -5,193 +5,214 @@ import { useRouter } from 'next/navigation';
 import { useMotherBabyServices } from '@/hooks/useServices';
 import type { ServiceMaster } from '@/hooks/useServices';
 
-const STAGES = [
-    { id: 'preg', label: 'Pregnancy', icon: 'pregnant_woman', sub: 'Weeks 1-40' },
-    { id: 'newborn', label: 'Newborn', icon: 'child_care', sub: '0-12 Months' },
-    { id: 'toddler', label: 'Toddler', icon: 'rowing', sub: '1-5 Years' },
-    { id: 'working', label: 'Working Mom', icon: 'business_center', sub: 'Care Balance' },
-];
+// Components
+import StageSelector, { StageId } from '@/components/mother-baby/StageSelector';
+import DynamicHero from '@/components/mother-baby/DynamicHero';
+import ToolsGrid from '@/components/mother-baby/ToolsGrid';
+import ProfileSection from '@/components/mother-baby/ProfileSection';
+import ExpertsSection from '@/components/mother-baby/ExpertsSection';
+import TrustTips from '@/components/mother-baby/TrustTips';
+import ProductsCarousel from '@/components/mother-baby/ProductsCarousel';
+import VaccinationSection from '@/components/mother-baby/VaccinationSection';
+import CareTakersList from '@/components/mother-baby/CareTakersList';
 
 export default function MotherBabyHomePage() {
     const router = useRouter();
-    const [selectedStage, setSelectedStage] = useState('preg');
+    const [selectedStage, setSelectedStage] = useState<StageId>('preg');
     const [search, setSearch] = useState('');
 
     // Fetch mother & baby services from Supabase
     const { data: motherBabyServices, loading, error } = useMotherBabyServices();
 
     const filteredServices = (motherBabyServices || []).filter((s: ServiceMaster) => {
+        // 1. Basic search filter
         const matchesSearch = !search ||
             s.name.toLowerCase().includes(search.toLowerCase()) ||
             s.description?.toLowerCase().includes(search.toLowerCase());
-        return matchesSearch;
+
+        // 2. Stage Filtering Logic (Simulated based on keywords)
+        // In a real app, 'ServiceMaster' would have a 'tags' or 'applicable_stages' array.
+        let matchesStage = true;
+
+        if (!search) { // Only apply stage filtering if not explicitly searching
+            const lowerName = s.name.toLowerCase();
+
+            switch (selectedStage) {
+                case 'preg':
+                    matchesStage = lowerName.includes('scan') || lowerName.includes('pregnan') || lowerName.includes('maternity') || lowerName.includes('antenatal') || lowerName.includes('fetal');
+                    break;
+                case 'newborn':
+                    matchesStage = lowerName.includes('baby') || lowerName.includes('vaccin') || lowerName.includes('lactation') || lowerName.includes('newborn') || lowerName.includes('nurse') || lowerName.includes('pediatric');
+                    break;
+                case 'toddler':
+                    matchesStage = lowerName.includes('nutri') || lowerName.includes('diet') || lowerName.includes('growth') || lowerName.includes('child') || lowerName.includes('speech');
+                    break;
+                case 'working':
+                    matchesStage = lowerName.includes('therapy') || lowerName.includes('counsel') || lowerName.includes('mental') || lowerName.includes('stress') || lowerName.includes('physio');
+                    break;
+            }
+        }
+
+        return matchesSearch && matchesStage;
     });
 
     return (
-        <div className="min-h-screen bg-[#fffafa] dark:bg-bg-dark text-slate-900 dark:text-white pb-32 font-sans animate-fade-in">
+        <div className="min-h-screen bg-[#fffafa] dark:bg-bg-dark text-slate-900 dark:text-white pb-32 font-sans animate-fade-in relative">
+
+            {/* Header */}
             <header className="sticky top-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-2xl border-b border-rose-100 dark:border-gray-800">
-                <div className="flex items-center gap-3 p-4">
-                    <button onClick={() => router.back()} className="size-10 flex items-center justify-center rounded-full bg-rose-50 dark:bg-gray-800 text-rose-500 transition-transform active:scale-90">
+                <div className="flex items-center gap-3 p-4 max-w-7xl mx-auto">
+                    <button onClick={() => router.back()} className="size-10 flex items-center justify-center rounded-full bg-rose-50 dark:bg-gray-800 text-rose-500 transition-transform active:scale-90 hover:bg-rose-100">
                         <span className="material-symbols-outlined">arrow_back</span>
                     </button>
                     <div className="flex flex-col">
                         <h1 className="text-xl font-black tracking-tight text-rose-600 dark:text-rose-400 uppercase leading-none">Mother & Baby</h1>
-                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Care Beyond Delivery</p>
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-0.5">Care Beyond Delivery</p>
+                    </div>
+                    <div className="flex-1"></div>
+                    <div className="size-10 rounded-full bg-slate-100 dark:bg-gray-800 flex items-center justify-center text-slate-600 relative">
+                        <span className="material-symbols-outlined">notifications</span>
+                        <span className="absolute top-2 right-2 size-2 bg-rose-500 rounded-full border-2 border-white"></span>
                     </div>
                 </div>
 
-                <div className="px-4 pb-3">
-                    <div className="flex items-center bg-rose-50/50 dark:bg-gray-800 rounded-2xl px-4 py-2 border border-rose-100 dark:border-gray-700 focus-within:border-rose-300 transition-all">
-                        <span className="material-symbols-outlined text-rose-300 text-xl">search</span>
-                        <input
-                            type="text"
-                            value={search}
-                            onChange={(e) => setSearch(e.target.value)}
-                            placeholder="Search pregnancy scans, nursing, vaccines..."
-                            className="bg-transparent border-none focus:ring-0 w-full text-sm font-medium ml-2 placeholder:text-rose-200 focus:outline-none"
-                        />
-                    </div>
+                <div className="px-4 pb-3 max-w-7xl mx-auto">
+                    <StageSelector currentStage={selectedStage} onSelectStage={setSelectedStage} />
                 </div>
             </header>
 
-            <main className="max-w-7xl mx-auto p-4 lg:p-8 flex flex-col gap-8">
+            <main className="max-w-7xl mx-auto p-4 lg:p-6 flex flex-col gap-6">
 
-                {/* Baby Profile & Tool Shortcuts */}
-                <section className="bg-gradient-to-br from-rose-50 to-indigo-50 dark:from-slate-900 dark:to-slate-800 rounded-[2.5rem] p-6 shadow-sm border border-white dark:border-slate-800">
-                    <div className="flex items-center justify-between mb-6">
-                        <div className="flex items-center gap-4">
-                            <div className="size-14 rounded-full bg-white border-2 border-rose-200 p-0.5 shadow-sm overflow-hidden flex items-center justify-center">
-                                <span className="material-symbols-outlined text-3xl text-rose-300">child_care</span>
-                            </div>
-                            <div>
-                                <h3 className="font-black text-slate-900 dark:text-white leading-none">Your Baby</h3>
-                                <p className="text-[10px] font-black text-rose-500 uppercase tracking-widest mt-1">Track Milestones</p>
-                            </div>
-                        </div>
-                        <button className="size-10 rounded-full bg-white dark:bg-gray-700 flex items-center justify-center text-slate-400 shadow-sm">
-                            <span className="material-symbols-outlined text-xl">edit</span>
-                        </button>
-                    </div>
+                {/* Dynamic Hero */}
+                <DynamicHero stage={selectedStage} />
 
-                    <div className="grid grid-cols-2 gap-3">
-                        <button
-                            onClick={() => router.push('/mother-baby/vaccination-tracker')}
-                            className="bg-white dark:bg-gray-800 p-4 rounded-3xl flex flex-col gap-2 items-start shadow-sm hover:shadow-md transition-all active:scale-[0.98]"
-                        >
-                            <div className="size-8 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center">
-                                <span className="material-symbols-outlined text-lg">vaccines</span>
-                            </div>
-                            <div className="text-left">
-                                <p className="text-xs font-black uppercase tracking-tight">Vaccinations</p>
-                                <p className="text-[9px] text-gray-400 font-bold">Track Schedule</p>
-                            </div>
-                        </button>
-                        <button
-                            className="bg-white dark:bg-gray-800 p-4 rounded-3xl flex flex-col gap-2 items-start shadow-sm hover:shadow-md transition-all active:scale-[0.98]"
-                        >
-                            <div className="size-8 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
-                                <span className="material-symbols-outlined text-lg">height</span>
-                            </div>
-                            <div className="text-left">
-                                <p className="text-xs font-black uppercase tracking-tight">Milestones</p>
-                                <p className="text-[9px] text-gray-400 font-bold">Track Growth</p>
-                            </div>
-                        </button>
-                    </div>
-                </section>
+                {/* Profiles */}
+                <ProfileSection />
 
-                {/* Stage Selector */}
+                {/* Trust & Tips */}
+                <TrustTips />
+
+                {/* Dedicated Vaccination Section (Prominent only for Newborn/Toddler/Working) - Or always show but distinct */}
+                {(selectedStage === 'newborn' || selectedStage === 'toddler') && (
+                    <VaccinationSection />
+                )}
+
+                {/* Tools Grid */}
+                <ToolsGrid />
+
+                {/* Products */}
+                <ProductsCarousel stage={selectedStage} />
+
+                {/* Experts */}
+                <ExpertsSection />
+
+                {/* Care Takers */}
+                <CareTakersList />
+
+                {/* Services Section */}
+
+                {/* Services Section */}
                 <section>
-                    <h3 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] mb-4 px-1">Tailored for your stage</h3>
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                        {STAGES.map((stage) => (
-                            <button
-                                key={stage.id}
-                                onClick={() => setSelectedStage(stage.id)}
-                                className={`flex flex-col items-center justify-center p-5 rounded-3xl border-2 transition-all duration-300 h-28 ${selectedStage === stage.id
-                                    ? 'bg-rose-500 border-rose-500 text-white shadow-lg shadow-rose-200 -translate-y-1'
-                                    : 'bg-white dark:bg-gray-800 border-rose-100 dark:border-gray-700 text-slate-600 dark:text-gray-400 hover:border-rose-200'
-                                    }`}
-                            >
-                                <span className="material-symbols-outlined text-3xl mb-2">{stage.icon}</span>
-                                <span className="text-xs font-black tracking-tight uppercase">{stage.label}</span>
-                                <span className={`text-[9px] font-bold ${selectedStage === stage.id ? 'opacity-80' : 'text-slate-400'}`}>{stage.sub}</span>
-                            </button>
-                        ))}
-                    </div>
-                </section>
-
-                {/* Loading State */}
-                {loading && (
-                    <div className="flex items-center justify-center py-12">
-                        <div className="animate-spin rounded-full h-10 w-10 border-2 border-rose-500 border-t-transparent"></div>
-                    </div>
-                )}
-
-                {/* Error State */}
-                {error && (
-                    <div className="text-center py-8 text-red-500">
-                        <span className="material-symbols-outlined text-4xl mb-2">error</span>
-                        <p className="text-sm font-medium">Failed to load services</p>
-                    </div>
-                )}
-
-                {/* Dynamic Services Grid */}
-                {!loading && (
-                    <section>
-                        <div className="flex justify-between items-end mb-4 px-1">
-                            <h3 className="text-xl font-black text-slate-900 dark:text-white leading-none">Curated Services</h3>
-                            <button className="text-xs font-black text-rose-500 uppercase tracking-widest">See All</button>
+                    <div className="flex justify-between items-end mb-4 px-1">
+                        <h3 className="text-xl font-black text-slate-900 dark:text-white leading-none">Care Programs</h3>
+                        <div className="flex items-center gap-2">
+                            <div className="flex items-center bg-white dark:bg-gray-800 rounded-full px-3 py-1.5 border border-slate-200 dark:border-gray-700 shadow-sm">
+                                <span className="material-symbols-outlined text-slate-400 text-base">search</span>
+                                <input
+                                    type="text"
+                                    value={search}
+                                    onChange={(e) => setSearch(e.target.value)}
+                                    placeholder="Search services..."
+                                    className="bg-transparent border-none focus:ring-0 w-24 text-xs font-medium ml-1 placeholder:text-slate-400 focus:outline-none"
+                                />
+                            </div>
                         </div>
+                    </div>
+
+                    {/* Loading State */}
+                    {loading && (
+                        <div className="flex items-center justify-center py-12">
+                            <div className="animate-spin rounded-full h-10 w-10 border-2 border-rose-500 border-t-transparent"></div>
+                        </div>
+                    )}
+
+                    {/* Error State */}
+                    {error && (
+                        <div className="text-center py-8 text-red-500 bg-red-50 rounded-3xl">
+                            <span className="material-symbols-outlined text-4xl mb-2">error</span>
+                            <p className="text-sm font-medium">Failed to load services</p>
+                        </div>
+                    )}
+
+                    {!loading && !error && (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             {filteredServices.map((service: ServiceMaster) => (
                                 <div
                                     key={service.id}
                                     onClick={() => router.push(`/home-care/${service.id}`)}
-                                    className="bg-white dark:bg-gray-800 rounded-[2.25rem] p-5 shadow-glass border border-white dark:border-slate-800 flex gap-5 cursor-pointer active:scale-[0.99] transition-all group overflow-hidden relative"
+                                    className="bg-white dark:bg-gray-800 rounded-[2.25rem] p-5 shadow-glass border border-white dark:border-slate-800 flex gap-5 cursor-pointer active:scale-[0.99] transition-all group overflow-hidden relative hover:shadow-xl hover:border-rose-100"
                                 >
-                                    <div className="size-28 rounded-3xl overflow-hidden shrink-0 shadow-soft bg-gradient-to-br from-rose-100 to-pink-100 dark:from-rose-900/30 dark:to-pink-900/30 flex items-center justify-center">
-                                        <span className="material-symbols-outlined text-5xl text-rose-400/50">child_care</span>
+                                    <div className="size-28 rounded-[1.5rem] overflow-hidden shrink-0 shadow-soft bg-gradient-to-br from-rose-100 to-pink-50 dark:from-rose-900/30 dark:to-pink-900/30 flex items-center justify-center group-hover:scale-105 transition-transform duration-500">
+                                        <span className="material-symbols-outlined text-5xl text-rose-400/50 group-hover:text-rose-400 transition-colors">child_care</span>
                                     </div>
                                     <div className="flex-1 min-w-0 flex flex-col justify-center">
-                                        <h4 className="text-lg font-black text-slate-900 dark:text-white leading-tight mb-1 group-hover:text-rose-500 transition-colors">{service.name}</h4>
-                                        <p className="text-[10px] font-bold text-rose-400 uppercase tracking-widest mb-2">{service.category}</p>
-                                        <p className="text-[11px] text-slate-400 font-medium line-clamp-2 leading-relaxed mb-4">{service.description || 'Specialized mother & baby care service'}</p>
-                                        <div className="flex items-center justify-between">
-                                            <span className="text-xl font-black text-slate-900 dark:text-white tracking-tighter">
-                                                Contact <span className="text-[10px] text-slate-400 font-bold uppercase tracking-tight">for quote</span>
+                                        <div className="flex items-center gap-2 mb-1">
+                                            <span className="px-2 py-0.5 rounded-full bg-slate-100 dark:bg-gray-700 text-[9px] font-black uppercase tracking-wider text-slate-500">{service.category}</span>
+                                            {service.isHomeService && (
+                                                <span className="px-2 py-0.5 rounded-full bg-teal-50 dark:bg-teal-900/30 text-[9px] font-black uppercase tracking-wider text-teal-600 flex items-center gap-1">
+                                                    <span className="material-symbols-outlined text-[10px]">home</span> Home
+                                                </span>
+                                            )}
+                                        </div>
+                                        <h4 className="text-lg font-black text-slate-900 dark:text-white leading-tight mb-2 group-hover:text-rose-500 transition-colors">{service.name}</h4>
+                                        <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium line-clamp-2 leading-relaxed mb-4">{service.description || 'Specialized mother & baby care service designed for your comfort and safety.'}</p>
+                                        <div className="flex items-center justify-between mt-auto">
+                                            <span className="text-sm font-black text-slate-900 dark:text-white tracking-tight flex items-baseline gap-1">
+                                                Start <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wide">Quote</span>
                                             </span>
-                                            <button className="bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg active:scale-95 transition-all">Book</button>
+                                            <button className="bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-slate-900/10 active:scale-95 transition-all group-hover:bg-rose-500 group-hover:text-white group-hover:shadow-rose-200">Book Now</button>
                                         </div>
                                     </div>
-                                    {service.isHomeService && (
-                                        <div className="absolute top-2 right-2">
-                                            <span className="material-symbols-outlined text-primary text-lg filled">verified</span>
-                                        </div>
-                                    )}
                                 </div>
                             ))}
                         </div>
+                    )}
 
-                        {filteredServices.length === 0 && (
-                            <div className="text-center py-12 flex flex-col items-center gap-4">
-                                <div className="size-20 rounded-full bg-rose-100 dark:bg-rose-900/30 flex items-center justify-center text-rose-400">
-                                    <span className="material-symbols-outlined text-4xl">search_off</span>
-                                </div>
-                                <p className="text-gray-500 font-medium">No services found.</p>
+                    {!loading && filteredServices.length === 0 && (
+                        <div className="text-center py-16 flex flex-col items-center gap-4 bg-white dark:bg-gray-800 rounded-[2.5rem] border border-dashed border-slate-200">
+                            <div className="size-20 rounded-full bg-slate-50 dark:bg-gray-700 flex items-center justify-center text-slate-300">
+                                <span className="material-symbols-outlined text-4xl">search_off</span>
                             </div>
-                        )}
-                    </section>
-                )}
-
+                            <div>
+                                <h4 className="text-slate-900 dark:text-white font-bold mb-1">No services found for this stage</h4>
+                                <p className="text-gray-500 text-sm font-medium">Try changing the stage or search for a specific service.</p>
+                            </div>
+                        </div>
+                    )}
+                </section>
             </main>
 
-            {/* WhatsApp Action */}
-            <button
-                onClick={() => alert('Opening ONE MEDI Mother & Baby Care Expert Support on WhatsApp...')}
-                className="fixed bottom-28 right-6 size-14 rounded-full bg-emerald-500 text-white flex items-center justify-center shadow-2xl shadow-emerald-500/40 z-40 active:scale-90 transition-transform group"
-            >
-                <span className="material-symbols-outlined text-3xl group-hover:scale-110 transition-transform">chat</span>
+            {/* Sticky Actions Bar */}
+            <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 bg-slate-900/90 dark:bg-white/90 backdrop-blur-xl text-white dark:text-slate-900 py-3 px-6 rounded-full shadow-2xl flex items-center gap-6 border border-white/10 dark:border-slate-900/10">
+                <button className="flex flex-col items-center gap-0.5 group">
+                    <span className="material-symbols-outlined text-xl group-hover:text-rose-400 transition-colors">calendar_month</span>
+                    <span className="text-[9px] font-black uppercase tracking-widest">Book</span>
+                </button>
+                <div className="w-px h-8 bg-white/20 dark:bg-slate-900/20"></div>
+                <button className="flex flex-col items-center gap-0.5 group">
+                    <span className="material-symbols-outlined text-xl group-hover:text-rose-400 transition-colors">support_agent</span>
+                    <span className="text-[9px] font-black uppercase tracking-widest">Expert</span>
+                </button>
+                <div className="w-px h-8 bg-white/20 dark:bg-slate-900/20"></div>
+                <button className="flex flex-col items-center gap-0.5 group">
+                    <span className="material-symbols-outlined text-xl group-hover:text-rose-400 transition-colors">chat</span>
+                    <span className="text-[9px] font-black uppercase tracking-widest">Chat</span>
+                </button>
+            </div>
+
+            {/* Help Button */}
+            <button className="fixed bottom-28 right-6 size-12 rounded-full bg-emerald-500 text-white flex items-center justify-center shadow-lg shadow-emerald-500/40 z-30 active:scale-90 transition-transform animate-bounce-subtle">
+                <span className="material-symbols-outlined text-2xl">whatsapp</span>
             </button>
         </div>
     );

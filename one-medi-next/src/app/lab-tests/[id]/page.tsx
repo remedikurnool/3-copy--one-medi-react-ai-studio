@@ -4,15 +4,16 @@ import React, { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useCartStore } from '@/store/cartStore';
 import { useLabTest } from '@/hooks';
+import PageHeader from '@/components/ui/PageHeader';
 
 // Reusable Components for this page
 const InfoCard = ({ icon, label, value, color, darkColor }: any) => (
-    <div className="flex flex-col gap-2 rounded-xl bg-white dark:bg-gray-800 p-4 shadow-sm border border-gray-100 dark:border-gray-700">
+    <div className="flex flex-col gap-2 rounded-xl bg-white dark:bg-surface-900 p-4 shadow-sm border border-surface-200 dark:border-surface-800">
         <div className={`flex size-10 items-center justify-center rounded-full ${color} ${darkColor}`}>
             <span className="material-symbols-outlined">{icon}</span>
         </div>
         <div>
-            <p className="text-xs text-gray-500 dark:text-gray-400">{label}</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400">{label}</p>
             <p className="text-base font-bold text-slate-900 dark:text-white">{value}</p>
         </div>
     </div>
@@ -112,18 +113,20 @@ export default function LabTestDetailPage() {
     };
 
     return (
-        <div className="min-h-screen bg-bg-light dark:bg-bg-dark text-slate-900 dark:text-white pb-28 relative flex flex-col font-sans">
+        <div className="min-h-screen bg-surface-50 dark:bg-surface-950 text-slate-900 dark:text-white pb-28 relative flex flex-col font-sans">
             {/* Sticky Header */}
-            <header className="sticky top-0 z-50 flex items-center justify-between bg-white/95 dark:bg-gray-900/95 backdrop-blur-md px-4 py-3 shadow-sm border-b border-gray-100 dark:border-gray-800">
-                <button onClick={() => router.back()} className="flex size-10 items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-                    <span className="material-symbols-outlined text-[24px]">arrow_back</span>
-                </button>
-                <h1 className="text-lg font-bold tracking-tight text-center flex-1">Test Details</h1>
-                <button onClick={() => router.push('/cart')} className="relative flex size-10 items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-                    <span className="material-symbols-outlined text-[24px]">shopping_cart</span>
-                    {cartItemsCount > 0 && <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">{cartItemsCount}</span>}
-                </button>
-            </header>
+            <PageHeader
+                title="Test Details"
+                showSearch={false}
+                showLocation={false}
+                className="lg:top-20"
+                actions={
+                    <button onClick={() => router.push('/cart')} className="relative flex size-10 items-center justify-center rounded-full hover:bg-surface-100 dark:hover:bg-surface-800 transition-colors">
+                        <span className="material-symbols-outlined text-[24px]">shopping_cart</span>
+                        {cartItemsCount > 0 && <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">{cartItemsCount}</span>}
+                    </button>
+                }
+            />
 
             <main className="flex-1 w-full">
                 {/* Hero Card */}
@@ -167,9 +170,9 @@ export default function LabTestDetailPage() {
                             <div
                                 key={variant.centerId}
                                 onClick={() => setSelectedVariant(variant)}
-                                className={`bg-white dark:bg-gray-800 rounded-xl p-3 border transition-all cursor-pointer flex gap-3 ${selectedVariant?.centerId === variant.centerId
+                                className={`bg-white dark:bg-surface-900 rounded-xl p-3 border transition-all cursor-pointer flex gap-3 ${selectedVariant?.centerId === variant.centerId
                                     ? 'border-primary ring-1 ring-primary/20 shadow-md'
-                                    : 'border-gray-100 dark:border-gray-700 opacity-80'
+                                    : 'border-surface-200 dark:border-surface-700 opacity-80'
                                     }`}
                             >
                                 <div className="size-14 rounded-lg bg-gray-50 dark:bg-gray-700 p-1 shrink-0 flex items-center justify-center overflow-hidden">
@@ -242,7 +245,7 @@ export default function LabTestDetailPage() {
             </main>
 
             {/* Sticky Footer */}
-            <div className="fixed bottom-0 left-0 right-0 z-40 bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800 p-4 pb-6 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+            <div className="fixed bottom-0 left-0 right-0 z-40 bg-white/90 dark:bg-surface-950/90 backdrop-blur-md border-t border-surface-200 dark:border-surface-800 p-4 pb-6 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
                 <div className="flex items-center gap-4 max-w-md mx-auto">
                     <div className="flex flex-col">
                         <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Total Price</p>

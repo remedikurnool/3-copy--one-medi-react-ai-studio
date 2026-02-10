@@ -5,6 +5,7 @@ import { useRouter, useParams } from 'next/navigation';
 import { useService } from '@/hooks/useServices';
 import { ServiceMaster } from '@/hooks/useServices';
 import { useBookingStore } from '@/store/bookingStore';
+import PageHeader from '@/components/ui/PageHeader';
 
 // Helper to generate plans since backend doesn't support them yet
 const getServicePlans = (service: ServiceMaster) => {
@@ -84,17 +85,19 @@ export default function HomeCareDetailPage() {
     const equipmentRequired = service.requirements?.some(r => r.toLowerCase().includes('equipment') || r.toLowerCase().includes('kit'));
 
     return (
-        <div className="relative min-h-screen flex flex-col bg-bg-light dark:bg-bg-dark text-slate-900 dark:text-white font-sans animate-fade-in">
+        <div className="relative min-h-screen flex flex-col bg-surface-50 dark:bg-surface-950 text-slate-900 dark:text-white font-sans animate-fade-in">
             {/* Top App Bar */}
-            <div className="sticky top-0 z-50 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm border-b border-gray-100 dark:border-gray-800 px-4 py-3 flex items-center justify-between">
-                <button onClick={() => router.back()} className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-                    <span className="material-symbols-outlined text-2xl">arrow_back</span>
-                </button>
-                <h1 className="text-lg font-bold">{isEquipment ? 'Product Details' : 'Service Details'}</h1>
-                <button className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-                    <span className="material-symbols-outlined text-2xl">share</span>
-                </button>
-            </div>
+            <PageHeader
+                title={isEquipment ? 'Product Details' : 'Service Details'}
+                showSearch={false}
+                showLocation={false}
+                className="lg:top-20"
+                actions={
+                    <button className="flex items-center justify-center w-10 h-10 rounded-full bg-surface-100 dark:bg-surface-800 hover:bg-surface-200 dark:hover:bg-surface-700 transition-colors">
+                        <span className="material-symbols-outlined text-2xl">share</span>
+                    </button>
+                }
+            />
 
             <div className="flex-1 overflow-y-auto pb-24">
                 {/* Hero Image */}
@@ -116,7 +119,7 @@ export default function HomeCareDetailPage() {
                 </div>
 
                 {/* Info Grid - Dynamic based on Service vs Equipment */}
-                <div className="flex border-b border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 justify-around text-center">
+                <div className="flex border-b border-surface-200 dark:border-surface-800 bg-white dark:bg-surface-900 p-4 justify-around text-center">
                     {!isEquipment && (
                         <>
                             <div className="flex flex-col gap-1">
@@ -143,7 +146,7 @@ export default function HomeCareDetailPage() {
                 <div className="p-4 space-y-6 bg-gray-50 dark:bg-black/20">
 
                     {/* Plan/Variant Selection */}
-                    <div className="bg-white dark:bg-gray-800 p-5 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+                    <div className="bg-white dark:bg-surface-900 p-5 rounded-xl shadow-sm border border-surface-200 dark:border-surface-800">
                         <h3 className="text-lg font-bold mb-4">{isEquipment ? 'Rental or Purchase?' : 'Choose Duration'}</h3>
                         <div className="flex flex-col gap-3">
                             {plans.map((plan) => (
@@ -152,7 +155,7 @@ export default function HomeCareDetailPage() {
                                     onClick={() => setSelectedPlan(plan)}
                                     className={`relative flex items-center justify-between p-4 rounded-xl border-2 cursor-pointer transition-all ${selectedPlan?.id === plan.id
                                         ? 'border-primary bg-blue-50/50 dark:bg-blue-900/10 shadow-sm'
-                                        : 'border-gray-100 dark:border-gray-700 hover:border-primary/50'
+                                        : 'border-surface-200 dark:border-surface-800 hover:border-primary/50'
                                         }`}
                                 >
                                     {isEquipment ? (
@@ -185,7 +188,7 @@ export default function HomeCareDetailPage() {
 
                     {/* Gender Preference Toggle (Services Only) */}
                     {!isEquipment && (
-                        <div className={`p-4 rounded-xl border transition-all flex items-center justify-between ${requestFemale ? 'bg-pink-50 dark:bg-pink-900/10 border-pink-200 dark:border-pink-800' : 'bg-white dark:bg-gray-800 border-gray-100 dark:border-gray-700 shadow-sm'}`}>
+                        <div className={`p-4 rounded-xl border transition-all flex items-center justify-between ${requestFemale ? 'bg-pink-50 dark:bg-pink-900/10 border-pink-200 dark:border-pink-800' : 'bg-white dark:bg-surface-900 border-surface-200 dark:border-surface-800 shadow-sm'}`}>
                             <div className="flex items-center gap-3">
                                 <div className={`size-10 rounded-full flex items-center justify-center transition-colors ${requestFemale ? 'bg-pink-100 dark:bg-pink-800 text-pink-600 dark:text-pink-200' : 'bg-gray-100 dark:bg-gray-700 text-gray-400'}`}>
                                     <span className="material-symbols-outlined">female</span>
@@ -203,16 +206,16 @@ export default function HomeCareDetailPage() {
                     )}
 
                     {/* Description */}
-                    <div className="bg-white dark:bg-gray-800 p-5 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+                    <div className="bg-white dark:bg-surface-900 p-5 rounded-xl shadow-sm border border-surface-200 dark:border-surface-800">
                         <h3 className="text-lg font-bold mb-3">About</h3>
-                        <p className="text-gray-600 dark:text-gray-300 text-base leading-relaxed">
+                        <p className="text-slate-600 dark:text-slate-300 text-base leading-relaxed">
                             {service.description || "Professional home care service tailored to your needs."}
                         </p>
                     </div>
 
                     {/* Features */}
                     {service.requirements && service.requirements.length > 0 && (
-                        <div className="bg-white dark:bg-gray-800 p-5 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+                        <div className="bg-white dark:bg-surface-900 p-5 rounded-xl shadow-sm border border-surface-200 dark:border-surface-800">
                             <h3 className="text-lg font-bold mb-4">What's Included</h3>
                             <ul className="space-y-3">
                                 {service.requirements.map((feature, i) => (
@@ -240,7 +243,7 @@ export default function HomeCareDetailPage() {
             </div>
 
             {/* Sticky Bottom Bar */}
-            <div className="sticky bottom-0 z-50 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 px-5 py-4 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
+            <div className="sticky bottom-0 z-50 bg-white dark:bg-surface-900 border-t border-surface-200 dark:border-surface-800 px-5 py-4 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
                 <div className="flex items-center gap-4">
                     <div className="flex-1">
                         <div className="flex flex-col mb-1">

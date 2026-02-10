@@ -2,104 +2,78 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useDiabetesPrograms } from '@/hooks/useServices';
-import type { ServiceMaster } from '@/hooks/useServices';
+
+// Components
+import DiabetesHero from '@/components/diabetes-care/DiabetesHero';
+import QuickActions from '@/components/diabetes-care/QuickActions';
+import ConditionSelector from '@/components/diabetes-care/ConditionSelector';
+import SugarLog from '@/components/diabetes-care/SugarLog';
+import VitalsLog from '@/components/diabetes-care/VitalsLog';
+import ProgramList from '@/components/diabetes-care/ProgramList';
+import DiagnosticsGrid from '@/components/diabetes-care/DiagnosticsGrid';
+import CareTeam from '@/components/diabetes-care/CareTeam';
+import DeviceStore from '@/components/diabetes-care/DeviceStore';
+import LifestyleHub from '@/components/diabetes-care/LifestyleHub';
+import FootCare from '@/components/diabetes-care/FootCare';
+import EducationFeed from '@/components/diabetes-care/EducationFeed';
 
 export default function DiabetesCarePage() {
     const router = useRouter();
-    const [search, setSearch] = useState('');
-
-    const { data: services, loading, error } = useDiabetesPrograms();
-
-    const filteredServices = (services || []).filter((s: ServiceMaster) =>
-        !search ||
-        s.name.toLowerCase().includes(search.toLowerCase()) ||
-        s.description?.toLowerCase().includes(search.toLowerCase())
-    );
+    const [selectedCondition, setSelectedCondition] = useState<string | null>(null);
 
     return (
-        <div className="min-h-screen bg-bg-light dark:bg-bg-dark text-slate-900 dark:text-white pb-24 font-sans animate-fade-in">
-            <header className="sticky top-0 z-50 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm shadow-sm border-b border-gray-100 dark:border-gray-800 transition-all">
-                <div className="flex items-center gap-3 px-4 py-3">
-                    <button onClick={() => router.back()} className="flex size-10 shrink-0 items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-                        <span className="material-symbols-outlined text-2xl">arrow_back</span>
+        <div className="min-h-screen bg-[#fafafa] dark:bg-bg-dark text-slate-900 dark:text-white pb-28 font-sans animate-fade-in">
+            {/* Header */}
+            <header className="sticky top-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-b border-slate-100 dark:border-gray-800">
+                <div className="flex items-center gap-3 p-4 max-w-lg mx-auto">
+                    <button onClick={() => router.back()} className="size-10 flex items-center justify-center rounded-full bg-slate-50 dark:bg-gray-800 text-slate-600 transition-transform active:scale-90 hover:bg-slate-100">
+                        <span className="material-symbols-outlined">arrow_back</span>
                     </button>
                     <div className="flex flex-col">
-                        <h1 className="text-xl font-bold tracking-tight leading-none">Diabetes Care</h1>
-                        <p className="text-xs text-gray-500 font-medium">Manage Sugar Levels</p>
+                        <h1 className="text-lg font-black tracking-tight text-slate-900 dark:text-white uppercase leading-none">Diabetes Care</h1>
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-0.5">Control & Reversal</p>
                     </div>
-                </div>
-
-                <div className="px-4 pb-3">
-                    <div className="flex items-center bg-gray-100 dark:bg-gray-800 rounded-2xl px-4 py-2 border border-transparent focus-within:border-primary/30 transition-all">
-                        <span className="material-symbols-outlined text-gray-400 text-xl">search</span>
-                        <input
-                            type="text"
-                            value={search}
-                            onChange={(e) => setSearch(e.target.value)}
-                            placeholder="Search diabetes services..."
-                            className="bg-transparent border-none focus:ring-0 w-full text-sm font-medium ml-2 placeholder:text-gray-400 focus:outline-none"
-                        />
+                    <div className="flex-1"></div>
+                    <div className="size-10 rounded-full bg-slate-50 dark:bg-gray-800 flex items-center justify-center text-slate-600">
+                        <span className="material-symbols-outlined">notifications</span>
                     </div>
                 </div>
             </header>
 
-            <main className="flex-1 px-4 py-4 space-y-4 max-w-lg mx-auto w-full">
-                {loading && (
-                    <div className="flex items-center justify-center py-12">
-                        <div className="animate-spin rounded-full h-8 w-8 border-2 border-primary border-t-transparent"></div>
-                    </div>
-                )}
+            <main className="max-w-lg mx-auto p-4 flex flex-col gap-2">
+                {/* Dashboard Core */}
+                <DiabetesHero />
+                <QuickActions />
 
-                {error && (
-                    <div className="text-center py-8 text-red-500">
-                        <span className="material-symbols-outlined text-4xl mb-2">error</span>
-                        <p className="text-sm">Failed to load services</p>
-                    </div>
-                )}
+                {/* Personalization */}
+                <ConditionSelector selected={selectedCondition} onSelect={setSelectedCondition} />
 
-                {!loading && filteredServices.map((service: ServiceMaster) => (
-                    <div
-                        key={service.id}
-                        onClick={() => router.push(`/home-care/${service.id}`)}
-                        className="group bg-white dark:bg-gray-800 rounded-2xl shadow-sm hover:shadow-lg transition-all overflow-hidden border border-gray-100 dark:border-gray-700 cursor-pointer active:scale-[0.98]"
-                    >
-                        <div className="flex flex-row gap-4 p-4">
-                            <div className="relative size-24 shrink-0 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-xl overflow-hidden flex items-center justify-center">
-                                <span className="material-symbols-outlined text-4xl text-primary/50">monitor_heart</span>
-                            </div>
+                {/* Monitoring Tools */}
+                <SugarLog />
+                <VitalsLog />
 
-                            <div className="flex flex-col justify-between flex-1 min-w-0">
-                                <div>
-                                    <h3 className="text-base font-bold leading-tight line-clamp-1">{service.name}</h3>
-                                    <p className="text-gray-500 dark:text-gray-400 text-xs font-medium mb-1">{service.category}</p>
-                                    <p className="text-gray-600 dark:text-gray-300 text-xs leading-relaxed line-clamp-2">
-                                        {service.description || 'Professional diabetes management service'}
-                                    </p>
-                                </div>
+                {/* Clinical Services */}
+                <ProgramList />
+                <DiagnosticsGrid />
+                <CareTeam />
 
-                                <div className="mt-2 flex items-center justify-between">
-                                    <div className="text-sm font-black text-slate-900 dark:text-white">
-                                        Contact for pricing
-                                    </div>
-                                    <button className="size-8 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-slate-900 dark:text-white">
-                                        <span className="material-symbols-outlined text-lg">chevron_right</span>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                ))}
-
-                {!loading && filteredServices.length === 0 && (
-                    <div className="text-center py-12 flex flex-col items-center gap-4">
-                        <div className="size-20 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-400">
-                            <span className="material-symbols-outlined text-4xl">search_off</span>
-                        </div>
-                        <p className="text-gray-500 font-medium">No services found.</p>
-                    </div>
-                )}
+                {/* Commerce & Lifestyle */}
+                <DeviceStore />
+                <LifestyleHub />
+                <FootCare />
+                <EducationFeed />
             </main>
+
+            {/* Sticky Action Bar */}
+            <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 w-[90%] max-w-md bg-blue-600 text-white py-3.5 px-6 rounded-2xl shadow-xl shadow-blue-200 dark:shadow-none flex items-center justify-between active:scale-[0.98] transition-all cursor-pointer">
+                <div className="flex flex-col">
+                    <span className="text-[10px] font-medium opacity-80 uppercase tracking-wider">Need Help?</span>
+                    <span className="text-sm font-black">Talk to Diabetologist</span>
+                </div>
+                <div className="size-10 rounded-full bg-white/20 flex items-center justify-center">
+                    <span className="material-symbols-outlined">call</span>
+                </div>
+            </div>
         </div>
     );
 }

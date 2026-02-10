@@ -1,156 +1,93 @@
 'use client';
 
-import React, { useState, Suspense } from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useLocationStore } from '@/store/locationStore';
-import { useMedicalScans, useScanSearch } from '@/hooks/useMedicalScans';
-import { ScanCenterSkeleton } from '@/components/ui/Skeletons';
-import { ScanCard } from '@/components/cards/ScanCard';
 import PageHeader from '@/components/ui/PageHeader';
-import Image from 'next/image';
+import { SCANS_CONTENT_MASTER } from '@/data/scans-content';
+import DiagnosticsHero from '@/components/scans/DiagnosticsHero';
+import ModalityGrid from '@/components/scans/ModalityGrid';
+import HealthPackages from '@/components/scans/HealthPackages';
+import DoctorRecommended from '@/components/scans/DoctorRecommended';
 
-const CATEGORIES = [
-    { label: 'All', icon: 'grid_view' },
-    { label: 'MRI', icon: 'radiology' },
-    { label: 'CT Scan', icon: 'scanner' },
-    { label: 'X-Ray', icon: 'skeleton' },
-    { label: 'Ultrasound', icon: 'water_drop' }
-];
-
-function ScansContent() {
+export default function ScansPage() {
     const router = useRouter();
-    const { city } = useLocationStore();
-    const [selectedCategory, setSelectedCategory] = useState('All');
-    const [search, setSearch] = useState('');
+    const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
-    // Real Database Fetching
-    const { data: allScans, loading: listLoading } = useMedicalScans();
-    const { data: searchResults, loading: searchLoading } = useScanSearch(search);
-
-    const isLoading = listLoading || (search.length >= 2 && searchLoading);
-    const scanList = (search.length >= 2 ? searchResults : allScans) || [];
-
-    const filteredScans = scanList.filter((scan: any) => {
-        const matchesCategory = selectedCategory === 'All' || scan.category === selectedCategory;
-        return matchesCategory;
-    });
+    const filteredTests = selectedCategory
+        ? SCANS_CONTENT_MASTER.popularTests.filter(t =>
+            t.category === SCANS_CONTENT_MASTER.categories.find(c => c.id === selectedCategory)?.label)
+        : SCANS_CONTENT_MASTER.popularTests;
 
     return (
-        <div className="min-h-screen bg-surface-50 dark:bg-surface-950 pb-32 font-sans text-slate-900 dark:text-white overflow-x-hidden">
+        <div className="min-h-screen bg-surface-50 dark:bg-surface-950 pb-32 font-sans text-slate-900 dark:text-white animate-fade-in">
             <PageHeader
-                title="Medical Scans"
+                title="Diagnostics"
                 showSearch={true}
-                searchValue={search}
-                onSearchChange={setSearch}
-                searchPlaceholder="Search MRI, CT scan..."
+                searchPlaceholder="Search MRI, CT, Blood Tests..."
                 showLocation={true}
                 className="lg:top-20"
             />
 
-            {/* Categories & Main Content */}
             <main className="max-w-7xl mx-auto w-full p-4 space-y-6">
+                <DiagnosticsHero />
+                <DoctorRecommended />
 
-                {/* Scrollable Category Chips */}
-                <div className="flex gap-3 overflow-x-auto no-scrollbar pb-2">
-                    {CATEGORIES.map((cat) => (
-                        <button
-                            key={cat.label}
-                            onClick={() => setSelectedCategory(cat.label)}
-                            className={`flex h-10 shrink-0 items-center justify-center gap-2 rounded-full px-5 active:scale-95 transition-all ${selectedCategory === cat.label
-                                ? 'bg-primary text-white shadow-lg shadow-primary/30 ring-2 ring-primary/20'
-                                : 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-slate-600 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-gray-700'
-                                }`}
-                        >
-                            <span className="material-symbols-outlined text-lg">{cat.icon}</span>
-                            <span className="text-[11px] font-black uppercase tracking-wider">{cat.label}</span>
-                        </button>
-                    ))}
-                </div>
+                <ModalityGrid
+                    onSelect={(id) => setSelectedCategory(selectedCategory === id ? null : id)}
+                    selectedId={selectedCategory}
+                />
 
-                {/* Filter Summary */}
-                <div className="flex justify-between items-center px-1">
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                        {isLoading ? 'Searching...' : `${filteredScans.length} Centers Found`}
-                    </p>
-                    <button className="flex items-center gap-1 text-primary font-black text-[10px] uppercase tracking-widest bg-primary/10 px-3 py-1.5 rounded-lg active:bg-primary/20 hover:bg-primary/20 transition-colors">
-                        <span className="material-symbols-outlined text-sm">sort</span>
-                        Sort
-                    </button>
-                </div>
+                <HealthPackages />
 
-                {/* Grid Content */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {isLoading ? (
-                        Array(6).fill(0).map((_, i) => <ScanCenterSkeleton key={i} />)
-                    ) : (
-                        <>
-                            {/* Promo Banner Integrated into Grid */}
-                            {!search && selectedCategory === 'All' && (
-                                <div className="col-span-1 md:col-span-2 lg:col-span-2 bg-gradient-to-br from-[#0f172a] to-[#334155] dark:from-[#000] dark:to-[#1e293b] rounded-[2rem] shadow-xl overflow-hidden p-6 relative min-h-[220px] border border-white/10 group cursor-pointer">
-                                    <div className="absolute right-0 top-0 size-64 bg-blue-500/10 rounded-full blur-3xl -mr-20 -mt-20 group-hover:bg-blue-500/20 transition-colors"></div>
-                                    <div className="relative z-10 flex flex-row items-center justify-between gap-6 h-full">
-                                        <div className="flex flex-col justify-center flex-1">
-                                            <div className="bg-emerald-500/20 backdrop-blur-md w-fit px-3 py-1 rounded-lg mb-3 border border-emerald-500/30">
-                                                <p className="text-emerald-400 font-black text-[9px] uppercase tracking-[0.2em]">Health Checkup</p>
-                                            </div>
-                                            <h3 className="text-white text-2xl font-black mb-1 leading-tight tracking-tight">Full Body<br />Diagnostic</h3>
-                                            <p className="text-slate-400 text-[10px] mb-5 font-bold uppercase tracking-widest">65+ Critical Markers</p>
-                                            <div className="flex items-baseline gap-2">
-                                                <span className="text-white font-black text-3xl tracking-tighter">₹999</span>
-                                                <span className="text-slate-500 line-through text-sm font-bold">₹2,499</span>
-                                            </div>
-                                        </div>
-                                        <div className="size-32 bg-white rounded-2xl shadow-2xl shrink-0 overflow-hidden relative rotate-3 group-hover:rotate-6 transition-transform duration-500 border-4 border-white/10 hidden sm:block">
-                                            <Image
-                                                src="https://images.unsplash.com/photo-1579152276506-44439679bb4c?auto=format&fit=crop&q=80&w=400"
-                                                alt="Lab Test"
-                                                fill
-                                                className="object-cover"
-                                            />
-                                        </div>
-                                    </div>
-                                    <button
-                                        onClick={() => router.push('/lab-tests')}
-                                        className="w-full sm:w-auto mt-6 bg-white text-slate-900 hover:bg-blue-50 active:scale-95 transition-all font-black h-12 rounded-xl text-[10px] uppercase tracking-widest shadow-lg flex items-center justify-center gap-2 sm:px-8"
-                                    >
-                                        View Package
-                                        <span className="material-symbols-outlined text-base">arrow_forward</span>
-                                    </button>
-                                </div>
-                            )}
-
-                            {filteredScans.map((scan: any) => (
-                                <ScanCard key={scan.id} scan={scan} onClick={() => router.push(`/scans/${scan.id}`)} />
-                            ))}
-                        </>
-                    )}
-                </div>
-
-                {!isLoading && filteredScans.length === 0 && (
-                    <div className="flex flex-col items-center justify-center py-20 opacity-50">
-                        <span className="material-symbols-outlined text-6xl mb-2">radiology</span>
-                        <p className="font-bold text-sm">No scans found</p>
+                {/* Popular Tests Listing */}
+                <section>
+                    <div className="flex justify-between items-end mb-4 px-1">
+                        <div>
+                            <h3 className="text-xl font-black text-slate-900 dark:text-white leading-none">
+                                {selectedCategory ? `${SCANS_CONTENT_MASTER.categories.find(c => c.id === selectedCategory)?.label} Tests` : 'Popular Tests'}
+                            </h3>
+                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide mt-1">
+                                {filteredTests.length} Tests Available
+                            </p>
+                        </div>
+                        {selectedCategory && (
+                            <button
+                                onClick={() => setSelectedCategory(null)}
+                                className="text-xs font-black text-red-500 uppercase tracking-widest hover:underline"
+                            >
+                                Clear Filter
+                            </button>
+                        )}
                     </div>
-                )}
-            </main>
 
-            {/* Floating Filter Button (FAB) */}
-            <button className="fixed bottom-6 right-5 z-40 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-full pl-5 pr-6 py-4 shadow-float flex items-center gap-3 font-black text-[10px] uppercase tracking-widest hover:scale-105 active:scale-95 transition-all lg:hidden">
-                <span className="material-symbols-outlined text-lg">tune</span>
-                Filters
-            </button>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {filteredTests.map((test) => (
+                            <div
+                                key={test.id}
+                                onClick={() => router.push(`/scans/${test.id}`)}
+                                className="bg-white dark:bg-gray-800 p-4 rounded-2xl border border-slate-100 dark:border-gray-700 flex gap-4 cursor-pointer hover:shadow-lg transition-all hover:-translate-y-1 group"
+                            >
+                                <div className="size-20 rounded-xl bg-slate-50 dark:bg-gray-700 shrink-0 overflow-hidden relative">
+                                    <img src={test.image} alt={test.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    <div className="flex justify-between items-start mb-1">
+                                        <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">{test.category}</span>
+                                        <span className="bg-green-50 text-green-600 text-[9px] font-black px-1.5 py-0.5 rounded uppercase">{test.discount}</span>
+                                    </div>
+                                    <h4 className="text-sm font-black text-slate-900 dark:text-white leading-tight mb-2 truncate group-hover:text-indigo-600 transition-colors">{test.name}</h4>
+
+                                    <div className="flex items-baseline gap-2 mt-auto">
+                                        <span className="text-lg font-black text-slate-900 dark:text-white">₹{test.price}</span>
+                                        <span className="text-xs font-bold text-slate-400 line-through">₹{test.mrp}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </section>
+            </main>
         </div>
     );
 }
 
-export default function ScansPage() {
-    return (
-        <Suspense fallback={
-            <div className="min-h-screen bg-bg-light dark:bg-bg-dark flex items-center justify-center">
-                <span className="material-symbols-outlined text-4xl text-slate-300 animate-spin">sync</span>
-            </div>
-        }>
-            <ScansContent />
-        </Suspense>
-    );
-}

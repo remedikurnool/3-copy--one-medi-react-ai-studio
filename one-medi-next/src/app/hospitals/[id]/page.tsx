@@ -3,6 +3,7 @@
 import React from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useHospital } from '@/hooks/useHospitals';
+import PageHeader from '@/components/ui/PageHeader';
 
 export default function HospitalDetailPage() {
     const router = useRouter();
@@ -45,16 +46,18 @@ export default function HospitalDetailPage() {
     };
 
     return (
-        <div className="min-h-screen bg-bg-light dark:bg-bg-dark text-slate-900 dark:text-white pb-32 font-sans relative">
-            <header className="sticky top-0 z-50 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md border-b border-gray-100 dark:border-gray-800 p-4 flex items-center justify-between">
-                <button onClick={() => router.back()} className="size-10 flex items-center justify-center rounded-full bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-                    <span className="material-symbols-outlined text-2xl">arrow_back</span>
-                </button>
-                <h1 className="text-lg font-bold">Hospital Details</h1>
-                <button className="size-10 flex items-center justify-center rounded-full bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-                    <span className="material-symbols-outlined text-2xl">share</span>
-                </button>
-            </header>
+        <div className="min-h-screen bg-surface-50 dark:bg-surface-950 text-slate-900 dark:text-white pb-32 font-sans relative">
+            <PageHeader
+                title="Hospital Details"
+                showSearch={false}
+                showLocation={false}
+                className="lg:top-20"
+                actions={
+                    <button className="size-10 flex items-center justify-center rounded-full bg-surface-100 dark:bg-surface-800 hover:bg-surface-200 dark:hover:bg-surface-700 transition-colors">
+                        <span className="material-symbols-outlined text-2xl">share</span>
+                    </button>
+                }
+            />
 
             <main className="flex flex-col animate-fade-in">
                 <div className="relative h-64 w-full">
@@ -75,7 +78,7 @@ export default function HospitalDetailPage() {
                 </div>
 
                 {/* Stats Bento Grid */}
-                <div className="p-4 grid grid-cols-2 lg:grid-cols-4 gap-3 bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800">
+                <div className="p-4 grid grid-cols-2 lg:grid-cols-4 gap-3 bg-white dark:bg-surface-900 border-b border-surface-200 dark:border-surface-800">
                     <div className="p-4 rounded-2xl bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-900/30 flex flex-col items-center text-center gap-1">
                         <span className="material-symbols-outlined text-blue-600">bed</span>
                         <span className="text-[10px] font-black text-blue-400 uppercase">Total Beds</span>
@@ -99,9 +102,9 @@ export default function HospitalDetailPage() {
                 </div>
 
                 <div className="p-4 space-y-6">
-                    <section className="bg-white dark:bg-gray-800 p-6 rounded-[2rem] shadow-sm border border-gray-100 dark:border-gray-700">
+                    <section className="bg-white dark:bg-surface-900 p-6 rounded-[2rem] shadow-sm border border-surface-200 dark:border-surface-800">
                         <h3 className="text-lg font-black mb-3">About the Hospital</h3>
-                        <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed font-medium">
+                        <p className="text-slate-600 dark:text-slate-300 text-sm leading-relaxed font-medium">
                             {extendedData.description}
                         </p>
                         <div className="flex gap-3 mt-5">
@@ -118,17 +121,17 @@ export default function HospitalDetailPage() {
                         <h3 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] mb-4 ml-1">Specialties & Departments</h3>
                         <div className="grid grid-cols-2 gap-3">
                             {extendedData.departments.map(dept => (
-                                <div key={dept} className="flex items-center gap-3 p-4 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm group hover:border-primary transition-colors cursor-pointer">
-                                    <div className="size-10 rounded-xl bg-gray-50 dark:bg-gray-700 flex items-center justify-center text-gray-400 group-hover:text-primary transition-colors">
+                                <div key={dept} className="flex items-center gap-3 p-4 bg-white dark:bg-surface-900 rounded-2xl border border-surface-200 dark:border-surface-800 shadow-sm group hover:border-primary transition-colors cursor-pointer">
+                                    <div className="size-10 rounded-xl bg-surface-50 dark:bg-surface-800 flex items-center justify-center text-slate-400 group-hover:text-primary transition-colors">
                                         <span className="material-symbols-outlined">health_metrics</span>
                                     </div>
-                                    <span className="text-sm font-bold text-slate-700 dark:text-gray-200">{dept}</span>
+                                    <span className="text-sm font-bold text-slate-700 dark:text-slate-200">{dept}</span>
                                 </div>
                             ))}
                         </div>
                     </section>
 
-                    <section className="bg-white dark:bg-gray-800 p-6 rounded-[2.5rem] border border-gray-100 dark:border-gray-700 shadow-sm">
+                    <section className="bg-white dark:bg-surface-900 p-6 rounded-[2.5rem] border border-surface-200 dark:border-surface-800 shadow-sm">
                         <h3 className="text-lg font-black mb-4">Cashless Insurance Partners</h3>
                         <div className="flex flex-wrap gap-2">
                             {extendedData.insurancePartners.map(partner => (
@@ -154,7 +157,7 @@ export default function HospitalDetailPage() {
                 </div>
             </main>
 
-            <footer className="fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 p-4 pb-6 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
+            <footer className="fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-surface-900 border-t border-surface-200 dark:border-surface-800 p-4 pb-6 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
                 <div className="max-w-md mx-auto flex gap-4">
                     <button
                         onClick={() => window.open(`tel:${extendedData.emergencyNumber}`)}

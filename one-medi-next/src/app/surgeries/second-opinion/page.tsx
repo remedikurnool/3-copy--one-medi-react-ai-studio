@@ -39,7 +39,7 @@ function SecondOpinionForm() {
     };
 
     return (
-        <div className="min-h-screen bg-bg-light dark:bg-bg-dark text-slate-900 dark:text-white pb-24 font-sans">
+        <div className="min-h-screen bg-surface-50 dark:bg-surface-950 text-slate-900 dark:text-white pb-24 font-sans">
             <PageHeader
                 title="Second Opinion"
                 subtitle={`Step ${step} of 4`}
