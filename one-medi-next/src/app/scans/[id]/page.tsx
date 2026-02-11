@@ -9,12 +9,13 @@ import LabPartnerList from '@/components/scans/LabPartnerList';
 import UploadPrescription from '@/components/scans/UploadPrescription';
 import { useCartStore } from '@/store/cartStore';
 
-export default function ScanDetailPage({ params }: { params: { id: string } }) {
+export default function ScanDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const router = useRouter();
     const { addToCart } = useCartStore();
+    const resolvedParams = React.use(params);
 
     // Use mock data or first item as fallback
-    const test = SCANS_CONTENT_MASTER.popularTests.find(t => t.id === params.id) || SCANS_CONTENT_MASTER.popularTests[0];
+    const test = SCANS_CONTENT_MASTER.popularTests.find(t => t.id === resolvedParams.id) || SCANS_CONTENT_MASTER.popularTests[0];
 
     const handleAddToCart = () => {
         addToCart({

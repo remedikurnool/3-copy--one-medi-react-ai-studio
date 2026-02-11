@@ -7,12 +7,13 @@ import { WELLNESS_CONTENT_MASTER } from '@/data/wellness-content';
 import { useCartStore } from '@/store/cartStore';
 import ProgramCurriculum from '@/components/wellness/ProgramCurriculum';
 
-export default function WellnessDetailPage({ params }: { params: { id: string } }) {
+export default function WellnessDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const router = useRouter();
     const { addToCart } = useCartStore();
+    const resolvedParams = React.use(params);
 
     // Use mock data or first item as fallback
-    const program = WELLNESS_CONTENT_MASTER.programs.find(p => p.id === params.id) || WELLNESS_CONTENT_MASTER.programs[0];
+    const program = WELLNESS_CONTENT_MASTER.programs.find(p => p.id === resolvedParams.id) || WELLNESS_CONTENT_MASTER.programs[0];
 
     const handleAddToCart = () => {
         addToCart({

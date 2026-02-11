@@ -10,13 +10,14 @@ import SafetyStatus from '@/components/medicines/SafetyStatus';
 import SimilarProducts from '@/components/medicines/SimilarProducts';
 import { useCartStore } from '@/store/cartStore';
 
-export default function MedicineDetailPage({ params }: { params: { id: string } }) {
+export default function MedicineDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const router = useRouter();
     const { addToCart } = useCartStore();
+    const resolvedParams = React.use(params);
 
     // In a real app, fetch based on params.id. Here we use the first mock product for demo.
     // Or filter from master list.
-    const product = MEDICINE_CONTENT_MASTER.products.find(p => p.id === params.id) || MEDICINE_CONTENT_MASTER.products[0];
+    const product = MEDICINE_CONTENT_MASTER.products.find(p => p.id === resolvedParams.id) || MEDICINE_CONTENT_MASTER.products[0];
 
     const handleAddToCart = () => {
         addToCart({

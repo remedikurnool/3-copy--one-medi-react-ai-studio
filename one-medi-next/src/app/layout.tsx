@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Lexend, Manrope } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/components/AuthProvider";
-import { Layout } from "@/components/Layout";
+import { Layout as MainLayout } from "@/components/MainLayout";
 
 const lexend = Lexend({
   variable: "--font-lexend",
@@ -34,9 +34,9 @@ export default function RootLayout({
         className={`${lexend.variable} ${manrope.variable} antialiased bg-surface-50 dark:bg-surface-950 text-slate-900 dark:text-slate-100 selection:bg-primary/20`}
       >
         <AuthProvider>
-          <Layout>
+          <MainLayout>
             {children}
-          </Layout>
+          </MainLayout>
         </AuthProvider>
       </body>
     </html>
