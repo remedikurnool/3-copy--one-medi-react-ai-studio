@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { usePathname } from 'next/navigation';
 import {
   TopOfferStrip,
   SmartHeader,
@@ -11,6 +12,9 @@ import {
 import { FlyingCartAnimation } from './ui/FlyingCartAnimation';
 
 export const Layout = ({ children }: { children?: React.ReactNode }) => {
+  const pathname = usePathname();
+  const isHomePage = pathname === '/';
+
   return (
     <div className="min-h-screen bg-surface-50 dark:bg-surface-950 font-sans flex flex-col transition-colors duration-300 relative selection:bg-primary/20 selection:text-primary-900">
 
@@ -21,9 +25,13 @@ export const Layout = ({ children }: { children?: React.ReactNode }) => {
       </div>
 
       <div className="relative z-10 flex flex-col min-h-screen">
-        <TopOfferStrip />
-        <SmartHeader />
-        <MegaMenu />
+        {isHomePage && (
+          <>
+            <TopOfferStrip />
+            <SmartHeader />
+            <MegaMenu />
+          </>
+        )}
 
         <main className="flex-1 w-full max-w-[1920px] mx-auto overflow-x-hidden">
           {children}
