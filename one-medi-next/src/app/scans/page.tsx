@@ -13,9 +13,12 @@ export default function ScansPage() {
     const router = useRouter();
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
-    const filteredTests = selectedCategory
-        ? SCANS_CONTENT_MASTER.popularTests.filter(t =>
-            t.category === SCANS_CONTENT_MASTER.categories.find(c => c.id === selectedCategory)?.label)
+    const selectedCategoryLabel = selectedCategory
+        ? SCANS_CONTENT_MASTER.categories.find(c => c.id === selectedCategory)?.label
+        : null;
+
+    const filteredTests = selectedCategoryLabel
+        ? SCANS_CONTENT_MASTER.popularTests.filter(t => t.category === selectedCategoryLabel)
         : SCANS_CONTENT_MASTER.popularTests;
 
     return (
@@ -73,7 +76,9 @@ export default function ScansPage() {
                                 <div className="flex-1 min-w-0">
                                     <div className="flex justify-between items-start mb-1">
                                         <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">{test.category}</span>
-                                        <span className="bg-green-50 text-green-600 text-[9px] font-black px-1.5 py-0.5 rounded uppercase">{test.discount}</span>
+                                        {test.discountPercent && test.discountPercent > 0 && (
+                                            <span className="bg-green-50 text-green-600 text-[9px] font-black px-1.5 py-0.5 rounded uppercase">{test.discountPercent}% OFF</span>
+                                        )}
                                     </div>
                                     <h4 className="text-sm font-black text-slate-900 dark:text-white leading-tight mb-2 truncate group-hover:text-indigo-600 transition-colors">{test.name}</h4>
 
@@ -90,4 +95,3 @@ export default function ScansPage() {
         </div>
     );
 }
-

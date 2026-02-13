@@ -38,12 +38,12 @@ const getSearchResults = (query: string): SearchResult[] => {
 
   // 2. Doctors
   DOCTORS.forEach(d => {
-    if (d.name.toLowerCase().includes(q) || d.specialty.toLowerCase().includes(q)) {
+    if (d.name.toLowerCase().includes(q) || d.specialization.toLowerCase().includes(q)) {
       results.push({
         id: d.id,
         name: d.name,
         type: 'doctor',
-        subText: `Doctor • ${d.specialty}`,
+        subText: `Doctor • ${d.specialization}`,
         image: d.image,
         url: `/doctors/${d.id}`
       });
@@ -57,7 +57,7 @@ const getSearchResults = (query: string): SearchResult[] => {
         id: l.id,
         name: l.name,
         type: 'lab',
-        subText: `Lab Test • ${l.parameterCount} Parameters`,
+        subText: `Lab Test • ${l.parametersIncluded?.length || 0} Parameters`,
         url: `/lab-tests/${l.id}`
       });
     }

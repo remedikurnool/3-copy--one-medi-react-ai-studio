@@ -2,9 +2,9 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useDoctors, useDoctorSearch } from '@/hooks/useDoctors'; // Fixed path
-import { DoctorCardSkeleton } from '@/components/ui/Skeletons'; // Fixed path
-import { DoctorCard } from '@/components/cards/DoctorCard'; // Fixed path
+import { useDoctors, useDoctorSearch } from '@/hooks/useDoctors';
+import { DoctorCardSkeleton } from '@/components/ui/Skeletons';
+import { DoctorCard } from '@/components/cards/DoctorCard';
 import PageHeader from '@/components/ui/PageHeader';
 import { useLocationStore } from '@/store/locationStore';
 import LocationModal from '@/components/ui/LocationModal';
@@ -24,7 +24,7 @@ export default function DoctorListPage() {
     const isLoading = loadingAll || (search.length >= 2 && loadingSearch);
     const displayDoctors = search.length >= 2 ? searchResults : allDoctors;
     const filteredDoctors = (displayDoctors || []).filter(doc => {
-        return selectedSpecialty === 'All' || doc.specialty === selectedSpecialty;
+        return selectedSpecialty === 'All' || doc.specialization === selectedSpecialty;
     });
 
     return (
@@ -45,12 +45,6 @@ export default function DoctorListPage() {
 
             {/* Specialty Filter */}
             <div className="sticky top-[136px] md:top-[88px] z-30 bg-surface-50/95 dark:bg-surface-950/95 backdrop-blur-sm py-4 border-b border-surface-200 dark:border-surface-800 mb-6">
-                {/* 
-                    Note: Top offset depends on Header height. 
-                    Header is approx 60px (top bar) + 72px (search container) = 132px on mobile with search.
-                    Actually PageHeader header `div` is p-4 (approx 56px) + search container (48+16 = 64px). Total ~120px. 
-                    Let's adjust top to roughly match.
-                 */}
                 <div className="flex gap-2 px-4 max-w-7xl mx-auto overflow-x-auto no-scrollbar scroll-pl-4">
                     {specialties.map(specialty => (
                         <button

@@ -11,10 +11,10 @@ export default function PhysiotherapyPage() {
 
     const filters = ['All', 'Ortho Care', 'Neuro Care', 'Equipment', 'Post-Op', 'Sports Rehab'];
 
-    const filteredServices = PHYSIO_SERVICES.filter(service => {
-        const matchesSearch = service.title.toLowerCase().includes(search.toLowerCase()) ||
+    const filteredServices = (PHYSIO_SERVICES as any[]).filter(service => {
+        const matchesSearch = service.name.toLowerCase().includes(search.toLowerCase()) ||
             service.description.toLowerCase().includes(search.toLowerCase()) ||
-            service.conditions?.some(c => c.toLowerCase().includes(search.toLowerCase()));
+            service.conditions?.some((c: string) => c.toLowerCase().includes(search.toLowerCase()));
 
         const matchesFilter = activeFilter === 'All' || service.subCategory === activeFilter;
 
@@ -59,8 +59,8 @@ export default function PhysiotherapyPage() {
                             key={filter}
                             onClick={() => setActiveFilter(filter)}
                             className={`flex h-8 shrink-0 items-center justify-center px-4 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${activeFilter === filter
-                                    ? 'bg-primary text-white shadow-md'
-                                    : 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-slate-600 dark:text-slate-300'
+                                ? 'bg-primary text-white shadow-md'
+                                : 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-slate-600 dark:text-slate-300'
                                 }`}
                         >
                             {filter}
@@ -109,13 +109,13 @@ export default function PhysiotherapyPage() {
 
                             <div className="flex flex-col p-5 gap-3">
                                 <div className="flex flex-col gap-1">
-                                    <h3 className="text-xl font-black leading-tight text-slate-900 dark:text-white tracking-tight">{service.title}</h3>
+                                    <h3 className="text-xl font-black leading-tight text-slate-900 dark:text-white tracking-tight">{service.name}</h3>
                                     <p className="text-gray-500 dark:text-gray-400 text-xs leading-relaxed line-clamp-2 font-medium">{service.description}</p>
 
                                     {/* Conditions Tags */}
                                     {service.conditions && (
                                         <div className="flex gap-2 mt-2 overflow-hidden">
-                                            {service.conditions.slice(0, 3).map(c => (
+                                            {service.conditions.slice(0, 3).map((c: string) => (
                                                 <span key={c} className="text-[9px] bg-slate-50 dark:bg-slate-700 text-slate-500 dark:text-slate-400 px-2 py-0.5 rounded border border-slate-100 dark:border-slate-600 font-bold uppercase tracking-tighter truncate">
                                                     {c}
                                                 </span>

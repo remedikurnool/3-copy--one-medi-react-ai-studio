@@ -53,24 +53,19 @@ export default function LabTestDetailPage() {
     // Try to get from Supabase
     const { data: dbTest, loading } = useLabTest(id);
 
-    // Mapping DB fields to UI fields
-    // Note: hook already returns LabTest object, but we need to augment with mock variants
-    // and ensure all fields match legacy expectations
-    const test = dbTest ? {
-        ...dbTest,
-        // hook provides: sampleType, fastingRequired, preparationInstructions, reportTime, variants=[]
-        // we need to mock variants logic
-        variants: [{
-            centerId: 'c1',
-            centerName: 'One Medi Partner Lab',
-            centerImage: 'https://images.unsplash.com/photo-1579152276506-0d60c41098ed?auto=format&fit=crop&q=80',
-            price: dbTest.price,
-            mrp: Math.round(dbTest.price * 1.5),
-            reportTime: dbTest.reportTime || '24 Hours',
-            distance: '0.8 km',
-            rating: 4.8
-        }]
-    } : null;
+    // Mock Variants since LabTest doesn't support them natively yet in DB
+    const variants = dbTest ? [{
+        centerId: 'c1',
+        centerName: 'One Medi Partner Lab',
+        centerImage: 'https://images.unsplash.com/photo-1579152276506-0d60c41098ed?auto=format&fit=crop&q=80',
+        price: dbTest.finalPrice,
+        mrp: dbTest.marketPrice,
+        reportTime: dbTest.turnaroundTime || '24 Hours',
+        distance: '0.8 km',
+        rating: 4.8
+    }] : [];
+
+    const test = dbTest ? { ...dbTest, variants } : null;
 
     const addToCart = useCartStore((state) => state.addToCart);
     const cartItemsCount = useCartStore((state) => state.items.length);
@@ -94,9 +89,9 @@ export default function LabTestDetailPage() {
 
     if (!test) return <div className="p-8 text-center text-slate-500">Test not found</div>;
 
-    const currentPrice = selectedVariant ? selectedVariant.price : test.price;
-    const currentMrp = selectedVariant ? selectedVariant.mrp : test.mrp;
-    const currentReportTime = selectedVariant ? selectedVariant.reportTime : test.reportTime;
+    const currentPrice = selectedVariant ? selectedVariant.price : test.finalPrice;
+    const currentMrp = selectedVariant ? selectedVariant.mrp : test.marketPrice;
+    const currentReportTime = selectedVariant ? selectedVariant.reportTime : test.turnaroundTime;
     const totalAmount = homeCollection ? currentPrice + 50 : currentPrice;
 
     const handleBookNow = () => {
@@ -107,7 +102,7 @@ export default function LabTestDetailPage() {
             price: totalAmount,
             mrp: currentMrp,
             qty: 1,
-            discount: test.discount
+            discount: test.discountPercent ? `${test.discountPercent}% OFF` : undefined
         });
         router.push('/cart');
     };
@@ -146,7 +141,9 @@ export default function LabTestDetailPage() {
                             <div className="mt-2 flex items-end gap-3">
                                 <span className="text-3xl font-bold">₹{currentPrice}</span>
                                 <span className="mb-1 text-lg text-blue-100 line-through decoration-blue-200">₹{currentMrp}</span>
-                                <span className="mb-1 rounded-md bg-white px-2 py-0.5 text-sm font-bold text-primary">{test.discount}</span>
+                                {test.discountPercent && test.discountPercent > 0 && (
+                                    <span className="mb-1 rounded-md bg-white px-2 py-0.5 text-sm font-bold text-primary">{test.discountPercent}% OFF</span>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -158,7 +155,7 @@ export default function LabTestDetailPage() {
                         <InfoCard icon="schedule" label="Report in" value={currentReportTime || "24 Hours"} color="bg-blue-50 text-primary" darkColor="dark:bg-blue-900/20 dark:text-blue-400" />
                         <InfoCard icon="bloodtype" label="Sample" value={test.sampleType || "Blood"} color="bg-red-50 text-red-500" darkColor="dark:bg-red-900/20 dark:text-red-400" />
                         <InfoCard icon="no_food" label="Fasting" value={test.fastingRequired ? "Required" : "Not Required"} color="bg-amber-50 text-amber-600" darkColor="dark:bg-amber-900/20 dark:text-amber-400" />
-                        <InfoCard icon="science" label="Department" value={test.department || "Pathology"} color="bg-emerald-50 text-emerald-600" darkColor="dark:bg-emerald-900/20 dark:text-emerald-400" />
+                        <InfoCard icon="science" label="Department" value={test.category || "Pathology"} color="bg-emerald-50 text-emerald-600" darkColor="dark:bg-emerald-900/20 dark:text-emerald-400" />
                     </div>
                 </div>
 
@@ -224,22 +221,24 @@ export default function LabTestDetailPage() {
 
                 {/* Accordions */}
                 <div className="flex flex-col gap-3 px-4 pb-4">
-                    {test.parameters && test.parameters.length > 0 && (
-                        <DetailsAccordion title={`Parameters Included (${test.parameters.length})`} defaultOpen badge="DETAILED">
+                    {test.parametersIncluded && test.parametersIncluded.length > 0 && (
+                        <DetailsAccordion title={`Parameters Included (${test.parametersIncluded.length})`} defaultOpen badge="DETAILED">
                             <ul className="space-y-3">
-                                {test.parameters.map((param: string, idx: number) => (
+                                {test.parametersIncluded.map((param: string, idx: number) => (
                                     <ParameterItem key={idx} name={param} />
                                 ))}
                             </ul>
                         </DetailsAccordion>
                     )}
 
-                    <DetailsAccordion title="Preparation Instructions" defaultOpen={!test.parameters}>
-                        <p className="whitespace-pre-line">{test.preparationInstructions}</p>
-                    </DetailsAccordion>
+                    {(test.prerequisites || test.preparationInstructions) && (
+                        <DetailsAccordion title="Preparation Instructions" defaultOpen={!test.parametersIncluded}>
+                            <p className="whitespace-pre-line">{test.prerequisites || test.preparationInstructions}</p>
+                        </DetailsAccordion>
+                    )}
 
                     <DetailsAccordion title="About this Test">
-                        <p>This package is designed to screen for common health conditions. It includes detailed analysis of parameters to help diagnose or monitor your health status effectively.</p>
+                        <p>{test.description}</p>
                     </DetailsAccordion>
                 </div>
             </main>

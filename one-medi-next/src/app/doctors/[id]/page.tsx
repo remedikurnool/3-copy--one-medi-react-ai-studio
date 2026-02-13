@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useDoctor } from '../../../hooks/useDoctors';
 import PrescriptionUpload from '../../../components/ui/PrescriptionUpload';
 import PageHeader from '@/components/ui/PageHeader';
+import { Doctor } from '@/types';
 
 export default function DoctorProfilePage() {
     const router = useRouter();
@@ -18,21 +19,45 @@ export default function DoctorProfilePage() {
     const [prescription, setPrescription] = useState<string | null>(null);
 
     // Default variants - mapped doctor object already has standardized fields
-    const defaultVariants = doctor ? [
-        { type: 'Clinic Visit', price: doctor.fee, icon: 'location_on', duration: '30 mins', nextSlot: 'Tomorrow, 10:30 AM' },
-        { type: 'Video Consult', price: Math.round(doctor.fee * 0.8), icon: 'videocam', duration: '20 mins', nextSlot: 'Today, 06:15 PM' }
-    ] : [];
+    const defaultVariants = useMemo(() => {
+        if (!doctor) return [];
+
+        const variants = [
+            {
+                type: 'Clinic Visit',
+                price: doctor.consultationFee,
+                icon: 'location_on',
+                duration: `${doctor.consultationDurationMinutes} mins`,
+                nextSlot: 'Tomorrow, 10:30 AM'
+            }
+        ];
+
+        if (doctor.availableOnline) {
+            variants.push({
+                type: 'Video Consult',
+                price: Math.round(doctor.consultationFee * 0.8),
+                icon: 'videocam',
+                duration: '20 mins',
+                nextSlot: 'Today, 06:15 PM'
+            });
+        }
+
+        return variants;
+    }, [doctor]);
 
     // Update selected variant when doctor loads
     useEffect(() => {
         if (defaultVariants.length > 0) {
             setSelectedType(defaultVariants[0].type);
         }
-    }, [doctor]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [defaultVariants]);
 
     const handleBooking = () => {
+        // Safe check for doctor
+        if (!doctor) return;
+
         const currentVariant = defaultVariants.find((v: any) => v.type === selectedType);
-        if (!currentVariant || !doctor) return;
+        if (!currentVariant) return;
 
         const queryParams = new URLSearchParams({
             doctorId: doctor.id,
@@ -55,7 +80,7 @@ export default function DoctorProfilePage() {
 
     if (!doctor) return <div className="p-8 text-center text-slate-500">Doctor not found</div>;
 
-    const currentVariant = defaultVariants.find((v: any) => v.type === selectedType) || { price: doctor.fee, nextSlot: 'Tomorrow', type: 'Clinic Visit' };
+    const currentVariant = defaultVariants.find((v: any) => v.type === selectedType) || { price: doctor.consultationFee, nextSlot: 'Tommorrow', type: 'Clinic Visit' };
 
     return (
         <div className="min-h-screen bg-surface-50 dark:bg-surface-950 pb-24 font-sans text-slate-900 dark:text-white">
@@ -92,9 +117,9 @@ export default function DoctorProfilePage() {
                     </div>
                     <div className="flex flex-col items-center justify-center text-center">
                         <h1 className="text-2xl font-black leading-tight tracking-tight text-slate-900 dark:text-white">{doctor.name}</h1>
-                        <p className="text-slate-500 dark:text-slate-400 text-base font-medium mt-1">{doctor.specialty}, {doctor.qualification}</p>
+                        <p className="text-slate-500 dark:text-slate-400 text-base font-medium mt-1">{doctor.specialization}, {doctor.qualification}</p>
                         <div className="flex items-center gap-2 mt-2">
-                            <span className="px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-900/30 text-primary text-xs font-bold border border-blue-100 dark:border-blue-800">Reg: APMC-48291</span>
+                            <span className="px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-900/30 text-primary text-xs font-bold border border-blue-100 dark:border-blue-800">Reg: {doctor.registrationNumber}</span>
                             <span className="px-2 py-0.5 rounded-full bg-green-50 dark:bg-green-900/30 text-secondary text-xs font-bold border border-green-100 dark:border-blue-800 flex items-center gap-1">
                                 <span className="size-1.5 rounded-full bg-secondary animate-pulse"></span>
                                 Available Now
@@ -118,14 +143,14 @@ export default function DoctorProfilePage() {
                         <div className="bg-blue-100 dark:bg-blue-900/50 p-2 rounded-full mb-1 text-primary">
                             <span className="material-symbols-outlined text-xl">medical_services</span>
                         </div>
-                        <p className="text-xl font-black text-slate-900 dark:text-white">{doctor.experience}</p>
+                        <p className="text-xl font-black text-slate-900 dark:text-white">{doctor.experienceYears}</p>
                         <p className="text-slate-400 text-xs font-bold uppercase tracking-wide">Years Exp.</p>
                     </div>
                     <div className="flex min-w-[100px] flex-1 flex-col gap-1 rounded-2xl bg-white dark:bg-surface-900 p-4 items-center text-center border border-surface-200 dark:border-surface-800 shadow-sm">
                         <div className="bg-teal-100 dark:bg-teal-900/50 p-2 rounded-full mb-1 text-secondary">
                             <span className="material-symbols-outlined text-xl">groups</span>
                         </div>
-                        <p className="text-xl font-black text-slate-900 dark:text-white">5k+</p>
+                        <p className="text-xl font-black text-slate-900 dark:text-white">{doctor.totalConsultations}+</p>
                         <p className="text-slate-400 text-xs font-bold uppercase tracking-wide">Patients</p>
                     </div>
                     <div className="flex min-w-[100px] flex-1 flex-col gap-1 rounded-2xl bg-white dark:bg-surface-900 p-4 items-center text-center border border-surface-200 dark:border-surface-800 shadow-sm">
@@ -149,7 +174,7 @@ export default function DoctorProfilePage() {
                     <div className="space-y-4">
                         <div>
                             <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed font-medium">
-                                {doctor.about || `${doctor.name} is a renowned ${doctor.specialty} based in Kurnool. With over ${doctor.experience} of clinical practice, they have successfully treated thousands of patients, focusing on evidence-based medicine and personalized care protocols.`}
+                                {doctor.bio || `${doctor.name} is a renowned ${doctor.specialization} based in Kurnool. With over ${doctor.experienceYears} of clinical practice, they have successfully treated thousands of patients.`}
                             </p>
                         </div>
 
@@ -160,7 +185,7 @@ export default function DoctorProfilePage() {
                                 </div>
                                 <div>
                                     <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1">Education</p>
-                                    <p className="text-sm font-bold text-slate-800 dark:text-gray-200">{doctor.qualification} from Top Medical University</p>
+                                    <p className="text-sm font-bold text-slate-800 dark:text-gray-200">{doctor.qualification}</p>
                                 </div>
                             </div>
 
@@ -171,9 +196,10 @@ export default function DoctorProfilePage() {
                                 <div>
                                     <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1">Specialization</p>
                                     <div className="flex flex-wrap gap-1 mt-1">
-                                        <span className="bg-gray-100 dark:bg-gray-800 text-[10px] font-bold px-2 py-0.5 rounded-md text-gray-600 dark:text-gray-400">{doctor.specialty}</span>
-                                        <span className="bg-gray-100 dark:bg-gray-800 text-[10px] font-bold px-2 py-0.5 rounded-md text-gray-600 dark:text-gray-400">Clinical Diagnosis</span>
-                                        <span className="bg-gray-100 dark:bg-gray-800 text-[10px] font-bold px-2 py-0.5 rounded-md text-gray-600 dark:text-gray-400">Patient Care</span>
+                                        <span className="bg-gray-100 dark:bg-gray-800 text-[10px] font-bold px-2 py-0.5 rounded-md text-gray-600 dark:text-gray-400">{doctor.specialization}</span>
+                                        {doctor.superSpecialization && (
+                                            <span className="bg-gray-100 dark:bg-gray-800 text-[10px] font-bold px-2 py-0.5 rounded-md text-gray-600 dark:text-gray-400">{doctor.superSpecialization}</span>
+                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -246,10 +272,10 @@ export default function DoctorProfilePage() {
                     <div className="p-5 flex flex-col gap-4">
                         <div className="flex justify-between items-start">
                             <div className="flex flex-col gap-1">
-                                <p className="text-lg font-bold leading-tight">{doctor.hospital || 'Sunrise Multi-Specialty Hospital'}</p>
+                                <p className="text-lg font-bold leading-tight">{doctor.hospitalAffiliation || 'Sunrise Multi-Specialty Hospital'}</p>
                                 <p className="text-gray-500 dark:text-gray-400 text-sm font-normal flex items-center gap-1">
                                     <span className="material-symbols-outlined text-[16px]">location_on</span>
-                                    {doctor.location || 'N.R. Peta, Kurnool, Andhra Pradesh'}
+                                    N.R. Peta, Kurnool, Andhra Pradesh
                                 </p>
                             </div>
                         </div>
@@ -266,7 +292,7 @@ export default function DoctorProfilePage() {
                             <span className="material-symbols-outlined">calendar_month</span>
                         </div>
                         <div className="flex flex-col">
-                            <p className="font-bold">Monday - Saturday</p>
+                            <p className="font-bold">{doctor.availableDays.join(', ')}</p>
                             <p className="text-gray-500 dark:text-gray-400 text-sm">Working Days</p>
                         </div>
                     </div>
@@ -275,8 +301,9 @@ export default function DoctorProfilePage() {
                             <span className="material-symbols-outlined">schedule</span>
                         </div>
                         <div className="flex flex-col">
-                            <p className="font-bold">10:00 AM - 02:00 PM</p>
-                            <p className="text-gray-500 dark:text-gray-400 text-sm">Evening: 06:00 PM - 09:00 PM</p>
+                            {doctor.availableTimeSlots.map((slot, i) => (
+                                <p key={i} className="font-bold">{slot}</p>
+                            ))}
                         </div>
                     </div>
                 </div>

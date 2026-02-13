@@ -1,8 +1,10 @@
+import { Scan } from '@/types';
+
 export const SCANS_CONTENT_MASTER = {
     categories: [
         { id: 'mri', label: 'MRI Scan', icon: 'radiology', color: 'blue' },
         { id: 'ct', label: 'CT Scan', icon: 'scanner', color: 'indigo' },
-        { id: 'pet', label: 'PET CT', icon: 'account_tree', color: 'amber' }, // energetic
+        { id: 'pet', label: 'PET CT', icon: 'account_tree', color: 'amber' },
         { id: 'ultrasound', label: 'Ultrasound', icon: 'water_drop', color: 'teal' },
         { id: 'xray', label: 'X-Ray', icon: 'skeleton', color: 'slate' },
         { id: 'cardiac', label: 'Cardiac', icon: 'ecg_heart', color: 'rose' },
@@ -14,59 +16,89 @@ export const SCANS_CONTENT_MASTER = {
         {
             id: 't_mri_brain',
             name: 'MRI Brain Plain',
+            slug: 'mri-brain-plain',
             category: 'MRI Scan',
+            scanType: 'MRI',
+            bodyPart: 'Brain',
             price: 3500,
             mrp: 6000,
-            discount: '40% OFF',
-            tat: '24 Hours',
-            preparation: 'Remove all metal objects',
-            image: 'https://images.unsplash.com/photo-1559757175-5700dde675bc?auto=format&fit=crop&q=80&w=200'
+            discountPercent: 40,
+            reportTime: '24 Hours',
+            preparationInstructions: 'Remove all metal objects',
+            description: 'MRI Brain Plain is a non-invasive imaging technique used to visualize the brain structure without contrast.',
+            image: 'https://images.unsplash.com/photo-1559757175-5700dde675bc?auto=format&fit=crop&q=80&w=200',
+            status: 'ACTIVE',
+            vendorId: 'v_scan_1'
         },
         {
             id: 't_ct_chest',
             name: 'CT Chest HRCT',
+            slug: 'ct-chest-hrct',
             category: 'CT Scan',
+            scanType: 'CT',
+            bodyPart: 'Chest',
             price: 2800,
             mrp: 4500,
-            discount: '38% OFF',
-            tat: '12 Hours',
-            preparation: 'Fast for 4 hours',
-            image: 'https://images.unsplash.com/photo-1530497610245-94d3c16cda28?auto=format&fit=crop&q=80&w=200'
+            discountPercent: 38,
+            reportTime: '12 Hours',
+            preparationInstructions: 'Fast for 4 hours',
+            description: 'High-Resolution CT (HRCT) of the chest is used to diagnose lung diseases.',
+            image: 'https://images.unsplash.com/photo-1530497610245-94d3c16cda28?auto=format&fit=crop&q=80&w=200',
+            status: 'ACTIVE',
+            vendorId: 'v_scan_1'
         },
         {
             id: 't_pet_whole',
             name: 'Whole Body PET CT',
+            slug: 'whole-body-pet-ct',
             category: 'PET CT',
+            scanType: 'PET-CT',
+            bodyPart: 'Whole Body',
             price: 18000,
             mrp: 25000,
-            discount: '28% OFF',
-            tat: '48 Hours',
-            preparation: 'Detailed specific prep required',
-            image: 'https://images.unsplash.com/photo-1579152276506-44439679bb4c?auto=format&fit=crop&q=80&w=200'
+            discountPercent: 28,
+            reportTime: '48 Hours',
+            preparationInstructions: 'Detailed specific prep required',
+            description: 'Whole Body PET CT is used for cancer staging and monitoring treatment response.',
+            image: 'https://images.unsplash.com/photo-1579152276506-44439679bb4c?auto=format&fit=crop&q=80&w=200',
+            status: 'ACTIVE',
+            vendorId: 'v_scan_2'
         },
         {
             id: 't_echo',
             name: '2D Echo Cardiogram',
+            slug: '2d-echo-cardiogram',
             category: 'Cardiac',
+            scanType: 'Ultrasound',
+            bodyPart: 'Heart',
             price: 1200,
             mrp: 2000,
-            discount: '40% OFF',
-            tat: 'Immediate',
-            preparation: 'No special prep',
-            image: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&q=80&w=200'
+            discountPercent: 40,
+            reportTime: 'Immediate',
+            preparationInstructions: 'No special prep',
+            description: '2D Echo uses sound waves to create images of your heart.',
+            image: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&q=80&w=200',
+            status: 'ACTIVE',
+            vendorId: 'v_scan_1'
         },
         {
             id: 't_endo',
             name: 'Upper GI Endoscopy',
+            slug: 'upper-gi-endoscopy',
             category: 'Endoscopy',
+            scanType: 'Endoscopy',
+            bodyPart: 'Stomach',
             price: 4500,
             mrp: 6000,
-            discount: '25% OFF',
-            tat: 'Same Day',
-            preparation: 'Overnight fasting mandatory',
-            image: 'https://images.unsplash.com/photo-1516549655169-df83a0833860?auto=format&fit=crop&q=80&w=200'
+            discountPercent: 25,
+            reportTime: 'Same Day',
+            preparationInstructions: 'Overnight fasting mandatory',
+            description: 'Upper GI Endoscopy is a procedure to examine the upper digestive tract.',
+            image: 'https://images.unsplash.com/photo-1516549655169-df83a0833860?auto=format&fit=crop&q=80&w=200',
+            status: 'ACTIVE',
+            vendorId: 'v_scan_2'
         }
-    ],
+    ] as Scan[],
     packages: [
         {
             id: 'pkg_fullbody',

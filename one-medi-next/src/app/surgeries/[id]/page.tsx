@@ -41,7 +41,7 @@ export default function SurgeryDetailPage() {
                     <span className="bg-primary text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest mb-2 inline-block shadow-sm">
                         {surgery.category}
                     </span>
-                    <h1 className="text-3xl font-black leading-tight text-slate-900 dark:text-white drop-shadow-sm">{surgery.procedureName}</h1>
+                    <h1 className="text-3xl font-black leading-tight text-slate-900 dark:text-white drop-shadow-sm">{surgery.name}</h1>
                 </div>
             </div>
 
@@ -123,7 +123,7 @@ export default function SurgeryDetailPage() {
                         <span className="text-xl font-black text-slate-900 dark:text-white">{surgery.approxCost}</span>
                     </div>
                     <button
-                        onClick={() => router.push(`/surgeries/second-opinion?procedure=${encodeURIComponent(surgery.procedureName)}&category=${encodeURIComponent(surgery.category)}`)}
+                        onClick={() => router.push(`/surgeries/second-opinion?procedure=${encodeURIComponent(surgery.name)}&category=${encodeURIComponent(surgery.category)}`)}
                         className="flex-1 h-14 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-2xl font-black text-sm uppercase tracking-widest shadow-lg flex items-center justify-center gap-2 active:scale-95 transition-all"
                     >
                         Get Opinion

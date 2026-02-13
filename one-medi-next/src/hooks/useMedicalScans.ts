@@ -1,7 +1,7 @@
 
 import { supabase } from '../lib/supabase';
 import { useSupabaseList, useSupabaseRecord, useSupabaseQuery } from './useSupabaseQuery';
-import { MedicalScan } from '../types';
+import { Scan } from '../types/index';
 
 interface DBScan {
     id: string;
@@ -17,25 +17,35 @@ interface DBScan {
     image_url?: string;
 }
 
-const mapScanNode = (data: DBScan): MedicalScan => ({
+const mapScanNode = (data: DBScan): Scan => ({
     id: data.id,
     name: data.name,
+    slug: data.id, // Using ID as slug for now
     category: data.category,
+    scanType: data.category, // Standardizing scanType
     bodyPart: data.body_part,
-    price: data.price,
-    mrp: data.price * 1.3, // Mock MRP
-    discount: '30% OFF', // Mock Discount
-    image: data.image_url || 'https://images.unsplash.com/photo-1579154204601-01588f351e67?auto=format&fit=crop&q=80',
     description: data.description,
-    scanDuration: `${data.duration_minutes} Minutes`,
+    preparationInstructions: data.preparation_instructions,
     contrastRequired: data.contrast_required,
-    preparationNotes: data.preparation_instructions,
-    variants: []
+    sedationRequired: false, // Default
+    price: data.price,
+    mrp: data.price * 1.3,
+    discountPercent: 30,
+    reportTime: `${data.duration_minutes} Minutes`,
+    marketPrice: data.price * 1.3,
+    finalPrice: data.price,
+    discountPercentage: 30,
+    turnaroundTime: `${data.duration_minutes} Minutes`,
+    image: data.image_url || 'https://images.unsplash.com/photo-1579154204601-01588f351e67?auto=format&fit=crop&q=80',
+    centerRequired: true,
+    homeServiceAvailable: false,
+    status: 'ACTIVE',
+    vendorId: 'v_diag_1' // Default vendor for diagnostics
 });
 
 // Hook to fetch all scans
 export function useMedicalScans(limit?: number) {
-    return useSupabaseQuery<MedicalScan[]>(
+    return useSupabaseQuery<Scan[]>(
         async () => {
             let query = supabase
                 .from('scans_master')
@@ -57,7 +67,7 @@ export function useMedicalScans(limit?: number) {
 
 // Hook to fetch a single scan
 export function useMedicalScan(id: string | undefined) {
-    const { data: listData, loading, error, refetch } = useSupabaseQuery<MedicalScan | null>(
+    const { data: listData, loading, error, refetch } = useSupabaseQuery<Scan | null>(
         async () => {
             if (!id) return { data: null, error: null };
             const { data, error } = await supabase
@@ -77,7 +87,7 @@ export function useMedicalScan(id: string | undefined) {
 
 // Hook to search scans
 export function useScanSearch(query: string) {
-    return useSupabaseQuery<MedicalScan[]>(
+    return useSupabaseQuery<Scan[]>(
         async () => {
             if (!query || query.length < 2) return { data: [], error: null };
 

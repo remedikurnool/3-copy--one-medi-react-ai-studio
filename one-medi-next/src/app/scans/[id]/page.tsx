@@ -24,11 +24,14 @@ export default function ScanDetailPage({ params }: { params: Promise<{ id: strin
             price: test.price,
             mrp: test.mrp,
             image: test.image,
-            type: 'lab', // Note: Make sure CartItem interface in store supports 'lab'
+            type: 'scan',
             qty: 1,
-            discount: test.discount,
+            discount: test.discountPercent ? `${test.discountPercent}% OFF` : undefined,
         });
+        // optional toast
     };
+
+    if (!test) return <div className="p-10 text-center">Test not found</div>;
 
     return (
         <div className="min-h-screen bg-surface-50 dark:bg-surface-950 font-sans text-slate-900 dark:text-white pb-32 animate-fade-in">
@@ -55,7 +58,9 @@ export default function ScanDetailPage({ params }: { params: Promise<{ id: strin
                         <div className="flex items-baseline gap-2">
                             <span className="text-2xl font-black text-slate-900 dark:text-white">₹{test.price}</span>
                             <span className="text-sm font-bold text-slate-400 line-through">₹{test.mrp}</span>
-                            <span className="bg-indigo-50 text-indigo-500 text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-wider">{test.discount}</span>
+                            {test.discountPercent && test.discountPercent > 0 && (
+                                <span className="bg-indigo-50 text-indigo-500 text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-wider">{test.discountPercent}% OFF</span>
+                            )}
                         </div>
                         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Included with Report</p>
                     </div>

@@ -48,28 +48,28 @@ export default function Home() {
     id: m.id,
     title: m.name,
     subtitle: m.manufacturer,
-    image: m.image,
+    image: m.image || 'https://images.unsplash.com/photo-1628771065518-0d82f0263320?auto=format&fit=crop&q=80&w=600',
     price: m.price,
-    discount: m.discount,
+    discount: m.discountPercent ? `${m.discountPercent}% OFF` : undefined,
     link: `/medicines/${m.id}`
   }));
 
   const doctorItems = (doctors || []).map(d => ({
     id: d.id,
     title: d.name,
-    subtitle: d.specialty,
+    subtitle: d.specialization,
     image: d.image,
-    tag: `${d.experience} Exp`,
+    tag: `${d.experienceYears} Years Exp`,
     link: `/doctors/${d.id}`
   }));
 
   const labItems = (labTests || []).map(l => ({
     id: l.id,
     title: l.name,
-    subtitle: `${l.parameterCount} Tests Included`,
+    subtitle: `${l.parametersIncluded?.length || 0} Tests Included`,
     image: 'https://images.unsplash.com/photo-1579154204601-01588f351e67?auto=format&fit=crop&q=80&w=200', // Placeholder or l.image
-    price: l.price,
-    discount: l.discount,
+    price: l.finalPrice,
+    discount: l.discountPercent ? `${l.discountPercent}% OFF` : undefined,
     link: `/lab-tests/${l.id}`
   }));
 

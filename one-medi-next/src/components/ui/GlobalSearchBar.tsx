@@ -202,7 +202,7 @@ export default function GlobalSearchBar() {
                             <span className="material-symbols-outlined text-[10px] filled text-amber-500">star</span>
                           </div>
                         </div>
-                        <p className="text-[10px] text-primary font-black uppercase tracking-widest mt-0.5">{doc.specialty} • {doc.experience} Exp</p>
+                        <p className="text-[10px] text-primary font-black uppercase tracking-widest mt-0.5">{doc.specialization} • {doc.experienceYears} Exp</p>
                       </div>
                       <span className="material-symbols-outlined text-gray-300">chevron_right</span>
                     </Command.Item>
@@ -220,7 +220,7 @@ export default function GlobalSearchBar() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="font-black text-slate-900 dark:text-white truncate tracking-tight">{lab.name}</p>
-                        <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-0.5">{lab.parameterCount} Parameters • {lab.reportTime} Report</p>
+                        <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-0.5">{lab.parametersIncluded?.length || 0} Parameters • {lab.turnaroundTime} Report</p>
                       </div>
                       <div className="text-right shrink-0">
                         <p className="font-black text-sm text-primary">₹{lab.price}</p>

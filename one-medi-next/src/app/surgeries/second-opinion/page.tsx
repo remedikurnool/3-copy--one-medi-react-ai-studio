@@ -22,8 +22,8 @@ function SecondOpinionForm() {
     // Filter doctors based on specialty (Mock logic mapping)
     const filteredDoctors = DOCTORS.filter(d => {
         if (!selectedSpecialty) return true;
-        if (selectedSpecialty === 'Orthopedics') return d.specialty === 'Orthopedic' || d.specialty === 'General Physician';
-        if (selectedSpecialty === 'Gynecology') return d.specialty === 'Gynecologist' || d.specialty === 'General Physician';
+        if (selectedSpecialty === 'Orthopedics') return d.specialization === 'Orthopedic' || d.specialization === 'General Physician';
+        if (selectedSpecialty === 'Gynecology') return d.specialization === 'Gynecologist' || d.specialization === 'General Physician';
         return true;
     });
 
@@ -111,11 +111,11 @@ function SecondOpinionForm() {
                                         <div className="size-16 rounded-2xl bg-gray-200 bg-cover bg-center shrink-0 shadow-inner" style={{ backgroundImage: `url("${doc.image}")` }}></div>
                                         <div className="flex-1">
                                             <h3 className={`font-black text-base ${selectedDoctor === doc.id ? 'text-primary' : 'text-slate-900 dark:text-white'}`}>{doc.name}</h3>
-                                            <p className="text-xs text-gray-500 font-bold uppercase tracking-wider mb-1">{doc.specialty}</p>
+                                            <p className="text-xs text-gray-500 font-bold uppercase tracking-wider mb-1">{doc.specialization}</p>
                                             <div className="flex items-center gap-2 text-xs font-medium text-slate-600 dark:text-gray-300">
-                                                <span className="bg-slate-100 dark:bg-slate-700 px-2 py-0.5 rounded text-[10px] font-bold">{doc.experience} Exp</span>
+                                                <span className="bg-slate-100 dark:bg-slate-700 px-2 py-0.5 rounded text-[10px] font-bold">{doc.experienceYears} Years Exp</span>
                                                 <span>•</span>
-                                                <span>{doc.hospital}</span>
+                                                <span>{doc.hospitalAffiliation}</span>
                                             </div>
                                         </div>
                                     </div>

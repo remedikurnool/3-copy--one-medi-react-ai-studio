@@ -13,9 +13,12 @@ export default function MedicinesPage() {
     const router = useRouter();
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
-    const filteredProducts = selectedCategory
-        ? MEDICINE_CONTENT_MASTER.products.filter(p =>
-            p.category === MEDICINE_CONTENT_MASTER.categories.find(c => c.id === selectedCategory)?.label)
+    const selectedCategoryLabel = selectedCategory
+        ? MEDICINE_CONTENT_MASTER.categories.find(c => c.id === selectedCategory)?.label
+        : null;
+
+    const filteredProducts = selectedCategoryLabel
+        ? MEDICINE_CONTENT_MASTER.products.filter(p => p.category === selectedCategoryLabel)
         : MEDICINE_CONTENT_MASTER.products;
 
     return (

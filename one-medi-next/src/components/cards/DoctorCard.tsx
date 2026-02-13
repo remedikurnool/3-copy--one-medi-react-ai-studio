@@ -1,8 +1,9 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { LazyImage } from '../ui/LazyImage';
+import { Doctor } from '@/types';
 
-export const DoctorCard = ({ doctor, onClick, className = '' }: { doctor: any, onClick?: () => void, className?: string }) => {
+export const DoctorCard = ({ doctor, onClick, className = '' }: { doctor: Doctor, onClick?: () => void, className?: string }) => {
   return (
     <motion.div
       className={`group card-modern p-4 cursor-pointer flex gap-4 items-center relative overflow-hidden ${className || 'w-[280px]'}`}
@@ -28,13 +29,13 @@ export const DoctorCard = ({ doctor, onClick, className = '' }: { doctor: any, o
       <div className="flex-1 min-w-0 py-1">
         <div className="mb-2">
           <span className="inline-block px-2 py-0.5 rounded-md bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 text-[10px] font-bold uppercase tracking-wide mb-1 border border-primary-100 dark:border-primary-800/30">
-            {doctor.specialty}
+            {doctor.specialization}
           </span>
           <h3 className="font-bold text-slate-900 dark:text-white text-base truncate group-hover:text-primary-600 transition-colors font-lexend">
             {doctor.name}
           </h3>
           <p className="text-xs text-slate-500 dark:text-slate-400 truncate font-medium">
-            {doctor.experience} years exp • {doctor.qualification}
+            {doctor.experienceYears} years exp • {doctor.qualification}
           </p>
         </div>
 
@@ -45,7 +46,7 @@ export const DoctorCard = ({ doctor, onClick, className = '' }: { doctor: any, o
 
           <div className="text-right">
             <span className="text-[10px] text-slate-400 block -mb-0.5">Consult</span>
-            <span className="text-sm font-black text-slate-900 dark:text-white">₹{doctor.consultation_fee}</span>
+            <span className="text-sm font-black text-slate-900 dark:text-white">₹{doctor.consultationFee}</span>
           </div>
         </div>
       </div>

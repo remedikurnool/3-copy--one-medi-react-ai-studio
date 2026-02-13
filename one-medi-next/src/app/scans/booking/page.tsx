@@ -14,7 +14,7 @@ function ScanBookingForm() {
     const variantId = searchParams.get('variantId');
 
     const scan = MEDICAL_SCANS.find(s => s.id === scanId);
-    const variant = scan?.variants?.find(v => v.centerId === variantId) || scan?.variants?.[0];
+    const variant = scan?.variants?.find((v: any) => v.centerId === variantId) || scan?.variants?.[0];
 
     const [selectedDate, setSelectedDate] = useState<string>('');
     const [selectedTime, setSelectedTime] = useState('10:30 AM');

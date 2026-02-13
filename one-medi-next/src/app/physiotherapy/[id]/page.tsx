@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { PHYSIO_SERVICES } from '@/constants';
+import { HomeCareService } from '@/types/index';
 import PageHeader from '@/components/ui/PageHeader';
 
 export default function PhysioDetailPage() {
@@ -64,7 +65,7 @@ export default function PhysioDetailPage() {
                                 </span>
                             )}
                         </div>
-                        <h1 className="text-3xl font-black text-white leading-tight mb-2">{service.title}</h1>
+                        <h1 className="text-3xl font-black text-white leading-tight mb-2">{service.name}</h1>
                         <div className="flex items-center gap-4 text-white/90">
                             <div className="flex items-center gap-1.5 bg-white/20 backdrop-blur-md px-2 py-1 rounded-lg">
                                 <span className="material-symbols-outlined text-amber-400 text-sm filled">star</span>
@@ -97,7 +98,7 @@ export default function PhysioDetailPage() {
                         </div>
 
                         <div className="grid grid-cols-1 gap-3">
-                            {(service.certifications || ['IAP Certified', 'Govt Regd Therapist']).map((cert, i) => (
+                            {(service.certifications || ['IAP Certified', 'Govt Regd Therapist']).map((cert: string, i: number) => (
                                 <div key={i} className="flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-100 dark:border-slate-700">
                                     <span className="material-symbols-outlined text-emerald-500 text-lg">verified</span>
                                     <span className="text-xs font-bold text-slate-700 dark:text-gray-300">{cert}</span>
@@ -111,7 +112,7 @@ export default function PhysioDetailPage() {
                 <div className="p-4">
                     <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4 ml-1">Select Session / Plan</h3>
                     <div className="flex flex-col gap-3">
-                        {service.plans?.map((plan) => (
+                        {service.plans?.map((plan: any) => (
                             <div
                                 key={plan.id}
                                 onClick={() => setSelectedPlan(plan)}
@@ -183,7 +184,7 @@ export default function PhysioDetailPage() {
                     <section className="bg-white dark:bg-surface-900 p-6 rounded-[2.5rem] shadow-sm border border-surface-200 dark:border-surface-800">
                         <h3 className="text-lg font-black mb-4">Key Inclusions</h3>
                         <div className="grid grid-cols-1 gap-3">
-                            {(service.features || ['Manual Therapy', 'Exercise Plan', 'Progress Tracking']).map((f, i) => (
+                            {(service.features || ['Manual Therapy', 'Exercise Plan', 'Progress Tracking']).map((f: string, i: number) => (
                                 <div key={i} className="flex items-center gap-3">
                                     <span className="material-symbols-outlined text-emerald-500 text-xl filled">check_circle</span>
                                     <span className="text-sm font-bold text-slate-700 dark:text-gray-300">{f}</span>
@@ -204,7 +205,7 @@ export default function PhysioDetailPage() {
                         {(service.reviewsList || [
                             { id: 'rev1', author: 'Anil Kumar', rating: 5, comment: 'Dr. Srinivas was very professional. My back pain reduced significantly in just 3 sessions.', date: 'Oct 10, 2023', isVerified: true },
                             { id: 'rev2', author: 'Latha M.', rating: 4, comment: 'Punctual staff and well-explained exercises.', date: 'Sep 28, 2023', isVerified: true }
-                        ]).map(review => (
+                        ]).map((review: any) => (
                             <div key={review.id} className="bg-white dark:bg-surface-900 p-6 rounded-[2rem] border border-surface-200 dark:border-surface-800 shadow-sm relative">
                                 <div className="flex justify-between items-start mb-4">
                                     <div className="flex items-center gap-3">

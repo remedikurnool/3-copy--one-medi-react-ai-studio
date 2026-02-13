@@ -18,7 +18,7 @@ export default function HealthFeedPage() {
     // To avoid duplication we could filter out the featured item ID if we wanted.
     const feedItems = CARE_GUIDES.filter(item => {
         const matchesTab = activeTab === 'All' || item.category === activeTab;
-        const matchesSearch = item.title.toLowerCase().includes(search.toLowerCase());
+        const matchesSearch = item.name.toLowerCase().includes(search.toLowerCase());
         return matchesTab && matchesSearch;
     });
 
@@ -58,8 +58,8 @@ export default function HealthFeedPage() {
                                 key={tab}
                                 onClick={() => setActiveTab(tab)}
                                 className={`h-8 px-4 rounded-full text-xs font-black uppercase tracking-wide whitespace-nowrap transition-all ${activeTab === tab
-                                        ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-md'
-                                        : 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-slate-500'
+                                    ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-md'
+                                    : 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-slate-500'
                                     }`}
                             >
                                 {tab}
@@ -74,7 +74,7 @@ export default function HealthFeedPage() {
                 {activeTab === 'All' && !search && featuredItem && (
                     <div className="relative h-[340px] rounded-[2.5rem] overflow-hidden shadow-xl group cursor-pointer animate-fade-in">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={featuredItem.image} alt={featuredItem.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                        <img src={featuredItem.image} alt={featuredItem.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
 
                         <div className="absolute top-4 left-4 flex gap-2">
@@ -88,7 +88,7 @@ export default function HealthFeedPage() {
 
                         <div className="absolute bottom-0 left-0 p-6 w-full">
                             <span className="text-orange-300 font-black text-[10px] uppercase tracking-[0.2em] mb-2 block">{featuredItem.category}</span>
-                            <h2 className="text-white text-2xl font-black leading-tight mb-3 line-clamp-2">{featuredItem.title}</h2>
+                            <h2 className="text-white text-2xl font-black leading-tight mb-3 line-clamp-2">{featuredItem.name}</h2>
                             <div className="flex items-center gap-3 text-white/80 text-xs font-medium">
                                 <div className="flex items-center gap-1.5">
                                     <div className="size-5 bg-white/20 rounded-full flex items-center justify-center text-white">
@@ -110,7 +110,7 @@ export default function HealthFeedPage() {
                             {/* Thumbnail */}
                             <div className="relative w-32 h-24 sm:w-40 sm:h-28 shrink-0 rounded-2xl overflow-hidden bg-gray-100 dark:bg-gray-800">
                                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                                <img src={item.image} alt={item.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                                <img src={item.image} alt={item.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
 
                                 {item.type === 'video' && (
                                     <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
@@ -135,7 +135,7 @@ export default function HealthFeedPage() {
                                         <button className="text-gray-300 hover:text-gray-500"><span className="material-symbols-outlined text-lg">more_horiz</span></button>
                                     </div>
                                     <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white leading-tight line-clamp-2 group-hover:text-primary transition-colors">
-                                        {item.title}
+                                        {item.name}
                                     </h3>
                                 </div>
 

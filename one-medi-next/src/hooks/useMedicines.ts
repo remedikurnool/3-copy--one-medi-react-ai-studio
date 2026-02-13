@@ -37,11 +37,18 @@ interface DBMedicine {
 const mapMedicineNode = (data: DBMedicine): Medicine => ({
     id: data.id,
     name: data.name,
-    genericName: data.generic_name || '',
+    slug: data.id,
+    description: data.description || '',
+    unit: 'Pack',
+    quantityPerPack: 1,
+    stockQuantity: 100,
+    returnEligible: true,
+    status: 'ACTIVE',
+    vendorId: 'v_pharma_1',
     category: data.category,
     price: data.price,
     mrp: data.mrp || data.price, // Fallback if mrp not in DB
-    discount: data.discount || '0% OFF',
+    discountPercent: data.mrp ? Math.round(((data.mrp - data.price) / data.mrp) * 100) : 0,
     image: data.image_url || 'https://placehold.co/600x400/e2e8f0/64748b?text=Medicine', // Fallback image
     packSize: data.pack_size,
     prescriptionRequired: data.prescription_required,
@@ -54,7 +61,7 @@ const mapMedicineNode = (data: DBMedicine): Medicine => ({
     routeOfAdministration: data.route_of_administration || '',
     sideEffects: data.side_effects || [],
     warnings: data.warnings || [],
-    safetyAdvice: {
+    safety: {
         pregnancy: data.safety_advice?.pregnancy || '',
         alcohol: data.safety_advice?.alcohol || '',
         driving: data.safety_advice?.driving || ''

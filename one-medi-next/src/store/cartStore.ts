@@ -3,7 +3,7 @@ import { persist } from 'zustand/middleware';
 
 export interface CartItem {
   id: string;
-  type: 'medicine' | 'lab';
+  type: 'medicine' | 'lab' | 'scan' | 'lab_test';
   name: string;
   price: number;
   mrp: number;

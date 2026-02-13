@@ -24,7 +24,7 @@ function DoctorBookingContent() {
 
     // Reconstruct variant from URL params or fallback
     const currentVariant = {
-        price: variantPrice ? parseFloat(variantPrice) : (doctor?.fee || 500),
+        price: variantPrice ? parseFloat(variantPrice) : (doctor?.consultationFee || 500),
         type: variantType || 'Clinic Visit',
         icon: variantIcon || 'apartment'
     };
@@ -140,7 +140,7 @@ function DoctorBookingContent() {
                         ></div>
                         <div>
                             <h3 className="font-bold text-lg leading-tight">{doctor.name}</h3>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">{doctor.specialty}</p>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">{doctor.specialization}</p>
                             <div className="flex items-center gap-1 text-xs font-bold text-primary mt-1">
                                 <span className="material-symbols-outlined text-[14px]">{currentVariant.icon}</span>
                                 {currentVariant.type}

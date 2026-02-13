@@ -122,7 +122,7 @@ export {
 } from './useLabTests';
 
 // Medical Scans
-export type { MedicalScan } from '../types';
+export type { Scan } from '../types/index';
 export {
     useMedicalScans,
     useMedicalScan,

@@ -1,7 +1,8 @@
 import React from 'react';
+import { Scan } from '@/types';
 
 interface TestDetailProps {
-    test: any;
+    test: Scan;
 }
 
 export default function TestDetailView({ test }: TestDetailProps) {
@@ -18,7 +19,7 @@ export default function TestDetailView({ test }: TestDetailProps) {
                 <div className="flex flex-wrap gap-4 text-xs font-bold text-slate-500 dark:text-slate-400">
                     <div className="flex items-center gap-2 bg-slate-50 dark:bg-gray-800 px-3 py-1.5 rounded-lg border border-slate-100 dark:border-gray-700">
                         <span className="material-symbols-outlined text-sm">schedule</span>
-                        Report in {test.tat}
+                        Report in {test.turnaroundTime}
                     </div>
                     <div className="flex items-center gap-2 bg-slate-50 dark:bg-gray-800 px-3 py-1.5 rounded-lg border border-slate-100 dark:border-gray-700">
                         <span className="material-symbols-outlined text-sm">science</span>
@@ -32,10 +33,16 @@ export default function TestDetailView({ test }: TestDetailProps) {
                 <div>
                     <h4 className="text-xs font-black text-amber-700 dark:text-amber-400 uppercase tracking-wide mb-1">Preparation Guide</h4>
                     <p className="text-xs font-medium text-amber-700/80 dark:text-amber-400/80 leading-relaxed">
-                        {test.preparation}
+                        {test.preparationInstructions}
                     </p>
                 </div>
             </div>
+
+            {test.description && (
+                <div className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                    <p>{test.description}</p>
+                </div>
+            )}
         </div>
     );
 }
