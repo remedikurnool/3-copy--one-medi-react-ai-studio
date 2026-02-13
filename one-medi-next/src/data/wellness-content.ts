@@ -8,7 +8,7 @@ export const WELLNESS_CONTENT_MASTER = {
     programs: [
         {
             id: 'w_keto_30',
-            title: '30-Day Keto Transformation',
+            name: '30-Day Keto Transformation',
             category: 'Weight Loss',
             image: 'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&q=80&w=400',
             duration: '4 Weeks',
@@ -22,7 +22,7 @@ export const WELLNESS_CONTENT_MASTER = {
         },
         {
             id: 'w_pcos_manage',
-            title: 'PCOS Management Program',
+            name: 'PCOS Management Program',
             category: 'Clinical Diet',
             image: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&q=80&w=400',
             duration: '12 Weeks',
@@ -36,7 +36,7 @@ export const WELLNESS_CONTENT_MASTER = {
         },
         {
             id: 'w_yoga_begin',
-            title: 'Yoga for Beginners',
+            name: 'Yoga for Beginners',
             category: 'Fitness & Yoga',
             image: 'https://images.unsplash.com/photo-1544367563-12123d8965cd?auto=format&fit=crop&q=80&w=400',
             duration: '8 Weeks',
@@ -50,7 +50,7 @@ export const WELLNESS_CONTENT_MASTER = {
         },
         {
             id: 'w_mindful_stress',
-            title: 'Stress & Anxiety Relief',
+            name: 'Stress & Anxiety Relief',
             category: 'Mental Wellness',
             image: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&q=80&w=400',
             duration: '21 Days',

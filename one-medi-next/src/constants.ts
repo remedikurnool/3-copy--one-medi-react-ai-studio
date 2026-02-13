@@ -539,9 +539,9 @@ export const PHYSIO_SERVICES: HomeCareService[] = [
     features: ['Manual Therapy', 'TENS/Ultrasound Support', 'Personalized Exercise Plan'],
     conditions: ['Back Pain', 'Knee Pain', 'Cervical Spondylosis'],
     plans: [
-      { id: 'pp1', name: 'Standard Session', title: 'Single Visit', duration: '45 Mins', price: 500, originalPrice: 600, savings: 100 },
-      { id: 'pp2', name: 'Extended Session', title: 'Deep Rehab', duration: '90 Mins', price: 900, originalPrice: 1200, savings: 300, label: 'Most Effective' },
-      { id: 'pp3', name: 'Weekly Package', title: '6 Sessions', duration: '6 Days', price: 2700, originalPrice: 3600, savings: 900, label: 'Best Value' }
+      { id: 'pp1', name: 'Single Visit', duration: '45 Mins', price: 500, originalPrice: 600, savings: 100 },
+      { id: 'pp2', name: 'Deep Rehab', duration: '90 Mins', price: 900, originalPrice: 1200, savings: 300, label: 'Most Effective' },
+      { id: 'pp3', name: '6 Sessions', duration: '6 Days', price: 2700, originalPrice: 3600, savings: 900, label: 'Best Value' }
     ],
     reviewsList: [
       { id: 'rev1', author: 'Anil Kumar', rating: 5, comment: 'Dr. Srinivas was very professional. My back pain reduced significantly in just 3 sessions.', date: 'Oct 10, 2023', isVerified: true },

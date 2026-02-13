@@ -291,7 +291,6 @@ export interface HomeCareService {
     plans?: {
         id: string;
         name: string;
-        title?: string;
         duration: string;
         price: number;
         originalPrice?: number;

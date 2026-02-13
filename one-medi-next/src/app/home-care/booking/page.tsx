@@ -63,7 +63,7 @@ export default function HomeCareBookingPage() {
                         <img src={service.image} alt="" className="size-full object-cover" />
                     </div>
                     <div className="flex-1">
-                        <h3 className="font-bold text-base leading-tight">{service.title}</h3>
+                        <h3 className="font-bold text-base leading-tight">{service.name}</h3>
                         <p className="text-xs text-gray-500 mt-1">{plan?.name || 'Standard Service'}</p>
 
                         <div className="flex flex-wrap gap-2 mt-2">

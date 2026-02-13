@@ -131,7 +131,7 @@ export default function PhysioDetailPage() {
                                         <span className="material-symbols-outlined">{plan.type === 'Rental' ? 'bed' : 'timer'}</span>
                                     </div>
                                     <div>
-                                        <h4 className="font-black text-base text-slate-900 dark:text-white">{plan.title || plan.name}</h4>
+                                        <h4 className="font-black text-base text-slate-900 dark:text-white">{plan.name}</h4>
                                         <p className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mt-0.5 tracking-tighter">{plan.duration}</p>
                                     </div>
                                 </div>

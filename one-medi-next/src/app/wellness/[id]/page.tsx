@@ -18,7 +18,7 @@ export default function WellnessDetailPage({ params }: { params: Promise<{ id: s
     const handleAddToCart = () => {
         addToCart({
             id: program.id,
-            name: program.title,
+            name: program.name,
             price: program.price,
             mrp: program.mrp,
             image: program.image,
@@ -42,7 +42,7 @@ export default function WellnessDetailPage({ params }: { params: Promise<{ id: s
                     <div className="relative h-64 md:h-80 w-full">
                         <img
                             src={program.image}
-                            alt={program.title}
+                            alt={program.name}
                             className="w-full h-full object-cover"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
@@ -56,7 +56,7 @@ export default function WellnessDetailPage({ params }: { params: Promise<{ id: s
                                     {program.rating} Rating
                                 </span>
                             </div>
-                            <h1 className="text-3xl md:text-4xl font-black leading-tight mb-2">{program.title}</h1>
+                            <h1 className="text-3xl md:text-4xl font-black leading-tight mb-2">{program.name}</h1>
                             <p className="text-sm font-medium text-slate-200 line-clamp-2 max-w-xl">{program.description}</p>
                         </div>
                     </div>
