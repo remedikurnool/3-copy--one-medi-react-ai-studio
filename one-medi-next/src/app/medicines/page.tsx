@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import PageHeader from '@/components/ui/PageHeader';
 import { MEDICINE_CONTENT_MASTER } from '@/data/medicine-content';
+import { useMedicines } from '@/hooks/useMedicines';
 import PharmacyHero from '@/components/medicines/PharmacyHero';
 import CategoryGrid from '@/components/medicines/CategoryGrid';
 import DealSlider from '@/components/medicines/DealSlider';
@@ -12,14 +13,15 @@ import ProductCard from '@/components/medicines/ProductCard';
 export default function MedicinesPage() {
     const router = useRouter();
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+    const { data: products, loading } = useMedicines();
 
     const selectedCategoryLabel = selectedCategory
         ? MEDICINE_CONTENT_MASTER.categories.find(c => c.id === selectedCategory)?.label
         : null;
 
     const filteredProducts = selectedCategoryLabel
-        ? MEDICINE_CONTENT_MASTER.products.filter(p => p.category === selectedCategoryLabel)
-        : MEDICINE_CONTENT_MASTER.products;
+        ? (products || []).filter(p => p.category === selectedCategoryLabel)
+        : (products || []);
 
     return (
         <div className="flex flex-col min-h-screen bg-surface-50 dark:bg-surface-950 font-sans animate-fade-in pb-24 text-slate-900 dark:text-white">
@@ -50,7 +52,7 @@ export default function MedicinesPage() {
                                 {selectedCategory ? `${MEDICINE_CONTENT_MASTER.categories.find(c => c.id === selectedCategory)?.label}` : 'Popular Medicines'}
                             </h3>
                             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide mt-1">
-                                {filteredProducts.length} Products Found
+                                {loading ? 'Loading...' : `${filteredProducts.length} Products Found`}
                             </p>
                         </div>
                         {selectedCategory && (
@@ -63,7 +65,12 @@ export default function MedicinesPage() {
                         )}
                     </div>
 
-                    {filteredProducts.length > 0 ? (
+                    {loading ? (
+                        <div className="text-center py-20 opacity-60">
+                            <span className="material-symbols-outlined text-4xl text-slate-300 animate-spin">progress_activity</span>
+                            <p className="mt-2 font-bold text-slate-500">Loading medicines...</p>
+                        </div>
+                    ) : filteredProducts.length > 0 ? (
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                             {filteredProducts.map((product) => (
                                 <ProductCard
@@ -84,4 +91,3 @@ export default function MedicinesPage() {
         </div>
     );
 }
-

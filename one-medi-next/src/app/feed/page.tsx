@@ -2,20 +2,32 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { CARE_GUIDES } from '@/constants';
+import { useHealthContent } from '@/hooks/useContent';
 
 export default function HealthFeedPage() {
     const router = useRouter();
     const [activeTab, setActiveTab] = useState('All');
     const [search, setSearch] = useState('');
+    const { data: healthContent, loading } = useHealthContent();
 
     const tabs = ['All', 'Nutrition', 'Fitness', 'Ayurveda', 'General Health', 'Chronic Care'];
+
+    const CARE_GUIDES = (healthContent || []).map(item => ({
+        ...item,
+        name: item.title,
+        image: item.thumbnail_url || 'https://images.unsplash.com/photo-1505751172876-fa1923c5c528?auto=format&fit=crop&q=80&w=400',
+        isFeatured: false,
+        author: item.author_name || 'OneMedi Team',
+        authorRole: '',
+        publishDate: item.published_at ? new Date(item.published_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '',
+        readTime: item.read_time_minutes ? `${item.read_time_minutes} min read` : '5 min read',
+        videoDuration: '',
+    }));
 
     // Featured Item (First featured or first item)
     const featuredItem = CARE_GUIDES.find(g => g.isFeatured) || CARE_GUIDES[0];
 
-    // Filtered List (Excluding featured item if desired, but for now we keep behavior simple)
-    // To avoid duplication we could filter out the featured item ID if we wanted.
+    // Filtered List
     const feedItems = CARE_GUIDES.filter(item => {
         const matchesTab = activeTab === 'All' || item.category === activeTab;
         const matchesSearch = item.name.toLowerCase().includes(search.toLowerCase());

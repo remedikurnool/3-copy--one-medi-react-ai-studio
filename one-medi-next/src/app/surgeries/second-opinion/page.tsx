@@ -2,7 +2,8 @@
 
 import React, { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { SURGERY_TYPES, DOCTORS, SURGERY_SPECIALTIES } from '@/constants';
+import { SURGERY_TYPES, SURGERY_SPECIALTIES } from '@/constants';
+import { useDoctors } from '@/hooks/useDoctors';
 import PrescriptionUpload from '@/components/ui/PrescriptionUpload';
 import PageHeader from '@/components/ui/PageHeader';
 
@@ -19,8 +20,11 @@ function SecondOpinionForm() {
     const [report, setReport] = useState<string | null>(null);
     const [symptoms, setSymptoms] = useState('');
 
-    // Filter doctors based on specialty (Mock logic mapping)
-    const filteredDoctors = DOCTORS.filter(d => {
+    // Fetch doctors from Supabase
+    const { data: allDoctors, loading: doctorsLoading } = useDoctors();
+
+    // Filter doctors based on specialty
+    const filteredDoctors = (allDoctors || []).filter(d => {
         if (!selectedSpecialty) return true;
         if (selectedSpecialty === 'Orthopedics') return d.specialization === 'Orthopedic' || d.specialization === 'General Physician';
         if (selectedSpecialty === 'Gynecology') return d.specialization === 'Gynecologist' || d.specialization === 'General Physician';

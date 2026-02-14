@@ -2,7 +2,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { MEDICINES, DOCTORS, LAB_TESTS, MEDICAL_SCANS } from '../../constants';
+import { useMedicineSearch } from '@/hooks/useMedicines';
+import { useDoctorSearch } from '@/hooks/useDoctors';
+import { useLabTestSearch } from '@/hooks/useLabTests';
+import { useScanSearch } from '@/hooks/useMedicalScans';
 import { useCartStore } from '../../store/cartStore';
 
 // --- Types ---
@@ -15,84 +18,12 @@ type SearchResult = {
   url: string;
 };
 
-// --- Helper: Fuzzy Search Logic ---
-const getSearchResults = (query: string): SearchResult[] => {
-  const q = query.toLowerCase().trim();
-  if (!q) return [];
-
-  const results: SearchResult[] = [];
-
-  // 1. Medicines
-  MEDICINES.forEach(m => {
-    if (m.name.toLowerCase().includes(q) || m.category.toLowerCase().includes(q)) {
-      results.push({
-        id: m.id,
-        name: m.name,
-        type: 'medicine',
-        subText: `Medicine • ${m.category}`,
-        image: m.image,
-        url: `/medicines/${m.id}`
-      });
-    }
-  });
-
-  // 2. Doctors
-  DOCTORS.forEach(d => {
-    if (d.name.toLowerCase().includes(q) || d.specialization.toLowerCase().includes(q)) {
-      results.push({
-        id: d.id,
-        name: d.name,
-        type: 'doctor',
-        subText: `Doctor • ${d.specialization}`,
-        image: d.image,
-        url: `/doctors/${d.id}`
-      });
-    }
-  });
-
-  // 3. Lab Tests
-  LAB_TESTS.forEach(l => {
-    if (l.name.toLowerCase().includes(q) || l.category?.toLowerCase().includes(q)) {
-      results.push({
-        id: l.id,
-        name: l.name,
-        type: 'lab',
-        subText: `Lab Test • ${l.parametersIncluded?.length || 0} Parameters`,
-        url: `/lab-tests/${l.id}`
-      });
-    }
-  });
-
-  // 4. Scans
-  MEDICAL_SCANS.forEach(s => {
-    if (s.name.toLowerCase().includes(q) || s.category.toLowerCase().includes(q)) {
-      results.push({
-        id: s.id,
-        name: s.name,
-        type: 'scan',
-        subText: `Scan • ${s.bodyPart}`,
-        image: s.image,
-        url: `/scans/detail` // Usually needs ID passing logic handled in component
-      });
-    }
-  });
-
-  // Simple Ranking: StartsWith > Includes
-  return results.sort((a, b) => {
-    const aStarts = a.name.toLowerCase().startsWith(q);
-    const bStarts = b.name.toLowerCase().startsWith(q);
-    if (aStarts && !bStarts) return -1;
-    if (!aStarts && bStarts) return 1;
-    return 0;
-  }).slice(0, 10); // Limit results
-};
-
 export default function AdvancedSearch() {
   const router = useRouter();
   const setPrescription = useCartStore((state) => state.setPrescription);
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState('');
-  const [results, setResults] = useState<SearchResult[]>([]);
+  const [debouncedQuery, setDebouncedQuery] = useState('');
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
   const [placeholderIndex, setPlaceholderIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -105,6 +36,81 @@ export default function AdvancedSearch() {
     'Search "Full Body Checkup"',
     'Search "Diabetes"'
   ];
+
+  // Debounce the query for Supabase search
+  useEffect(() => {
+    if (query.length < 2) {
+      setDebouncedQuery('');
+      return;
+    }
+    const timer = setTimeout(() => setDebouncedQuery(query), 300);
+    return () => clearTimeout(timer);
+  }, [query]);
+
+  // Use Supabase search hooks
+  const { data: medicines } = useMedicineSearch(debouncedQuery || '');
+  const { data: doctors } = useDoctorSearch(debouncedQuery || '');
+  const { data: labTests } = useLabTestSearch(debouncedQuery || '');
+  const { data: scans } = useScanSearch(debouncedQuery || '');
+
+  // Build results from hook data
+  const results: SearchResult[] = React.useMemo(() => {
+    if (!debouncedQuery) return [];
+    const items: SearchResult[] = [];
+
+    (medicines || []).forEach((m: any) => {
+      items.push({
+        id: m.id,
+        name: m.name,
+        type: 'medicine',
+        subText: `Medicine • ${m.category || ''}`,
+        image: m.image,
+        url: `/medicines/${m.id}`
+      });
+    });
+
+    (doctors || []).forEach((d: any) => {
+      items.push({
+        id: d.id,
+        name: d.name,
+        type: 'doctor',
+        subText: `Doctor • ${d.specialization || ''}`,
+        image: d.image,
+        url: `/doctors/${d.id}`
+      });
+    });
+
+    (labTests || []).forEach((l: any) => {
+      items.push({
+        id: l.id,
+        name: l.name,
+        type: 'lab',
+        subText: `Lab Test • ${l.parametersIncluded?.length || 0} Parameters`,
+        url: `/lab-tests/${l.id}`
+      });
+    });
+
+    (scans || []).forEach((s: any) => {
+      items.push({
+        id: s.id,
+        name: s.name,
+        type: 'scan',
+        subText: `Scan • ${s.bodyPart || ''}`,
+        image: s.image,
+        url: `/scans/detail`
+      });
+    });
+
+    // Sort: startsWith > includes
+    const q = debouncedQuery.toLowerCase();
+    return items.sort((a, b) => {
+      const aStarts = a.name.toLowerCase().startsWith(q);
+      const bStarts = b.name.toLowerCase().startsWith(q);
+      if (aStarts && !bStarts) return -1;
+      if (!aStarts && bStarts) return 1;
+      return 0;
+    }).slice(0, 10);
+  }, [medicines, doctors, labTests, scans, debouncedQuery]);
 
   // Load Recent Searches
   useEffect(() => {
@@ -122,15 +128,6 @@ export default function AdvancedSearch() {
     }, 3000);
     return () => clearInterval(interval);
   }, [isOpen]);
-
-  // Handle Search Input
-  useEffect(() => {
-    if (query.length >= 2) {
-      setResults(getSearchResults(query));
-    } else {
-      setResults([]);
-    }
-  }, [query]);
 
   // Click Outside to Close
   useEffect(() => {
@@ -159,8 +156,6 @@ export default function AdvancedSearch() {
     if (!query) return;
     saveRecent(query);
     setIsOpen(false);
-    // Generic search page navigation could go here
-    // navigate(`/search?q=${query}`);
   };
 
   const saveRecent = (term: string) => {
@@ -261,7 +256,7 @@ export default function AdvancedSearch() {
         <div className="absolute top-full left-0 right-0 mt-3 bg-white dark:bg-gray-900 rounded-2xl shadow-float border border-gray-100 dark:border-gray-800 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 max-h-[70vh] overflow-y-auto no-scrollbar">
 
           {/* 1. Results List */}
-          {query.length >= 2 && results.length > 0 && (
+          {debouncedQuery.length >= 2 && results.length > 0 && (
             <div className="py-2">
               <p className="px-4 py-2 text-xs font-bold text-gray-400 uppercase tracking-wider">Best Matches</p>
               {results.map((item) => (
@@ -279,7 +274,7 @@ export default function AdvancedSearch() {
                   </div>
                   <div className="flex-1">
                     <h4 className="text-sm font-bold text-slate-900 dark:text-white leading-tight" dangerouslySetInnerHTML={{
-                      __html: item.name.replace(new RegExp(query, 'gi'), (match) => `<span class="text-primary">${match}</span>`)
+                      __html: item.name.replace(new RegExp(query, 'gi'), (match: string) => `<span class="text-primary">${match}</span>`)
                     }}></h4>
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{item.subText}</p>
                   </div>
@@ -290,12 +285,12 @@ export default function AdvancedSearch() {
           )}
 
           {/* 2. No Results State */}
-          {query.length >= 2 && results.length === 0 && (
+          {debouncedQuery.length >= 2 && results.length === 0 && (
             <div className="p-8 text-center text-gray-400">
               <div className="bg-gray-50 dark:bg-gray-800 size-16 rounded-full flex items-center justify-center mx-auto mb-3">
                 <span className="material-symbols-outlined text-3xl">search_off</span>
               </div>
-              <p className="text-sm font-medium">No results found for "{query}"</p>
+              <p className="text-sm font-medium">No results found for &quot;{query}&quot;</p>
               <p className="text-xs mt-1">Try checking for typos or use broader terms.</p>
             </div>
           )}

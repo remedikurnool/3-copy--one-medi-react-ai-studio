@@ -3,7 +3,7 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import PageHeader from '@/components/ui/PageHeader';
-import { MEDICINE_CONTENT_MASTER } from '@/data/medicine-content';
+import { useMedicine } from '@/hooks/useMedicines';
 import ProductGallery from '@/components/medicines/ProductGallery';
 import ProductInfo from '@/components/medicines/ProductInfo';
 import SafetyStatus from '@/components/medicines/SafetyStatus';
@@ -14,24 +14,29 @@ export default function MedicineDetailPage({ params }: { params: Promise<{ id: s
     const router = useRouter();
     const { addToCart } = useCartStore();
     const resolvedParams = React.use(params);
-
-    // In a real app, fetch based on params.id. Here we use the first mock product for demo.
-    // Or filter from master list.
-    const product = MEDICINE_CONTENT_MASTER.products.find(p => p.id === resolvedParams.id) || MEDICINE_CONTENT_MASTER.products[0];
+    const { data: product, loading } = useMedicine(resolvedParams.id);
 
     const handleAddToCart = () => {
+        if (!product) return;
         addToCart({
             id: product.id,
             name: product.name,
             price: product.price,
             mrp: product.mrp,
-            image: product.thumbnailImage || product.images[0],
+            image: product.thumbnailImage || product.images?.[0] || product.image,
             type: 'medicine',
             qty: 1,
             discount: product.discountPercent ? `${product.discountPercent}% OFF` : undefined,
         });
-        // optional toast
     };
+
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-surface-50 dark:bg-surface-950 flex items-center justify-center">
+                <span className="material-symbols-outlined text-4xl text-slate-300 animate-spin">progress_activity</span>
+            </div>
+        );
+    }
 
     if (!product) {
         return <div className="p-10 text-center">Product not found</div>;
@@ -50,7 +55,7 @@ export default function MedicineDetailPage({ params }: { params: Promise<{ id: s
                 {/* Product Hero */}
                 <div className="bg-white dark:bg-gray-800 rounded-[2.5rem] p-6 shadow-sm border border-slate-100 dark:border-gray-700 grid md:grid-cols-2 gap-8">
                     <div>
-                        <ProductGallery images={product.images} />
+                        <ProductGallery images={product.images || [product.image]} />
                     </div>
 
                     <div>

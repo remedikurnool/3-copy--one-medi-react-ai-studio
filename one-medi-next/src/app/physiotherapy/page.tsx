@@ -2,16 +2,17 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { PHYSIO_SERVICES } from '@/constants';
+import { usePhysiotherapyServices } from '@/hooks/useServices';
 
 export default function PhysiotherapyPage() {
     const router = useRouter();
     const [search, setSearch] = useState('');
     const [activeFilter, setActiveFilter] = useState('All');
+    const { data: physioServices, loading } = usePhysiotherapyServices();
 
     const filters = ['All', 'Ortho Care', 'Neuro Care', 'Equipment', 'Post-Op', 'Sports Rehab'];
 
-    const filteredServices = (PHYSIO_SERVICES as any[]).filter(service => {
+    const filteredServices = ((physioServices || []) as any[]).filter(service => {
         const matchesSearch = service.name.toLowerCase().includes(search.toLowerCase()) ||
             service.description.toLowerCase().includes(search.toLowerCase()) ||
             service.conditions?.some((c: string) => c.toLowerCase().includes(search.toLowerCase()));

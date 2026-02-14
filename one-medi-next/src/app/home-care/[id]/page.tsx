@@ -163,7 +163,7 @@ export default function HomeCareDetailPage() {
                                             {plan.type}
                                         </span>
                                     ) : (
-                                        plan.label && <span className="absolute -top-3 left-4 bg-secondary text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">{plan.label}</span>
+                                        plan.title && <span className="absolute -top-3 left-4 bg-secondary text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">{plan.title}</span>
                                     )}
 
                                     <div className="mt-1">

@@ -2,12 +2,21 @@
 
 import React from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { SURGERY_PACKAGES } from '@/constants';
+import { useService } from '@/hooks/useServices';
 
 export default function SurgeryDetailPage() {
     const router = useRouter();
     const params = useParams();
-    const surgery = SURGERY_PACKAGES.find(s => s.id === params.id);
+    const { data: serviceData, loading } = useService(params.id as string);
+    const surgery = serviceData as any;
+
+    if (loading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-surface-50 dark:bg-surface-950">
+                <span className="material-symbols-outlined text-4xl text-slate-300 animate-spin">progress_activity</span>
+            </div>
+        );
+    }
 
     if (!surgery) {
         return (
@@ -76,7 +85,7 @@ export default function SurgeryDetailPage() {
                         <div className="mt-4">
                             <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Recommended For</p>
                             <div className="flex flex-wrap gap-2">
-                                {surgery.symptoms.map((sym, i) => (
+                                {surgery.symptoms.map((sym: string, i: number) => (
                                     <span key={i} className="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-300 px-3 py-1 rounded-lg text-xs font-bold border border-red-100 dark:border-red-900/30">
                                         {sym}
                                     </span>
@@ -90,7 +99,7 @@ export default function SurgeryDetailPage() {
                 <div className="bg-white dark:bg-surface-900 p-5 rounded-3xl shadow-sm border border-surface-200 dark:border-surface-800">
                     <h3 className="text-lg font-black mb-4">Package Inclusions</h3>
                     <ul className="space-y-3">
-                        {(surgery.inclusions || ['Surgeon Fee', 'Anesthesia', 'Hospital Stay', 'Post-op Care', 'Medicines']).map((inc, i) => (
+                        {(surgery.inclusions || ['Surgeon Fee', 'Anesthesia', 'Hospital Stay', 'Post-op Care', 'Medicines']).map((inc: string, i: number) => (
                             <li key={i} className="flex items-center gap-3 text-sm font-medium text-slate-700 dark:text-slate-200">
                                 <span className="size-6 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-green-600 shrink-0">
                                     <span className="material-symbols-outlined text-sm font-bold">check</span>

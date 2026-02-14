@@ -2,16 +2,33 @@
 
 import React, { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { PHYSIO_SERVICES } from '@/constants';
+import { useService } from '@/hooks/useServices';
 import { HomeCareService } from '@/types/index';
 import PageHeader from '@/components/ui/PageHeader';
 
 export default function PhysioDetailPage() {
     const params = useParams();
     const router = useRouter();
-    const service = PHYSIO_SERVICES.find(s => s.id === params.id);
-    const [homeVisit, setHomeVisit] = useState(service?.homeVisitAvailable || false);
-    const [selectedPlan, setSelectedPlan] = useState(service?.plans ? service.plans[0] : null);
+    const { data: serviceData, loading } = useService(params.id as string);
+    const service = serviceData as any;
+    const [homeVisit, setHomeVisit] = useState(false);
+    const [selectedPlan, setSelectedPlan] = useState<any>(null);
+
+    // Update state when service loads
+    React.useEffect(() => {
+        if (service) {
+            setHomeVisit(service.homeVisitAvailable || false);
+            if (service.plans?.length) setSelectedPlan(service.plans[0]);
+        }
+    }, [service]);
+
+    if (loading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-surface-50 dark:bg-surface-950">
+                <span className="material-symbols-outlined text-4xl text-slate-300 animate-spin">progress_activity</span>
+            </div>
+        );
+    }
 
     if (!service) {
         return (

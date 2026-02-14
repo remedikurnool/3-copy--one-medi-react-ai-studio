@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { MEDICAL_SCANS } from '@/constants';
+import { useMedicalScan } from '@/hooks/useMedicalScans';
 import { supabase } from '@/lib/supabase';
 
 function ScanBookingForm() {
@@ -13,8 +13,9 @@ function ScanBookingForm() {
     const scanId = searchParams.get('scanId');
     const variantId = searchParams.get('variantId');
 
-    const scan = MEDICAL_SCANS.find(s => s.id === scanId);
-    const variant = scan?.variants?.find((v: any) => v.centerId === variantId) || scan?.variants?.[0];
+    const { data: scanData, loading: scanLoading } = useMedicalScan(scanId || undefined);
+    const scan = scanData as any;
+    const variant = scan?.variants?.find((v: any) => v.centerId === variantId) || scan?.variants?.[0] || { price: scan?.price || 0, mrp: scan?.mrp || 0, centerName: 'OneMedi Partner Lab' };
 
     const [selectedDate, setSelectedDate] = useState<string>('');
     const [selectedTime, setSelectedTime] = useState('10:30 AM');

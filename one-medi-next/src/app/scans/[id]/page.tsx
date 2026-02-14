@@ -3,7 +3,7 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import PageHeader from '@/components/ui/PageHeader';
-import { SCANS_CONTENT_MASTER } from '@/data/scans-content';
+import { useMedicalScan } from '@/hooks/useMedicalScans';
 import TestDetailView from '@/components/scans/TestDetailView';
 import LabPartnerList from '@/components/scans/LabPartnerList';
 import UploadPrescription from '@/components/scans/UploadPrescription';
@@ -13,11 +13,10 @@ export default function ScanDetailPage({ params }: { params: Promise<{ id: strin
     const router = useRouter();
     const { addToCart } = useCartStore();
     const resolvedParams = React.use(params);
-
-    // Use mock data or first item as fallback
-    const test = SCANS_CONTENT_MASTER.popularTests.find(t => t.id === resolvedParams.id) || SCANS_CONTENT_MASTER.popularTests[0];
+    const { data: test, loading } = useMedicalScan(resolvedParams.id);
 
     const handleAddToCart = () => {
+        if (!test) return;
         addToCart({
             id: test.id,
             name: test.name,
@@ -28,8 +27,15 @@ export default function ScanDetailPage({ params }: { params: Promise<{ id: strin
             qty: 1,
             discount: test.discountPercent ? `${test.discountPercent}% OFF` : undefined,
         });
-        // optional toast
     };
+
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-surface-50 dark:bg-surface-950 flex items-center justify-center">
+                <span className="material-symbols-outlined text-4xl text-slate-300 animate-spin">progress_activity</span>
+            </div>
+        );
+    }
 
     if (!test) return <div className="p-10 text-center">Test not found</div>;
 
