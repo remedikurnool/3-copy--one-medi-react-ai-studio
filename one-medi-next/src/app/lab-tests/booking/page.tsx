@@ -3,6 +3,7 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '../../../lib/supabase';
+import { useLabTestBooking } from '../../../hooks/useBookings';
 import PrescriptionUpload from '../../../components/ui/PrescriptionUpload';
 
 function LabBookingContent() {
@@ -31,6 +32,9 @@ function LabBookingContent() {
     const [user, setUser] = useState<any>(null);
     const [patientName, setPatientName] = useState('');
     const [patientAge, setPatientAge] = useState('');
+    const [bookingError, setBookingError] = useState<string | null>(null);
+
+    const { bookLabTest, loading: bookingLoading, error: bookingHookError } = useLabTestBooking();
 
     useEffect(() => {
         supabase.auth.getUser().then(({ data: { user } }) => {
@@ -303,10 +307,40 @@ function LabBookingContent() {
                             <span className="text-xs text-gray-400 line-through">₹{mrp}</span>
                         </div>
                     </div>
-                    <button onClick={() => router.push('/bookings')} className="flex-1 h-14 bg-primary hover:bg-primary-dark text-white rounded-xl text-lg font-bold shadow-lg shadow-primary/30 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
-                        <span>Checkout</span>
-                        <span className="material-symbols-outlined">arrow_forward</span>
+                    <button
+                        onClick={async () => {
+                            setBookingError(null);
+                            if (!user) {
+                                setBookingError('Please login to book a test');
+                                return;
+                            }
+                            if (!testId) { setBookingError('Invalid test selection'); return; }
+                            const booking = await bookLabTest(
+                                user.id,
+                                testId,
+                                'default-vendor',
+                                selectedDate,
+                                selectedTime,
+                                serviceType as 'home' | 'center'
+                            );
+                            if (booking) {
+                                router.push(`/bookings?newBookingId=${booking.id}`);
+                            } else {
+                                setBookingError(bookingHookError || 'Failed to create booking');
+                            }
+                        }}
+                        disabled={bookingLoading}
+                        className="flex-1 h-14 bg-primary hover:bg-primary-dark disabled:opacity-50 text-white rounded-xl text-lg font-bold shadow-lg shadow-primary/30 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+                    >
+                        {bookingLoading ? (
+                            <><span className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></span> Booking...</>
+                        ) : (
+                            <><span>Confirm Booking</span><span className="material-symbols-outlined">arrow_forward</span></>
+                        )}
                     </button>
+                    {bookingError && (
+                        <p className="text-xs text-red-500 font-bold mt-2 text-center">{bookingError}</p>
+                    )}
                 </div>
             </footer>
         </div>

@@ -3,7 +3,7 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import PageHeader from '@/components/ui/PageHeader';
-import { WELLNESS_CONTENT_MASTER } from '@/data/wellness-content';
+import { useService } from '@/hooks/useServices';
 import { useCartStore } from '@/store/cartStore';
 import ProgramCurriculum from '@/components/wellness/ProgramCurriculum';
 
@@ -12,8 +12,40 @@ export default function WellnessDetailPage({ params }: { params: Promise<{ id: s
     const { addToCart } = useCartStore();
     const resolvedParams = React.use(params);
 
-    // Use mock data or first item as fallback
-    const program = WELLNESS_CONTENT_MASTER.programs.find(p => p.id === resolvedParams.id) || WELLNESS_CONTENT_MASTER.programs[0];
+    const { data: service, loading, error } = useService(resolvedParams.id);
+
+    // Map service to program-like shape
+    const program = service ? {
+        id: service.id,
+        name: service.name,
+        category: service.category,
+        image: service.imageUrl || 'https://images.unsplash.com/photo-1544367563-12123d8965cd?auto=format&fit=crop&q=80&w=400',
+        duration: service.durationMinutes ? `${service.durationMinutes} mins` : 'Flexible',
+        price: service.price || 0,
+        mrp: Math.round((service.price || 0) * 1.5),
+        expert: 'OneMedi Expert',
+        rating: 4.8,
+        description: service.description || '',
+        includes: service.requirements || []
+    } : null;
+
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-surface-50 dark:bg-surface-950 flex items-center justify-center">
+                <div className="animate-spin rounded-full h-10 w-10 border-2 border-primary border-t-transparent"></div>
+            </div>
+        );
+    }
+
+    if (error || !program) {
+        return (
+            <div className="min-h-screen bg-surface-50 dark:bg-surface-950 flex flex-col items-center justify-center text-center p-6 font-sans text-slate-900 dark:text-white">
+                <span className="material-symbols-outlined text-4xl text-gray-300 mb-2">spa</span>
+                <h2 className="text-xl font-bold">Program Not Found</h2>
+                <button onClick={() => router.push('/wellness')} className="mt-4 text-primary font-bold">Browse Programs</button>
+            </div>
+        );
+    }
 
     const handleAddToCart = () => {
         addToCart({

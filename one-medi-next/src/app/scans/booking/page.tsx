@@ -3,6 +3,7 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useMedicalScan } from '@/hooks/useMedicalScans';
+import { useScanBooking } from '@/hooks/useBookings';
 import { supabase } from '@/lib/supabase';
 
 function ScanBookingForm() {
@@ -21,6 +22,9 @@ function ScanBookingForm() {
     const [selectedTime, setSelectedTime] = useState('10:30 AM');
     const [patient, setPatient] = useState('self');
     const [user, setUser] = useState<any>(null);
+    const [bookingError, setBookingError] = useState<string | null>(null);
+
+    const { bookScan, loading: bookingLoading, error: bookingHookError } = useScanBooking();
 
     useEffect(() => {
         supabase.auth.getUser().then(({ data: { user } }) => setUser(user));
@@ -62,9 +66,27 @@ function ScanBookingForm() {
     const mrp = variant.mrp || Math.round(variant.price * 1.3);
     const discount = mrp - variant.price;
 
-    const handleProceed = () => {
-        // In production, this would create a booking and go to payment
-        router.push('/checkout');
+    const handleProceed = async () => {
+        setBookingError(null);
+        if (!user) {
+            setBookingError('Please login to book a scan');
+            return;
+        }
+        if (!scanId) { setBookingError('Invalid scan selection'); return; }
+
+        const booking = await bookScan(
+            user.id,
+            scanId,
+            variantId || 'default-center',
+            selectedDate,
+            selectedTime
+        );
+
+        if (booking) {
+            router.push(`/bookings?newBookingId=${booking.id}`);
+        } else {
+            setBookingError(bookingHookError || 'Failed to create booking');
+        }
     };
 
     return (
@@ -278,12 +300,19 @@ function ScanBookingForm() {
                         </div>
                         <button
                             onClick={handleProceed}
-                            className="flex-1 bg-primary hover:bg-primary-dark text-white font-bold h-12 rounded-xl text-lg shadow-lg shadow-blue-500/30 flex items-center justify-center gap-2 transition-all active:scale-95"
+                            disabled={bookingLoading}
+                            className="flex-1 bg-primary hover:bg-primary-dark disabled:opacity-50 text-white font-bold h-12 rounded-xl text-lg shadow-lg shadow-blue-500/30 flex items-center justify-center gap-2 transition-all active:scale-95"
                         >
-                            Proceed to Pay
-                            <span className="material-symbols-outlined text-[20px]">arrow_forward</span>
+                            {bookingLoading ? (
+                                <><span className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></span> Booking...</>
+                            ) : (
+                                <>Confirm Booking<span className="material-symbols-outlined text-[20px]">arrow_forward</span></>
+                            )}
                         </button>
                     </div>
+                    {bookingError && (
+                        <p className="text-xs text-red-500 font-bold mt-2 px-4 text-center">{bookingError}</p>
+                    )}
                 </div>
             </div>
         </div>

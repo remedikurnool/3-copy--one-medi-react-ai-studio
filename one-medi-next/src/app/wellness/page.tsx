@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import PageHeader from '@/components/ui/PageHeader';
 import { WELLNESS_CONTENT_MASTER } from '@/data/wellness-content';
+import { useWellnessPlans } from '@/hooks/useServices';
 import WellnessHero from '@/components/wellness/WellnessHero';
 import ProgramCategoryGrid from '@/components/wellness/ProgramCategoryGrid';
 import WellnessTools from '@/components/wellness/WellnessTools';
@@ -13,11 +14,28 @@ import SuccessStories from '@/components/wellness/SuccessStories';
 export default function WellnessPage() {
     const router = useRouter();
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+    const { data: programs, loading: programsLoading } = useWellnessPlans();
+
+    // Map Supabase services to program-like shape for ProgramCard
+    const mappedPrograms = (programs || []).map(p => ({
+        id: p.id,
+        name: p.name,
+        category: p.category,
+        image: p.imageUrl || 'https://images.unsplash.com/photo-1544367563-12123d8965cd?auto=format&fit=crop&q=80&w=400',
+        duration: p.durationMinutes ? `${p.durationMinutes} mins` : 'Flexible',
+        price: p.price || 0,
+        mrp: Math.round((p.price || 0) * 1.5),
+        expert: 'OneMedi Expert',
+        rating: 4.8,
+        tags: p.requirements?.slice(0, 2) || [],
+        description: p.description || '',
+        includes: p.requirements || []
+    }));
 
     const filteredPrograms = selectedCategory
-        ? WELLNESS_CONTENT_MASTER.programs.filter(p =>
+        ? mappedPrograms.filter(p =>
             p.category === WELLNESS_CONTENT_MASTER.categories.find(c => c.id === selectedCategory)?.label)
-        : WELLNESS_CONTENT_MASTER.programs;
+        : mappedPrograms;
 
     return (
         <div className="min-h-screen bg-surface-50 dark:bg-surface-950 pb-32 font-sans text-slate-900 dark:text-white animate-fade-in">
@@ -60,7 +78,11 @@ export default function WellnessPage() {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {filteredPrograms.map((program) => (
+                        {programsLoading ? (
+                            <div className="col-span-full flex justify-center py-12">
+                                <div className="animate-spin rounded-full h-8 w-8 border-2 border-primary border-t-transparent"></div>
+                            </div>
+                        ) : filteredPrograms.map((program) => (
                             <ProgramCard
                                 key={program.id}
                                 program={program}

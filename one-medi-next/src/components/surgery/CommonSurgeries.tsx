@@ -1,7 +1,11 @@
+'use client';
+
 import React from 'react';
-import { SURGERY_CONTENT_MASTER } from '@/data/surgery-content';
+import { useSurgeryPackages } from '@/hooks/useServices';
 
 export default function CommonSurgeries() {
+    const { data: surgeries, loading } = useSurgeryPackages();
+
     return (
         <section className="mb-12">
             <div className="flex justify-between items-end mb-6 px-1">
@@ -12,7 +16,11 @@ export default function CommonSurgeries() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {SURGERY_CONTENT_MASTER.commonSurgeries.map((surgery) => (
+                {loading ? (
+                    <div className="col-span-full flex justify-center py-12">
+                        <div className="animate-spin rounded-full h-8 w-8 border-2 border-primary border-t-transparent"></div>
+                    </div>
+                ) : (surgeries || []).map((surgery) => (
                     <div key={surgery.id} className="bg-white dark:bg-gray-800 rounded-[2rem] p-5 border border-slate-100 dark:border-gray-700 shadow-sm hover:shadow-xl transition-all group cursor-pointer active:scale-[0.99] flex flex-col h-full">
                         <div className="flex justify-between items-start mb-4">
                             <span className="inline-block px-3 py-1 rounded-lg bg-blue-50 dark:bg-gray-700 text-blue-600 dark:text-blue-400 text-[10px] font-black uppercase tracking-wider">
@@ -23,11 +31,11 @@ export default function CommonSurgeries() {
                             </div>
                         </div>
 
-                        <h4 className="text-lg font-black text-slate-900 dark:text-white leading-tight mb-2">{surgery.title}</h4>
+                        <h4 className="text-lg font-black text-slate-900 dark:text-white leading-tight mb-2">{surgery.name}</h4>
 
-                        {/* Tags */}
+                        {/* Tags from requirements */}
                         <div className="flex flex-wrap gap-2 mb-4">
-                            {surgery.tech.slice(0, 2).map((t, i) => (
+                            {(surgery.requirements || []).slice(0, 2).map((t, i) => (
                                 <span key={i} className="text-[10px] font-bold text-slate-500 bg-slate-50 dark:bg-gray-700/50 px-2 py-1 rounded-md border border-slate-100 dark:border-gray-600">
                                     {t}
                                 </span>
@@ -38,9 +46,11 @@ export default function CommonSurgeries() {
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2 text-xs font-medium text-slate-500 dark:text-gray-400">
                                     <span className="material-symbols-outlined text-base">healing</span>
-                                    {surgery.recovery} Recovery
+                                    {surgery.durationMinutes ? `${surgery.durationMinutes} min` : 'Varies'} Recovery
                                 </div>
-                                <span className="text-sm font-black text-slate-900 dark:text-white">{surgery.price}</span>
+                                <span className="text-sm font-black text-slate-900 dark:text-white">
+                                    {surgery.price ? `₹${surgery.price.toLocaleString()}` : 'Consult'}
+                                </span>
                             </div>
 
                             <button className="w-full py-3 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-xs font-black uppercase tracking-widest hover:opacity-90 transition-opacity">

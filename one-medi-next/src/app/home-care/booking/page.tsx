@@ -4,6 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useBookingStore } from '@/store/bookingStore';
 import { useUserStore } from '@/store/userStore';
+import { useCreateBooking } from '@/hooks/useBookings';
+import { supabase } from '@/lib/supabase';
 
 export default function HomeCareBookingPage() {
     const router = useRouter();
@@ -14,6 +16,9 @@ export default function HomeCareBookingPage() {
     const [selectedTime, setSelectedTime] = useState('09:00 AM');
     const [selectedAddressId, setSelectedAddressId] = useState(addresses[0]?.id);
     const [mounted, setMounted] = useState(false);
+    const [bookingError, setBookingError] = useState<string | null>(null);
+
+    const { createBooking, loading: bookingLoading, error: bookingHookError } = useCreateBooking();
 
     useEffect(() => {
         setMounted(true);
@@ -38,11 +43,35 @@ export default function HomeCareBookingPage() {
     const visitFee = isHomeVisit ? (service.homeVisitFee || 0) : 0;
     const totalAmount = basePrice + visitFee;
 
-    const handleConfirm = () => {
-        // In a real app, API call here
-        // Clear booking draft? 
-        // useBookingStore.getState().clearBookingDraft(); 
-        router.push('/order-success');
+    const handleConfirm = async () => {
+        setBookingError(null);
+
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+            setBookingError('Please login to book a service');
+            return;
+        }
+
+        if (!service?.id) {
+            setBookingError('Invalid service selection');
+            return;
+        }
+
+        const booking = await createBooking(
+            user.id,
+            {
+                service_catalog_id: service.id,
+                booking_date: selectedDate === 'today' ? new Date().toISOString().split('T')[0] : selectedDate,
+                booking_time: selectedTime,
+                notes: `Plan: ${plan?.name || 'Standard'}, ${isHomeVisit ? 'Home Visit' : 'Clinic Visit'}${preferences?.requestFemale ? ', Female Staff Requested' : ''}`
+            }
+        );
+
+        if (booking) {
+            router.push(`/bookings?newBookingId=${booking.id}`);
+        } else {
+            setBookingError(bookingHookError || 'Failed to create booking');
+        }
     };
 
     return (
@@ -170,10 +199,18 @@ export default function HomeCareBookingPage() {
                 <div className="max-w-lg mx-auto">
                     <button
                         onClick={handleConfirm}
-                        className="w-full h-14 bg-primary hover:bg-primary-dark text-white rounded-xl text-lg font-bold shadow-lg shadow-primary/30 flex items-center justify-center gap-2 active:scale-95 transition-all"
+                        disabled={bookingLoading}
+                        className="w-full h-14 bg-primary hover:bg-primary-dark disabled:opacity-50 text-white rounded-xl text-lg font-bold shadow-lg shadow-primary/30 flex items-center justify-center gap-2 active:scale-95 transition-all"
                     >
-                        Confirm Booking
+                        {bookingLoading ? (
+                            <><span className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></span> Booking...</>
+                        ) : (
+                            'Confirm Booking'
+                        )}
                     </button>
+                    {bookingError && (
+                        <p className="text-xs text-red-500 font-bold mt-2 text-center">{bookingError}</p>
+                    )}
                 </div>
             </div>
         </div>
