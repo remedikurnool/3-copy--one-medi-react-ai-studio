@@ -5,6 +5,10 @@ import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
 import { useUserStore } from '../store/userStore';
 
+// ==============================================================
+// AUTH CONTEXT – Single source of truth for session state
+// ==============================================================
+
 interface AuthContextType {
     session: Session | null;
     user: User | null;
@@ -21,22 +25,23 @@ const AuthContext = createContext<AuthContextType>({
 
 export const useAuth = () => useContext(AuthContext);
 
+// ==============================================================
+// AUTH PROVIDER – Bridges Supabase session ↔ Zustand store
+// ==============================================================
+
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [session, setSession] = useState<Session | null>(null);
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
 
-    // Zustand store actions
     const {
-        login,
-        logout: storeLogout,
+        setProfile,
         updateProfile,
-        addAddress,
+        resetAuth,
         setAddresses,
-        addFamilyMember,
         setFamilyMembers,
         setAuthenticated,
-        isAuthenticated
+        isAuthenticated,
     } = useUserStore();
 
     useEffect(() => {
@@ -51,8 +56,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             }
         });
 
-        // 2. Listen for changes
-        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+        // 2. Listen for auth state changes
+        const {
+            data: { subscription },
+        } = supabase.auth.onAuthStateChange(async (_event, session) => {
             setSession(session);
             setUser(session?.user ?? null);
 
@@ -60,15 +67,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                 await syncUserData(session.user);
             } else {
                 if (isAuthenticated) {
-                    storeLogout();
+                    resetAuth();
                 }
             }
             setLoading(false);
         });
 
         return () => subscription.unsubscribe();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
+    // ==============================================================
+    // SYNC USER DATA – Fetches profile, addresses, family from Supabase
+    // Maps DB snake_case → Store camelCase
+    // ==============================================================
     const syncUserData = async (authUser: User) => {
         try {
             // A. Fetch Profile
@@ -79,24 +91,39 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                 .single();
 
             if (profile && !profileError) {
-                // Map DB snake_case to Store camelCase if needed, or assumed match
-                // Store expects: name, phone, email, gender, dob, bloodGroup, height, weight, image
-                // DB likely has: name, phone, email, gender, dob, blood_group, height, weight, image_url
+                // DB columns:  full_name, phone, email, gender, date_of_birth, blood_group,
+                //              avatar_url, emergency_contact
+                // Store keys:  name, phone, email, gender, dob, bloodGroup,
+                //              height, weight, image
 
-                updateProfile({
-                    name: profile.name || authUser.user_metadata?.full_name || 'User',
+                setProfile({
+                    id: profile.id,
+                    name: profile.full_name || authUser.user_metadata?.full_name || '',
                     phone: profile.phone || authUser.phone || '',
                     email: profile.email || authUser.email || '',
-                    gender: profile.gender,
-                    dob: profile.dob,
-                    bloodGroup: profile.blood_group, // Note mapping
-                    height: profile.height?.toString(),
-                    weight: profile.weight?.toString(),
-                    image: profile.image_url || authUser.user_metadata?.avatar_url
+                    gender: profile.gender || '',
+                    dob: profile.date_of_birth || '',
+                    bloodGroup: profile.blood_group || '',
+                    height: '',
+                    weight: '',
+                    image: profile.avatar_url || authUser.user_metadata?.avatar_url || '',
                 });
 
-                setAuthenticated(true);
-
+            } else {
+                // Profile might not exist yet (trigger may still be running)
+                // Set basic info from auth user metadata
+                setProfile({
+                    id: authUser.id,
+                    name: authUser.user_metadata?.full_name || '',
+                    phone: authUser.phone || '',
+                    email: authUser.email || '',
+                    gender: '',
+                    dob: '',
+                    bloodGroup: '',
+                    height: '',
+                    weight: '',
+                    image: authUser.user_metadata?.avatar_url || '',
+                });
             }
 
             // B. Fetch Addresses
@@ -105,17 +132,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                 .select('*')
                 .eq('profile_id', authUser.id);
 
-            if (addresses) {
-                const mappedAddresses = addresses.map(addr => ({
-                    id: addr.id,
-                    tag: addr.tag as 'Home' | 'Office' | 'Other',
-                    line1: addr.line1,
-                    line2: addr.line2,
-                    city: addr.city,
-                    pincode: addr.pincode,
-                    isDefault: addr.is_default
-                }));
-                setAddresses(mappedAddresses);
+            if (addresses && addresses.length > 0) {
+                setAddresses(
+                    addresses.map((addr) => ({
+                        id: addr.id,
+                        tag: addr.tag as 'Home' | 'Office' | 'Other',
+                        line1: addr.line1 || '',
+                        line2: addr.line2 || '',
+                        city: addr.city || '',
+                        pincode: addr.pincode || '',
+                        isDefault: addr.is_default || false,
+                    }))
+                );
             }
 
             // C. Fetch Family Members
@@ -124,18 +152,28 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                 .select('*')
                 .eq('profile_id', authUser.id);
 
-            if (family) {
-                setFamilyMembers(family as any);
+            if (family && family.length > 0) {
+                setFamilyMembers(
+                    family.map((f) => ({
+                        id: f.id,
+                        name: f.name || '',
+                        relation: f.relation || '',
+                        age: f.age?.toString() || '',
+                        gender: f.gender || 'Other',
+                    }))
+                );
             }
-
         } catch (error) {
-            console.error('Error syncing user data:', error);
+            console.error('[AuthProvider] Error syncing user data:', error);
         }
     };
 
+    // ==============================================================
+    // SIGN OUT – Clears BOTH Supabase session AND Zustand store
+    // ==============================================================
     const signOut = async () => {
         await supabase.auth.signOut();
-        storeLogout();
+        resetAuth();
     };
 
     return (

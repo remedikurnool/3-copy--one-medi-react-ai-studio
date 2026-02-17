@@ -3,6 +3,7 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUserStore } from '../../store/userStore';
+import { useAuth } from '@/components/AuthProvider';
 import { motion } from 'framer-motion';
 
 const MenuLink = ({ icon, label, sub, onClick, color = "text-slate-600" }: any) => (
@@ -24,7 +25,8 @@ const MenuLink = ({ icon, label, sub, onClick, color = "text-slate-600" }: any) 
 
 function ProfileContent() {
     const router = useRouter();
-    const { profile, isAuthenticated, logout } = useUserStore();
+    const { profile, isAuthenticated } = useUserStore();
+    const { signOut } = useAuth();
     const [isDark, setIsDark] = useState(false);
 
     useEffect(() => {
@@ -50,9 +52,9 @@ function ProfileContent() {
         }
     };
 
-    const handleLogout = () => {
+    const handleLogout = async () => {
         if (confirm('Are you sure you want to log out?')) {
-            logout();
+            await signOut();
             router.push('/login');
         }
     };
@@ -105,15 +107,15 @@ function ProfileContent() {
                     {/* Quick Stats Cards */}
                     <div className="grid grid-cols-3 gap-3 mt-8 max-w-md mx-auto w-full">
                         <div className="bg-blue-50 dark:bg-gray-700/30 p-4 rounded-[1.5rem] text-center border border-blue-100 dark:border-gray-600">
-                            <span className="block text-xl font-black text-blue-600 dark:text-blue-400 mb-1">{profile.bloodGroup || 'O+'}</span>
+                            <span className="block text-xl font-black text-blue-600 dark:text-blue-400 mb-1">{profile.bloodGroup || '—'}</span>
                             <span className="text-[9px] font-black text-slate-400 uppercase tracking-wider">Blood Type</span>
                         </div>
                         <div className="bg-purple-50 dark:bg-gray-700/30 p-4 rounded-[1.5rem] text-center border border-purple-100 dark:border-gray-600">
-                            <span className="block text-xl font-black text-purple-600 dark:text-purple-400 mb-1">{profile.height || '175'}</span>
+                            <span className="block text-xl font-black text-purple-600 dark:text-purple-400 mb-1">{profile.height || '—'}</span>
                             <span className="text-[9px] font-black text-slate-400 uppercase tracking-wider">Height (cm)</span>
                         </div>
                         <div className="bg-orange-50 dark:bg-gray-700/30 p-4 rounded-[1.5rem] text-center border border-orange-100 dark:border-gray-600">
-                            <span className="block text-xl font-black text-orange-600 dark:text-orange-400 mb-1">{profile.weight || '72'}</span>
+                            <span className="block text-xl font-black text-orange-600 dark:text-orange-400 mb-1">{profile.weight || '—'}</span>
                             <span className="text-[9px] font-black text-slate-400 uppercase tracking-wider">Weight (kg)</span>
                         </div>
                     </div>

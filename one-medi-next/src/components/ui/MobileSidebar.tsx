@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useUserStore } from '@/store/userStore';
+import { useAuth } from '@/components/AuthProvider';
 
 interface MobileSidebarProps {
    isOpen: boolean;
@@ -24,7 +25,8 @@ const SIDEBAR_LINKS = [
 
 export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
    const router = useRouter();
-   const { isAuthenticated, profile, logout } = useUserStore();
+   const { isAuthenticated, profile } = useUserStore();
+   const { signOut } = useAuth();
 
    // Prevent background scroll when sidebar is open
    useEffect(() => {
@@ -146,8 +148,8 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
 
                      {isAuthenticated && (
                         <button
-                           onClick={() => {
-                              logout();
+                           onClick={async () => {
+                              await signOut();
                               onClose();
                            }}
                            className="w-full flex items-center gap-4 p-3 rounded-xl text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 transition-all mt-4"

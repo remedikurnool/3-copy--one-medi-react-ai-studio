@@ -2,35 +2,27 @@
 
 import React, { useState, useEffect, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useUserStore } from '../../../store/userStore';
 import { supabase } from '../../../lib/supabase';
 
 function OTPContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const { login } = useUserStore();
-    const phone = searchParams.get('phone') || '9876543210';
+    const phone = searchParams.get('phone') || '';
 
-    const [otp, setOtp] = useState(['', '', '', '']);
+    const [otp, setOtp] = useState(['', '', '', '', '', '']);
     const [timer, setTimer] = useState(30);
     const [isVerifying, setIsVerifying] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const inputsRef = useRef<(HTMLInputElement | null)[]>([]);
 
     useEffect(() => {
-        // Focus first input
-        if (inputsRef.current[0]) {
-            inputsRef.current[0].focus();
+        if (!phone) {
+            router.replace('/login');
+            return;
         }
-
-        // Simulate sending OTP alert - kept from legacy for testing flow
-        const t = setTimeout(() => {
-            //   alert(`Your One Medi OTP is: 1234`); // Commented out to be less intrusive in dev
-            console.log('OTP sent for dev: 1234');
-        }, 1000);
-
-        return () => clearTimeout(t);
-    }, []);
+        // Focus first input
+        inputsRef.current[0]?.focus();
+    }, [phone, router]);
 
     useEffect(() => {
         if (timer > 0) {
@@ -46,7 +38,7 @@ function OTPContent() {
         setOtp(newOtp);
 
         // Auto advance
-        if (value && index < 3) {
+        if (value && index < 5) {
             inputsRef.current[index + 1]?.focus();
         }
     };
@@ -59,7 +51,7 @@ function OTPContent() {
 
     const handleVerify = async () => {
         const enteredOtp = otp.join('');
-        if (enteredOtp.length !== 4) return;
+        if (enteredOtp.length !== 6) return;
 
         setIsVerifying(true);
         setError(null);
@@ -74,23 +66,32 @@ function OTPContent() {
             if (verifyError) throw verifyError;
 
             if (session) {
-                // AuthProvider syncUserData will handle the rest via onAuthStateChange listener
+                // AuthProvider syncUserData handles the rest via onAuthStateChange
                 router.push('/');
             }
         } catch (err: any) {
             setError(err.message || 'Invalid OTP. Please try again.');
-            setOtp(['', '', '', '']);
+            setOtp(['', '', '', '', '', '']);
             inputsRef.current[0]?.focus();
         } finally {
             setIsVerifying(false);
         }
     };
 
-    const handleResend = () => {
+    const handleResend = async () => {
         setTimer(30);
-        // alert(`Your One Medi OTP is: 1234`);
-        console.log('OTP resent: 1234');
+        setError(null);
+        try {
+            const { error } = await supabase.auth.signInWithOtp({
+                phone: `+91${phone}`,
+            });
+            if (error) throw error;
+        } catch (err: any) {
+            setError(err.message || 'Failed to resend OTP.');
+        }
     };
+
+    if (!phone) return null;
 
     return (
         <div className="min-h-screen bg-white dark:bg-slate-900 flex flex-col relative overflow-hidden font-sans">
@@ -102,13 +103,13 @@ function OTPContent() {
                 <div className="mb-10">
                     <h1 className="text-3xl font-black text-slate-900 dark:text-white mb-2 tracking-tight">Verification</h1>
                     <p className="text-slate-500 dark:text-gray-400 font-medium">
-                        We've sent a 4-digit code to <br />
+                        We've sent a 6-digit code to <br />
                         <span className="text-slate-900 dark:text-white font-bold">+91 {phone}</span>
                         <button onClick={() => router.back()} className="text-primary text-sm font-bold ml-2 hover:underline">Edit</button>
                     </p>
                 </div>
 
-                <div className="flex justify-between gap-4 mb-10">
+                <div className="flex justify-between gap-3 mb-10">
                     {otp.map((digit, index) => (
                         <input
                             key={index}
@@ -124,9 +125,15 @@ function OTPContent() {
                     ))}
                 </div>
 
+                {error && (
+                    <p className="text-xs text-red-500 font-bold mb-4 flex items-center gap-1 justify-center">
+                        <span className="material-symbols-outlined text-sm">error</span>{error}
+                    </p>
+                )}
+
                 <button
                     onClick={handleVerify}
-                    disabled={otp.join('').length < 4 || isVerifying}
+                    disabled={otp.join('').length < 6 || isVerifying}
                     className="h-14 bg-primary hover:bg-primary-dark disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed text-white rounded-2xl font-black text-lg shadow-lg shadow-primary/30 active:scale-[0.98] transition-all flex items-center justify-center gap-2 mb-6 w-full"
                 >
                     {isVerifying ? (

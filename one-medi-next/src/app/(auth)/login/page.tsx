@@ -3,12 +3,10 @@
 import React, { useState, Suspense } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { useUserStore } from '../../../store/userStore';
 import { supabase } from '../../../lib/supabase';
 
 function LoginForm() {
     const router = useRouter();
-    const { googleLogin } = useUserStore();
     const [phone, setPhone] = useState('');
     const [error, setError] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
@@ -39,9 +37,24 @@ function LoginForm() {
         }
     };
 
-    const handleGoogleLogin = () => {
-        googleLogin();
-        router.push('/');
+    const handleGoogleLogin = async () => {
+        setIsLoading(true);
+        setError(null);
+
+        try {
+            const { error } = await supabase.auth.signInWithOAuth({
+                provider: 'google',
+                options: {
+                    redirectTo: `${window.location.origin}/callback`,
+                },
+            });
+
+            if (error) throw error;
+            // Supabase will redirect to Google → callback route → home
+        } catch (err: any) {
+            setError(err.message || 'Failed to initiate Google login.');
+            setIsLoading(false);
+        }
     };
 
     return (
@@ -96,10 +109,14 @@ function LoginForm() {
 
                     <button
                         type="submit"
-                        disabled={phone.length < 10}
+                        disabled={phone.length < 10 || isLoading}
                         className="h-14 bg-primary hover:bg-primary-dark disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed text-white rounded-2xl font-black text-lg shadow-lg shadow-primary/30 active:scale-[0.98] transition-all flex items-center justify-center gap-2 w-full"
                     >
-                        Get OTP <span className="material-symbols-outlined">arrow_forward</span>
+                        {isLoading ? (
+                            <><span className="material-symbols-outlined animate-spin">progress_activity</span> Sending...</>
+                        ) : (
+                            <>Get OTP <span className="material-symbols-outlined">arrow_forward</span></>
+                        )}
                     </button>
                 </form>
 
@@ -110,7 +127,8 @@ function LoginForm() {
 
                 <button
                     onClick={handleGoogleLogin}
-                    className="h-14 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl font-bold text-slate-700 dark:text-white shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 active:scale-[0.98] transition-all flex items-center justify-center gap-3 w-full"
+                    disabled={isLoading}
+                    className="h-14 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl font-bold text-slate-700 dark:text-white shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 active:scale-[0.98] transition-all flex items-center justify-center gap-3 w-full disabled:opacity-50"
                 >
                     <div className="w-6 h-6 relative">
                         <Image src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" fill className="object-contain" unoptimized />
