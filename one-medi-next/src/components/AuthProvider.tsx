@@ -92,7 +92,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
             if (profile && !profileError) {
                 // DB columns:  full_name, phone, email, gender, date_of_birth, blood_group,
-                //              avatar_url, emergency_contact
+                //              height, weight, avatar_url, emergency_contact
                 // Store keys:  name, phone, email, gender, dob, bloodGroup,
                 //              height, weight, image
 
@@ -104,8 +104,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                     gender: profile.gender || '',
                     dob: profile.date_of_birth || '',
                     bloodGroup: profile.blood_group || '',
-                    height: '',
-                    weight: '',
+                    height: profile.height?.toString() || '',
+                    weight: profile.weight?.toString() || '',
                     image: profile.avatar_url || authUser.user_metadata?.avatar_url || '',
                 });
 
@@ -137,9 +137,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                     addresses.map((addr) => ({
                         id: addr.id,
                         tag: addr.tag as 'Home' | 'Office' | 'Other',
-                        line1: addr.line1 || '',
-                        line2: addr.line2 || '',
-                        city: addr.city || '',
+                        line1: addr.line_1 || '',
+                        line2: addr.line_2 || '',
+                        city: '', // city_id FK → resolved on client if needed
                         pincode: addr.pincode || '',
                         isDefault: addr.is_default || false,
                     }))
