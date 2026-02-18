@@ -92,7 +92,7 @@ export default function DoctorListPage() {
                         </div>
                         <h3 className="text-lg font-bold text-slate-900 dark:text-white">No Specialists Found</h3>
                         <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 max-w-xs mx-auto">
-                            We couldn't find any doctors matching your search or filter. Try a different specialty.
+                            We couldn&apos;t find any doctors matching your search or filter. Try a different specialty.
                         </p>
                         <button
                             onClick={() => { setSearch(''); setSelectedSpecialty('All'); }}
