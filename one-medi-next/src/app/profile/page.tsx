@@ -26,14 +26,15 @@ const MenuLink = ({ icon, label, sub, onClick, color = "text-slate-600" }: any) 
 function ProfileContent() {
     const router = useRouter();
     const { profile, isAuthenticated } = useUserStore();
-    const { signOut } = useAuth();
+    const { signOut, loading } = useAuth();
     const [isDark, setIsDark] = useState(false);
 
     useEffect(() => {
-        if (!isAuthenticated) {
+        // Only redirect after AuthProvider has finished checking the session
+        if (!loading && !isAuthenticated) {
             router.push('/login');
         }
-    }, [isAuthenticated, router]);
+    }, [loading, isAuthenticated, router]);
 
     useEffect(() => {
         const isDarkMode = document.documentElement.classList.contains('dark');
@@ -58,6 +59,15 @@ function ProfileContent() {
             router.push('/login');
         }
     };
+
+    // Show spinner while auth is being checked
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-bg-light dark:bg-bg-dark flex items-center justify-center">
+                <span className="material-symbols-outlined text-4xl text-slate-300 animate-spin">sync</span>
+            </div>
+        );
+    }
 
     if (!isAuthenticated) return null;
 

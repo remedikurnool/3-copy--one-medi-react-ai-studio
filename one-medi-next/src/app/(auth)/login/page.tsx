@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, Suspense } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import { supabase } from '../../../lib/supabase';
 
@@ -10,6 +10,8 @@ type EmailStep = 'form' | 'success';
 
 function LoginForm() {
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const redirectTo = searchParams.get('next') || searchParams.get('redirect') || '/';
 
     // Tab state
     const [authMode, setAuthMode] = useState<AuthMode>('email');
@@ -95,7 +97,8 @@ function LoginForm() {
                         throw error;
                     }
                 } else {
-                    router.push('/');
+                    // Use replace so user can't go back to login page
+                    router.replace(redirectTo);
                 }
             }
         } catch (err: any) {
