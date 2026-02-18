@@ -1,0 +1,244 @@
+﻿
+src\app\error.tsx:34:                    onClick={() => 
+window.location.href = '/'}
+src\app\(auth)\login\page.tsx:48:                    
+redirectTo: `${window.location.origin}/callback`,
+src\app\ambulance\page.tsx:256:                          
+      <span className="material-symbols-outlined 
+text-2xl">location_on</span>
+src\app\blood-banks\page.tsx:65:                         
+   <span className="material-symbols-outlined 
+text-[16px]">location_on</span>
+src\app\cart\page.tsx:53:                
+showLocation={false}
+src\app\checkout\page.tsx:93:                <PageHeader 
+title="Submit Order" subtitle="Pharmacist Review" 
+showCart={false} showLocation={false} />
+src\app\checkout\page.tsx:158:            <PageHeader 
+title="Checkout" subtitle="Secure Payment" 
+showCart={false} showLocation={false} 
+className="lg:top-20" />
+src\app\checkout\page.tsx:192:                           
+     <span className="material-symbols-outlined 
+text-primary">location_on</span>
+src\app\checkout\page.tsx:236:                           
+     <span className="material-symbols-outlined text-4xl 
+text-slate-300 mb-2">add_location</span>
+src\app\doctors\page.tsx:9:import { useLocationStore } 
+from '@/store/locationStore';
+src\app\doctors\page.tsx:10:import LocationModal from 
+'@/components/ui/LocationModal';
+src\app\doctors\page.tsx:14:    const { city } = 
+useLocationStore();
+src\app\doctors\page.tsx:15:    const 
+[isLocationModalOpen, setIsLocationModalOpen] = 
+useState(false);
+src\app\doctors\page.tsx:31:            <LocationModal 
+isOpen={isLocationModalOpen} onClose={() => 
+setIsLocationModalOpen(false)} />
+src\app\doctors\page.tsx:36:                
+showLocation={true}
+src\app\doctors\page.tsx:41:                
+onLocationClick={() => setIsLocationModalOpen(true)}
+src\app\doctors\[id]\page.tsx:30:                icon: 
+'location_on',
+src\app\doctors\[id]\page.tsx:92:                
+showLocation={false}
+src\app\doctors\[id]\page.tsx:281:                       
+             <span className="material-symbols-outlined 
+text-[16px]">location_on</span>
+src\app\home-care\booking\page.tsx:142:                  
+          <h3 className="text-sm font-bold text-gray-500 
+uppercase tracking-wider">Service Location</h3>
+src\app\home-care\booking\page.tsx:163:                  
+                  <span 
+className="material-symbols-outlined 
+text-3xl">add_location_alt</span>
+src\app\home-care\[id]\page.tsx:93:                
+showLocation={false}
+src\app\hospitals\page.tsx:57:                           
+ {hospital.location?.is_open_24x7 && (
+src\app\hospitals\page.tsx:82:                           
+     <span className="material-symbols-outlined 
+text-[18px] shrink-0 mt-0.5">location_on</span>
+src\app\hospitals\page.tsx:83:                           
+     <p 
+className="leading-snug">{hospital.location?.address || 
+'Kurnool, Andhra Pradesh'}</p>
+src\app\hospitals\[id]\page.tsx:53:                
+showLocation={false}
+src\app\hospitals\[id]\page.tsx:74:                      
+      <span className="material-symbols-outlined 
+text-sm">location_on</span>
+src\app\hospitals\[id]\page.tsx:75:                      
+      {hospital.location}
+src\app\lab-tests\page.tsx:5:import { useLocationStore } 
+from '@/store/locationStore';
+src\app\lab-tests\page.tsx:6:import LocationModal from 
+'@/components/ui/LocationModal';
+src\app\lab-tests\page.tsx:23:    const { city } = 
+useLocationStore();
+src\app\lab-tests\page.tsx:24:    const 
+[isLocationModalOpen, setIsLocationModalOpen] = 
+useState(false);
+src\app\lab-tests\page.tsx:40:            <LocationModal 
+isOpen={isLocationModalOpen} onClose={() => 
+setIsLocationModalOpen(false)} />
+src\app\lab-tests\page.tsx:45:                
+showLocation={true}
+src\app\lab-tests\page.tsx:50:                
+onLocationClick={() => setIsLocationModalOpen(true)}
+src\app\lab-tests\[id]\page.tsx:116:                
+showLocation={false}
+src\app\medicines\page.tsx:33:                
+showLocation={true}
+src\app\orders\[id]\page.tsx:138:                        
+    <span className="material-symbols-outlined 
+text-primary text-lg">location_on</span>
+src\app\physiotherapy\[id]\page.tsx:60:                
+showLocation={false}
+src\app\profile\page.tsx:139:                        
+<MenuLink icon="location_on" label="Addresses" 
+sub="Delivery locations" onClick={() => 
+router.push('/profile/addresses')} 
+color="text-indigo-500" />
+src\app\profile\addresses\page.tsx:78:                   
+     <span className="material-symbols-outlined 
+text-xl">add_location_alt</span>
+src\app\scans\page.tsx:35:                
+showLocation={true}
+src\app\surgeries\second-opinion\page.tsx:51:            
+    showLocation={false}
+src\components\ErrorBoundary.tsx:69:                     
+       onClick={() => window.location.href = '/'}
+src\components\home\TestimonialsTrust.tsx:10:        
+location: "Kurnool",
+src\components\home\TestimonialsTrust.tsx:18:        
+location: "Nandyal",
+src\components\home\TestimonialsTrust.tsx:26:        
+location: "Adoni",
+src\components\home\TestimonialsTrust.tsx:79:            
+                    <p className="text-xs 
+text-slate-500">{item.location}</p>
+src\components\layout\SmartHeader.tsx:8:import { 
+useLocationStore } from '@/store/locationStore';
+src\components\layout\SmartHeader.tsx:9:import 
+LocationModal from '@/components/ui/LocationModal';
+src\components\layout\SmartHeader.tsx:13:    const { 
+city, address } = useLocationStore();
+src\components\layout\SmartHeader.tsx:15:    const 
+[isLocationModalOpen, setIsLocationModalOpen] = 
+useState(false);
+src\components\layout\SmartHeader.tsx:27:            
+<LocationModal isOpen={isLocationModalOpen} onClose={() 
+=> setIsLocationModalOpen(false)} />
+src\components\layout\SmartHeader.tsx:39:                
+    {/* Logo & Location */}
+src\components\layout\SmartHeader.tsx:51:                
+            onClick={() => setIsLocationModalOpen(true)}
+src\components\layout\SmartHeader.tsx:55:                
+                <span 
+className="material-symbols-outlined 
+text-lg">location_on</span>
+src\components\layout\SmartHeader.tsx:60:                
+                    {address || city || 'Select 
+Location'}
+src\components\mother-baby\CareTakersList.tsx:4:    { 
+id: 1, name: 'Sunita Devi', role: 'Japa Maid', exp: '15 
+Yrs', rating: 4.9, image: 'person_apron', type: 
+'traditional', location: 'Live-in' },
+src\components\mother-baby\CareTakersList.tsx:5:    { 
+id: 2, name: 'Grace Mary', role: 'Expert Nanny', exp: '8 
+Yrs', rating: 4.8, image: 'person', type: 'modern', 
+location: 'Day Shift' },
+src\components\mother-baby\CareTakersList.tsx:6:    { 
+id: 3, name: 'Lakshmi K', role: 'Postpartum Care', exp: 
+'12 Yrs', rating: 4.7, image: 'person_apron', type: 
+'traditional', location: 'Visit' },
+src\components\mother-baby\CareTakersList.tsx:30:        
+                        <span className="px-2 py-0.5 
+rounded-full bg-slate-100 dark:bg-gray-700 text-[9px] 
+font-black uppercase tracking-wider 
+text-slate-500">{caretaker.location}</span>
+src\components\surgery\SurgeonCard.tsx:54:               
+             <span className="text-[10px] font-bold 
+text-slate-400 uppercase tracking-wide">Location</span>
+src\components\ui\DesktopHeader.tsx:8:import { 
+useLocationStore } from '@/store/locationStore';
+src\components\ui\DesktopHeader.tsx:11:import 
+LocationModal from './LocationModal';
+src\components\ui\DesktopHeader.tsx:17:  const { city } 
+= useLocationStore();
+src\components\ui\DesktopHeader.tsx:21:  const 
+[isLocationModalOpen, setIsLocationModalOpen] = 
+useState(false);
+src\components\ui\DesktopHeader.tsx:35:      
+<LocationModal isOpen={isLocationModalOpen} onClose={() 
+=> setIsLocationModalOpen(false)} />
+src\components\ui\DesktopHeader.tsx:121:            {/* 
+Location */}
+src\components\ui\DesktopHeader.tsx:123:              
+onClick={() => setIsLocationModalOpen(true)}
+src\components\ui\DesktopHeader.tsx:128:              
+<span className="material-symbols-outlined text-primary 
+text-xl">location_on</span>
+src\components\ui\EmptyState.tsx:141:            
+icon="location_off"
+src\components\ui\EmptyState.tsx:145:            
+actionIcon="add_location"
+src\components\ui\LocationModal.tsx:5:import { 
+useLocationStore } from '@/store/locationStore';
+src\components\ui\LocationModal.tsx:7:interface 
+LocationModalProps {
+src\components\ui\LocationModal.tsx:14:export default 
+function LocationModal({ isOpen, onClose }: 
+LocationModalProps) {
+src\components\ui\LocationModal.tsx:15:  const { city, 
+address, setManualLocation } = useLocationStore();
+src\components\ui\LocationModal.tsx:28:  const 
+handleDetectLocation = () => {
+src\components\ui\LocationModal.tsx:30:    if 
+('geolocation' in navigator) {
+src\components\ui\LocationModal.tsx:31:      
+navigator.geolocation.getCurrentPosition(
+src\components\ui\LocationModal.tsx:36:            
+setManualLocation('Kurnool', 'Near Raj Vihar Centre');
+src\components\ui\LocationModal.tsx:44:          
+alert('Could not detect location. Please select 
+manually.');
+src\components\ui\LocationModal.tsx:49:      
+alert('Geolocation is not supported by your browser');
+src\components\ui\LocationModal.tsx:54:    
+setManualLocation(selectedCity, address);
+src\components\ui\LocationModal.tsx:82:                
+<h2 className="text-xl font-black text-slate-900 
+dark:text-white">Select Location</h2>
+src\components\ui\LocationModal.tsx:106:              
+{/* Detect Location Button */}
+src\components\ui\LocationModal.tsx:108:                
+onClick={handleDetectLocation}
+src\components\ui\LocationModal.tsx:114:                 
+   {detecting ? 'location_searching' : 'my_location'}
+src\components\ui\LocationModal.tsx:118:                 
+ <h3 className="font-bold text-base leading-tight">Use 
+Current Location</h3>
+src\components\ui\PageHeader.tsx:6:import { 
+useLocationStore } from '@/store/locationStore';
+src\components\ui\PageHeader.tsx:14:    showLocation?: 
+boolean;
+src\components\ui\PageHeader.tsx:20:    
+onLocationClick?: () => void;
+src\components\ui\PageHeader.tsx:30:    showLocation = 
+true,
+src\components\ui\PageHeader.tsx:36:    onLocationClick,
+src\components\ui\PageHeader.tsx:43:    const { city } = 
+useLocationStore();
+src\components\ui\PageHeader.tsx:79:                     
+   {showLocation && !subtitle && (
+src\components\ui\PageHeader.tsx:81:                     
+           onClick={onLocationClick}
+src\components\ui\PageHeader.tsx:84:                     
+           <span className="material-symbols-outlined 
+text-[14px] filled">location_on</span>
+
+
