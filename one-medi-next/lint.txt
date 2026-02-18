@@ -1,0 +1,547 @@
+﻿
+> one-medi-next@0.1.0 lint
+> eslint
+
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\app\(auth)\login\page.tsx
+  33:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  54:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\app\(auth)\otp\page.tsx
+   72:23  error  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+   89:23  error  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  106:27  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\app\ambulance\page.tsx
+  113:18  warning  Unused eslint-disable directive (no problems were reported from '@next/next/no-img-element')
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\app\bookings\page.tsx
+  121:11  warning  'router' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\app\cart\page.tsx
+  36:105  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\app\checkout\page.tsx
+   5:10  warning  'motion' is defined but never used                    @typescript-eslint/no-unused-vars
+   5:18  warning  'AnimatePresence' is defined but never used           @typescript-eslint/no-unused-vars
+  17:13  warning  'isAuthenticated' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\app\doctors\[id]\page.tsx
+   8:10  warning  'Doctor' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          @typescript-eslint/no-unused-vars
+  16:36  warning  'error' is assigned a value but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  @typescript-eslint/no-unused-vars
+  51:13  error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\app\doctors\[id]\page.tsx:51:13
+  49 |     useEffect(() => {
+  50 |         if (defaultVariants.length > 0) {
+> 51 |             setSelectedType(defaultVariants[0].type);
+     |             ^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  52 |         }
+  53 |     }, [defaultVariants]);
+  54 |  react-hooks/set-state-in-effect
+  59:57  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    @typescript-eslint/no-explicit-any
+  83:53  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    @typescript-eslint/no-explicit-any
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\app\doctors\booking\page.tsx
+  54:13  error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\app\doctors\booking\page.tsx:54:13
+  52 |     useEffect(() => {
+  53 |         if (!selectedDate && dates.length > 0) {
+> 54 |             setSelectedDate(dates[0].iso);
+     |             ^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  55 |         }
+  56 |     }, []);
+  57 |  react-hooks/set-state-in-effect
+  56:8   warning  React Hook useEffect has missing dependencies: 'dates' and 'selectedDate'. Either include them or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               react-hooks/exhaustive-deps
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\app\doctors\page.tsx
+  14:13  warning  'city' is assigned a value but never used                        @typescript-eslint/no-unused-vars
+  96:38  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\app\feed\page.tsx
+  11:34  warning  'loading' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\app\home-care\[id]\page.tsx
+   34:54  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          @typescript-eslint/no-explicit-any
+   40:13  error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\app\home-care\[id]\page.tsx:40:13
+  38 |         if (service) {
+  39 |             const plans = getServicePlans(service);
+> 40 |             setSelectedPlan(plans[0]);
+     |             ^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  41 |         }
+  42 |     }, [service]);
+  43 |  react-hooks/set-state-in-effect
+  105:22  warning  Unused eslint-disable directive (no problems were reported from '@next/next/no-img-element')
+  219:72  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   react/no-unescaped-entities
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\app\home-care\booking\page.tsx
+  24:9  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\app\home-care\booking\page.tsx:24:9
+  22 |
+  23 |     useEffect(() => {
+> 24 |         setMounted(true);
+     |         ^^^^^^^^^^ Avoid calling setState() directly within an effect
+  25 |     }, []);
+  26 |
+  27 |     if (!mounted) return null;  react-hooks/set-state-in-effect
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\app\hospitals\page.tsx
+  44:63  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\app\insurance\page.tsx
+    9:11  warning  'router' is assigned a value but never used  @typescript-eslint/no-unused-vars
+   47:51  error    Unexpected any. Specify a different type     @typescript-eslint/no-explicit-any
+   81:69  error    Unexpected any. Specify a different type     @typescript-eslint/no-explicit-any
+  302:50  error    Unexpected any. Specify a different type     @typescript-eslint/no-explicit-any
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\app\lab-tests\[id]\page.tsx
+   10:61  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        @typescript-eslint/no-explicit-any
+   22:68  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        @typescript-eslint/no-explicit-any
+   37:34  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        @typescript-eslint/no-explicit-any
+   73:60  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        @typescript-eslint/no-explicit-any
+   77:13  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\app\lab-tests\[id]\page.tsx:77:13
+  75 |     useEffect(() => {
+  76 |         if (test && test.variants && test.variants.length > 0 && !selectedVariant) {
+> 77 |             setSelectedVariant(test.variants[0]);
+     |             ^^^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  78 |         }
+  79 |     }, [test]); // eslint-disable-line react-hooks/exhaustive-deps
+  80 |  react-hooks/set-state-in-effect
+  166:55  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        @typescript-eslint/no-explicit-any
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\app\lab-tests\booking\page.tsx
+  32:38  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        @typescript-eslint/no-explicit-any
+  49:18  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        @typescript-eslint/no-explicit-any
+  64:13  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\app\lab-tests\booking\page.tsx:64:13
+  62 |     useEffect(() => {
+  63 |         if (dates.length > 0 && !selectedDate) {
+> 64 |             setSelectedDate(dates[0].id);
+     |             ^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  65 |         }
+  66 |     }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  67 |  react-hooks/set-state-in-effect
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\app\lab-tests\custom-package\assessment\page.tsx
+  121:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\app\lab-tests\custom-package\result\page.tsx
+    5:32  warning  'Shield' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               @typescript-eslint/no-unused-vars
+   44:13  error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\app\lab-tests\custom-package\result\page.tsx:44:13
+  42 |         const saved = localStorage.getItem("health_assessment_result");
+  43 |         if (saved) {
+> 44 |             setResult(JSON.parse(saved));
+     |             ^^^^^^^^^ Avoid calling setState() directly within an effect
+  45 |         } else {
+  46 |             router.push("/lab-tests/custom-package/assessment");
+  47 |         }  react-hooks/set-state-in-effect
+  107:48  warning  'idx' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  @typescript-eslint/no-unused-vars
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\app\lab-tests\page.tsx
+   23:13  warning  'city' is assigned a value but never used                        @typescript-eslint/no-unused-vars
+  105:38  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\app\layout.tsx
+  31:9  warning  Block is not recommended. See: https://nextjs.org/docs/messages/google-font-display                                                                              @next/next/google-font-display
+  31:9  warning  Custom fonts not added in `pages/_document.js` will only load for a single page. This is discouraged. See: https://nextjs.org/docs/messages/no-page-custom-font  @next/next/no-page-custom-font
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\app\medicines\[id]\page.tsx
+  14:11  warning  'router' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\app\mother-baby\tools\[toolId]\page.tsx
+  27:63  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\app\not-found.tsx
+  13:51  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\app\notifications\page.tsx
+  3:27  warning  'useEffect' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\app\page.tsx
+  21:3  warning  'useMedicalScans' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\app\physiotherapy\[id]\page.tsx
+    6:10  warning  'HomeCareService' is defined but never used  @typescript-eslint/no-unused-vars
+   13:36  error    Unexpected any. Specify a different type     @typescript-eslint/no-explicit-any
+   15:54  error    Unexpected any. Specify a different type     @typescript-eslint/no-explicit-any
+  132:52  error    Unexpected any. Specify a different type     @typescript-eslint/no-explicit-any
+  225:41  error    Unexpected any. Specify a different type     @typescript-eslint/no-explicit-any
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\app\physiotherapy\page.tsx
+  11:35  warning  'loading' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  15:57  error    Unexpected any. Specify a different type      @typescript-eslint/no-explicit-any
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\app\profile\addresses\page.tsx
+  21:40  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  92:99  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\app\profile\family\page.tsx
+  23:45  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  98:98  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\app\profile\health-records\page.tsx
+  6:59  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\app\profile\page.tsx
+   9:76  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             @typescript-eslint/no-explicit-any
+  40:9   error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\app\profile\page.tsx:40:9
+  38 |     useEffect(() => {
+  39 |         const isDarkMode = document.documentElement.classList.contains('dark');
+> 40 |         setIsDark(isDarkMode);
+     |         ^^^^^^^^^ Avoid calling setState() directly within an effect
+  41 |     }, []);
+  42 |
+  43 |     const toggleDarkMode = () => {  react-hooks/set-state-in-effect
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\app\scans\[id]\page.tsx
+  13:11  warning  'router' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\app\scans\booking\page.tsx
+  17:38  warning  'scanLoading' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  18:30  error    Unexpected any. Specify a different type          @typescript-eslint/no-explicit-any
+  19:46  error    Unexpected any. Specify a different type          @typescript-eslint/no-explicit-any
+  24:38  error    Unexpected any. Specify a different type          @typescript-eslint/no-explicit-any
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\app\scans\page.tsx
+  82:41  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\app\services\page.tsx
+  230:107  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\app\skin-hair\page.tsx
+  20:20  warning  'setSearch' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  23:38  warning  'error' is assigned a value but never used      @typescript-eslint/no-unused-vars
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\app\surgeries\[id]\page.tsx
+  11:36  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\app\surgeries\page.tsx
+  15:12  warning  'search' is assigned a value but never used     @typescript-eslint/no-unused-vars
+  15:20  warning  'setSearch' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\app\surgeries\procedure\[slug]\page.tsx
+  11:41  warning  'params' is defined but never used           @typescript-eslint/no-unused-vars
+  12:11  warning  'router' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\app\surgeries\second-opinion\page.tsx
+  24:40  warning  'doctorsLoading' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\app\upload-rx\page.tsx
+  17:12  warning  'file' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\app\wellness\[id]\page.tsx
+  75:25  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\components\AuthProvider.tsx
+  39:9  warning  'updateProfile' is assigned a value but never used     @typescript-eslint/no-unused-vars
+  43:9  warning  'setAuthenticated' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\components\cards\BentoCard.tsx
+   6:109  warning  'isLarge' is defined but never used                                                                                                                                                                                                                                                      @typescript-eslint/no-unused-vars
+   6:120  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  22:17   warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\components\cards\MedicineCard.tsx
+   4:8   warning  'Image' is defined but never used         @typescript-eslint/no-unused-vars
+  15:65  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\components\cards\ScanCard.tsx
+  7:53  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\components\home\BentoServiceGrid.tsx
+  16:4   error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  28:17  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\components\home\CategoryCarousel.tsx
+  80:29  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\components\home\DownloadApp.tsx
+   4:10  warning  'motion' is defined but never used                                                                                                                                                                                                                                                       @typescript-eslint/no-unused-vars
+  33:29  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  36:29  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  49:25  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\components\home\DynamicHero.tsx
+  77:25  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\components\home\QuickAccessGrid.tsx
+  23:34  warning  'index' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\components\home\TestimonialsTrust.tsx
+  76:29  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  86:29  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                                                                                                                                                                                          react/no-unescaped-entities
+  86:41  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                                                                                                                                                                                          react/no-unescaped-entities
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\components\layout\AdvancedFooter.tsx
+   5:10  warning  'motion' is defined but never used                               @typescript-eslint/no-unused-vars
+  20:36  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\components\layout\SmartHeader.tsx
+   6:18  warning  'AnimatePresence' is defined but never used  @typescript-eslint/no-unused-vars
+  12:11  warning  'router' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\components\mother-baby\TrustTips.tsx
+  12:116  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\components\mother-baby\VaccinationSection.tsx
+  24:88  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\components\mother-baby\tools\PregnancyTracker.tsx
+  20:92   error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  21:108  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\components\scans\UploadPrescription.tsx
+  12:43  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\components\skin-hair\ConcernGrid.tsx
+  17:104  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\components\surgery\CostEstimator.tsx
+  31:114  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\components\ui\AdvancedSearch.tsx
+   23:9   warning  'setPrescription' is assigned a value but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   @typescript-eslint/no-unused-vars
+   43:7   error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\components\ui\AdvancedSearch.tsx:43:7
+  41 |   useEffect(() => {
+  42 |     if (query.length < 2) {
+> 43 |       setDebouncedQuery('');
+     |       ^^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  44 |       return;
+  45 |     }
+  46 |     const timer = setTimeout(() => setDebouncedQuery(query), 300);  react-hooks/set-state-in-effect
+   61:35  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               @typescript-eslint/no-explicit-any
+   72:33  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               @typescript-eslint/no-explicit-any
+   83:34  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               @typescript-eslint/no-explicit-any
+   93:31  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               @typescript-eslint/no-explicit-any
+  119:7   error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\components\ui\AdvancedSearch.tsx:119:7
+  117 |     const saved = localStorage.getItem('oneMedi_recentSearches');
+  118 |     if (saved) {
+> 119 |       setRecentSearches(JSON.parse(saved));
+      |       ^^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  120 |     }
+  121 |   }, []);
+  122 |               react-hooks/set-state-in-effect
+  130:6   warning  React Hook useEffect has a missing dependency: 'placeholders.length'. Either include it or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 react-hooks/exhaustive-deps
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\components\ui\CategoryPill.tsx
+  6:66  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\components\ui\DesktopHeader.tsx
+   6:35  warning  'useScroll' is defined but never used        @typescript-eslint/no-unused-vars
+   6:46  warning  'useTransform' is defined but never used     @typescript-eslint/no-unused-vars
+  15:9   warning  'router' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\components\ui\FlyingCartAnimation.tsx
+  23:50  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  26:25  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  82:9   warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\components\ui\Footer.tsx
+  24:20  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\components\ui\GlobalSearchBar.tsx
+   21:55   error  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+   21:71   error  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+   21:84   error  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  132:102  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  132:110  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  133:189  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  133:201  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\components\ui\HeroSlider.tsx
+   7:54  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  55:29  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\components\ui\LocationModal.tsx
+  32:16  warning  'position' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\components\ui\MobileSidebar.tsx
+  4:8  warning  'Link' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\components\wellness\ProgramCard.tsx
+   4:14  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  16:17  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\components\wellness\ProgramCurriculum.tsx
+  11:21  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\components\wellness\SuccessStories.tsx
+  13:29  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\constants.ts
+  3:44  warning  'VendorId' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\hooks\useBookings.ts
+  146:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  185:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  228:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\hooks\useHospitals.ts
+    2:28  warning  'useSupabaseList' is defined but never used    @typescript-eslint/no-unused-vars
+    2:45  warning  'useSupabaseRecord' is defined but never used  @typescript-eslint/no-unused-vars
+   37:64  error    Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+  118:64  error    Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+  165:66  error    Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\hooks\useLabTests.ts
+  19:18  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\hooks\useMedicalScans.ts
+  3:10  warning  'useSupabaseList' is defined but never used    @typescript-eslint/no-unused-vars
+  3:27  warning  'useSupabaseRecord' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\hooks\useMedicines.ts
+  3:10  warning  'useSupabaseList' is defined but never used    @typescript-eslint/no-unused-vars
+  3:27  warning  'useSupabaseRecord' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\hooks\useOrders.ts
+    5:10  warning  'useUserStore' is defined but never used  @typescript-eslint/no-unused-vars
+   18:24  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   30:16  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   31:16  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   70:23  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   87:16  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   91:18  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  142:23  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  202:23  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  247:23  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\hooks\useRealtime.ts
+   44:9   error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\hooks\useRealtime.ts:44:9
+  42 |
+  43 |     useEffect(() => {
+> 44 |         fetchOrders();
+     |         ^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  45 |
+  46 |         // Don't subscribe if not authenticated
+  47 |         if (!isAuthenticated) return;                        react-hooks/set-state-in-effect
+   98:40  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    @typescript-eslint/no-explicit-any
+  103:13  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\hooks\useRealtime.ts:103:13
+  101 |     useEffect(() => {
+  102 |         if (!doctorId || !date) {
+> 103 |             setSlots([]);
+      |             ^^^^^^^^ Avoid calling setState() directly within an effect
+  104 |             setLoading(false);
+  105 |             return;
+  106 |         }  react-hooks/set-state-in-effect
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\hooks\useSupabaseQuery.ts
+  21:30  error    Unexpected any. Specify a different type                                                                                                                                                                                         @typescript-eslint/no-explicit-any
+  33:19  error    Unexpected any. Specify a different type                                                                                                                                                                                         @typescript-eslint/no-explicit-any
+  58:8   warning  React Hook useCallback was passed a dependency list that is not an array literal. This means we can't statically verify whether you've passed the correct dependencies                                                           react-hooks/exhaustive-deps
+  58:8   warning  React Hook useCallback has a missing dependency: 'queryFn'. Either include it or remove the dependency array. If 'queryFn' changes too often, find the parent component that defines it and wrap that definition in useCallback  react-hooks/exhaustive-deps
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\hooks\useUIConfig.ts
+    1:45  warning  'useSupabaseRecord' is defined but never used  @typescript-eslint/no-unused-vars
+  139:22  warning  'e' is defined but never used                  @typescript-eslint/no-unused-vars
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\hooks\useVendors.ts
+  17:36  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\store\bookingStore.ts
+   6:14  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   7:11  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  12:18  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\store\locationStore.ts
+  115:28  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\karthik\republic\3-copy--one-medi-react-ai-studio\one-medi-next\src\types\index.ts
+   95:16  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  156:16  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  254:16  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+Γ£û 187 problems (113 errors, 74 warnings)
+  0 errors and 2 warnings potentially fixable with the `--fix` option.
+

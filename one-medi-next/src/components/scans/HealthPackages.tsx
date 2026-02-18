@@ -1,14 +1,91 @@
-import React from 'react';
-import { SCANS_CONTENT_MASTER } from '@/data/scans-content';
+import React, { useEffect, useState } from 'react';
+import { supabase } from '@/lib/supabase';
+import { useRouter } from 'next/navigation';
+
+interface HealthPackage {
+    id: string;
+    title: string;
+    testsCount: number;
+    includes: string[];
+    price: number;
+    mrp: number;
+    color: string;
+    recommended: string;
+}
 
 export default function HealthPackages() {
+    const router = useRouter();
+    const [packages, setPackages] = useState<HealthPackage[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        async function fetchPackages() {
+            try {
+                // Fetch lab tests that are packages
+                const { data: tests, error } = await supabase
+                    .from('lab_tests')
+                    .select('*, lab_pricing(*)')
+                    .eq('category', 'Package')
+                    .eq('is_active', true);
+
+                if (error) throw error;
+
+                // Transform data to match UI needs
+                const mappedPackages: HealthPackage[] = (tests || []).map((test: any) => {
+                    const pricing = test.lab_pricing?.[0] || {};
+                    const includes = test.includes || [];
+
+                    // Infer metadata purely for UI (since migration didn't store color/recommended in DB explicitly yet)
+                    // In a perfect world, we'd add 'metadata' jsonb column to lab_tests for this.
+                    // For now, mapping based on code/name or defaults.
+                    let color = 'emerald';
+                    let recommended = 'General Wellness';
+
+                    if (test.code === 'pkg_senior') {
+                        color = 'orange';
+                        recommended = 'Geriatric Care';
+                    } else if (test.code === 'pkg_women') {
+                        color = 'pink';
+                        recommended = 'Gynecologist';
+                    }
+
+                    return {
+                        id: test.id,
+                        title: test.name,
+                        testsCount: 85, // Fallback if includes is empty, ideally includes.length
+                        includes: includes,
+                        price: pricing.price || 0,
+                        mrp: pricing.mrp || 0,
+                        color,
+                        recommended
+                    };
+                });
+
+                setPackages(mappedPackages);
+            } catch (err) {
+                console.error('Error fetching health packages:', err);
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        fetchPackages();
+    }, []);
+
+    if (loading) return null; // Or skeleton
+    if (!packages.length) return null;
+
     return (
-        <section className="mb-10">
+        <section className="mb-10 animate-fade-in">
             <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 px-1">Curated Health Packages</h3>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {SCANS_CONTENT_MASTER.packages.map((pkg) => (
-                    <div key={pkg.id} className="bg-white dark:bg-gray-800 rounded-[2rem] p-5 border border-slate-100 dark:border-gray-700 shadow-sm hover:shadow-xl transition-all hover:-translate-y-1 group cursor-pointer relative overflow-hidden">
+                {packages.map((pkg) => (
+                    <div
+                        key={pkg.id}
+                        onClick={() => router.push(`/scans/${pkg.id}`)}
+                        className="card-modern relative overflow-hidden p-5 group cursor-pointer"
+                    >
                         <div className={`absolute top-0 right-0 w-24 h-24 bg-${pkg.color}-500/10 rounded-full blur-2xl -mr-10 -mt-10 transition-all group-hover:bg-${pkg.color}-500/20`}></div>
 
                         <div className="flex justify-between items-start mb-4">
@@ -27,7 +104,7 @@ export default function HealthPackages() {
                                     </div>
                                 ))}
                             </div>
-                            <span className="text-xs font-bold text-slate-500">+{pkg.testsCount} Tests included</span>
+                            <span className="text-xs font-bold text-slate-500">+{pkg.includes.length || pkg.testsCount} Tests included</span>
                         </div>
 
                         <div className="pt-4 border-t border-slate-50 dark:border-gray-700 flex items-end justify-between">
@@ -35,10 +112,12 @@ export default function HealthPackages() {
                                 <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-0.5">Package Price</p>
                                 <div className="flex items-baseline gap-2">
                                     <span className="text-xl font-black text-slate-900 dark:text-white">₹{pkg.price}</span>
-                                    <span className="text-xs font-bold text-slate-400 line-through">₹{pkg.mrp}</span>
+                                    {pkg.mrp > pkg.price && (
+                                        <span className="text-xs font-bold text-slate-400 line-through">₹{pkg.mrp}</span>
+                                    )}
                                 </div>
                             </div>
-                            <button className="size-10 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 flex items-center justify-center shadow-lg active:scale-90 transition-transform">
+                            <button className="size-10 btn bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-lg hover:scale-105 active:scale-95">
                                 <span className="material-symbols-outlined text-lg">arrow_forward</span>
                             </button>
                         </div>

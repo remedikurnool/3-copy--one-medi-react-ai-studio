@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import PageHeader from '@/components/ui/PageHeader';
-import { WELLNESS_CONTENT_MASTER } from '@/data/wellness-content';
+import { useMenu } from '@/hooks/useUIConfig';
 import { useWellnessPlans } from '@/hooks/useServices';
 import WellnessHero from '@/components/wellness/WellnessHero';
 import ProgramCategoryGrid from '@/components/wellness/ProgramCategoryGrid';
@@ -15,6 +15,8 @@ export default function WellnessPage() {
     const router = useRouter();
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
     const { data: programs, loading: programsLoading } = useWellnessPlans();
+    const { data: menu } = useMenu('wellness_categories');
+    const categories = menu?.items || [];
 
     // Map Supabase services to program-like shape for ProgramCard
     const mappedPrograms = (programs || []).map(p => ({
@@ -32,9 +34,21 @@ export default function WellnessPage() {
         includes: p.requirements || []
     }));
 
-    const filteredPrograms = selectedCategory
-        ? mappedPrograms.filter(p =>
-            p.category === WELLNESS_CONTENT_MASTER.categories.find(c => c.id === selectedCategory)?.label)
+    // Find selected category object to get its title/label for matching
+    const selectedCategoryItem = selectedCategory ? categories.find(c => (c.route || c.id) === selectedCategory || c.id === selectedCategory) : null;
+    // Note: ProgramCategoryGrid uses cat.route || cat.id as selection key.
+    // In migration, I used route params like '/wellness/weight-loss'.
+    // Existing logic might be using 'weight-loss'.
+    // Let's assume onSelect passes the ID or Route.
+    // In ProgramCategoryGrid refactor: onClick={() => onSelect(cat.route || cat.id)}
+    // The route is '/wellness/weight-loss'.
+    // The program.category in DB might be 'Weight Loss' (Title).
+
+    // If selectedCategory is '/wellness/weight-loss', I need to find the item and get its title 'Weight Loss'.
+    // Then filter programs where category === 'Weight Loss'.
+
+    const filteredPrograms = selectedCategory && selectedCategoryItem
+        ? mappedPrograms.filter(p => p.category === selectedCategoryItem.title)
         : mappedPrograms;
 
     return (
@@ -61,7 +75,7 @@ export default function WellnessPage() {
                     <div className="flex justify-between items-end mb-6 px-1">
                         <div>
                             <h3 className="text-xl font-black text-slate-900 dark:text-white leading-none">
-                                {selectedCategory ? `${WELLNESS_CONTENT_MASTER.categories.find(c => c.id === selectedCategory)?.label}` : 'Featured Programs'}
+                                {selectedCategoryItem ? selectedCategoryItem.title : 'Featured Programs'}
                             </h3>
                             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide mt-1">
                                 {filteredPrograms.length} Plans Available
@@ -104,4 +118,3 @@ export default function WellnessPage() {
         </div>
     );
 }
-

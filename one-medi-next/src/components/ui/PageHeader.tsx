@@ -4,6 +4,8 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 import { useCartStore } from '@/store/cartStore';
 import { useLocationStore } from '@/store/locationStore';
+import { useSmartBack } from '@/hooks/useSmartBack';
+import { SmartBreadcrumbs } from './SmartBreadcrumbs';
 
 interface PageHeaderProps {
     title: string;
@@ -40,13 +42,15 @@ export default function PageHeader({
     const cartItemsCount = useCartStore((state) => state.items.length);
     const { city } = useLocationStore();
 
+    const smartBack = useSmartBack();
+
     const handleBack = () => {
         if (customBackAction) {
             customBackAction();
         } else if (backUrl) {
             router.push(backUrl);
         } else {
-            router.back();
+            smartBack();
         }
     };
 
@@ -124,6 +128,11 @@ export default function PageHeader({
                     </div>
                 </div>
             )}
+
+            {/* Smart Breadcrumbs */}
+            <div className="px-4 pb-2">
+                <SmartBreadcrumbs />
+            </div>
         </header>
     );
 }

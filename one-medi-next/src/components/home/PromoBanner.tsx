@@ -3,9 +3,16 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
+import { usePromoBanners } from '@/hooks/useUIConfig';
 
 export default function PromoBanner() {
     const router = useRouter();
+    const { data: carousel, loading } = usePromoBanners();
+    const banner = carousel?.items?.[0]; // Get the first active banner
+
+    if (loading || !banner) {
+        return null; // Or return a Skeleton/Default banner
+    }
 
     return (
         <div className="px-4 lg:px-8 py-6">
@@ -28,13 +35,13 @@ export default function PromoBanner() {
                             Limited Time Offer
                         </span>
                         <h3 className="text-2xl md:text-4xl font-black text-white mb-2 font-lexend leading-tight">
-                            Get 15% Additional Cashback
+                            {banner.title}
                         </h3>
                         <p className="text-indigo-100 font-medium text-sm md:text-base mb-6">
-                            On all medicine orders above ₹999. Use code <span className="font-bold text-white bg-white/20 px-1 rounded">HEALTH15</span>
+                            {banner.subtitle}
                         </p>
                         <button
-                            onClick={() => router.push('/medicines')}
+                            onClick={() => router.push(banner.link_url || '/')}
                             className="bg-white text-indigo-700 px-8 py-3 rounded-xl font-bold hover:bg-indigo-50 transition-colors shadow-lg active:scale-95"
                         >
                             Order Now

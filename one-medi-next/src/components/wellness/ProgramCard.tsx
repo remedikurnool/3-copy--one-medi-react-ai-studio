@@ -1,4 +1,4 @@
-import React from 'react';
+import { LazyImage } from '../ui/LazyImage';
 
 interface ProgramCardProps {
     program: any;
@@ -9,14 +9,15 @@ export default function ProgramCard({ program, onClick }: ProgramCardProps) {
     return (
         <div
             onClick={onClick}
-            className="group relative bg-white dark:bg-gray-800 rounded-[2.5rem] p-4 flex flex-col gap-4 cursor-pointer border border-slate-100 dark:border-gray-700 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 overflow-hidden"
+            className="group card-modern p-4 flex flex-col gap-4 cursor-pointer relative overflow-hidden"
         >
             {/* Image Section */}
-            <div className="relative h-48 w-full rounded-[2rem] overflow-hidden">
-                <img
+            <div className="relative h-48 w-full rounded-[2rem] overflow-hidden bg-slate-100 dark:bg-slate-800">
+                <LazyImage
                     src={program.image}
                     alt={program.title}
-                    className="size-full object-cover group-hover:scale-110 transition-transform duration-700"
+                    fill
+                    className="object-cover group-hover:scale-110 transition-transform duration-700"
                 />
 
                 <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider text-slate-900 shadow-sm">

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Image from 'next/image';
+import { LazyImage } from '../ui/LazyImage';
 
 interface ProductGalleryProps {
     images: string[];
@@ -18,14 +18,14 @@ export default function ProductGallery({ images }: ProductGalleryProps) {
                         onClick={() => setSelectedImg(img)}
                         className={`size-16 md:size-20 rounded-xl border-2 shrink-0 relative overflow-hidden transition-all ${selectedImg === img ? 'border-primary ring-2 ring-primary/20' : 'border-slate-100 dark:border-gray-700 hover:border-slate-300'}`}
                     >
-                        <Image src={img} alt={`Thumb ${idx}`} fill className="object-cover" />
+                        <LazyImage src={img} alt={`Thumb ${idx}`} fill className="object-cover" />
                     </button>
                 ))}
             </div>
 
             {/* Main Image */}
             <div className="flex-1 aspect-square md:aspect-auto md:h-[400px] bg-white dark:bg-gray-800 rounded-[2rem] border border-slate-100 dark:border-gray-700 relative overflow-hidden flex items-center justify-center p-8 group">
-                <Image
+                <LazyImage
                     src={selectedImg}
                     alt="Product"
                     fill

@@ -3,8 +3,8 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import PageHeader from '@/components/ui/PageHeader';
-import { MEDICINE_CONTENT_MASTER } from '@/data/medicine-content';
 import { useMedicines } from '@/hooks/useMedicines';
+import { useMenu, useCarousel } from '@/hooks/useUIConfig';
 import PharmacyHero from '@/components/medicines/PharmacyHero';
 import CategoryGrid from '@/components/medicines/CategoryGrid';
 import DealSlider from '@/components/medicines/DealSlider';
@@ -13,15 +13,18 @@ import ProductCard from '@/components/medicines/ProductCard';
 export default function MedicinesPage() {
     const router = useRouter();
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-    const { data: products, loading } = useMedicines();
+    // Dynamic UI Data
+    const { data: categoryMenu } = useMenu('medicine_categories');
+    const { data: dealsCarousel } = useCarousel('medicine_deals');
 
     const selectedCategoryLabel = selectedCategory
-        ? MEDICINE_CONTENT_MASTER.categories.find(c => c.id === selectedCategory)?.label
+        ? categoryMenu?.items.find(c => (c.route || c.id) === selectedCategory)?.title
         : null;
 
-    const filteredProducts = selectedCategoryLabel
-        ? (products || []).filter(p => p.category === selectedCategoryLabel)
-        : (products || []);
+    const { data: products, loading } = useMedicines(undefined, selectedCategoryLabel);
+
+    // Client-side filtering removed. products is already filtered by the hook.
+    const filteredProducts = products || [];
 
     return (
         <div className="flex flex-col min-h-screen bg-surface-50 dark:bg-surface-950 font-sans animate-fade-in pb-24 text-slate-900 dark:text-white">
@@ -36,12 +39,13 @@ export default function MedicinesPage() {
             <main className="p-4 max-w-7xl mx-auto w-full flex flex-col gap-6">
                 {/* Hero & Offers */}
                 <PharmacyHero />
-                <DealSlider />
+                {dealsCarousel && <DealSlider deals={dealsCarousel.items} />}
 
                 {/* Categories */}
                 <CategoryGrid
                     onSelect={(id) => setSelectedCategory(selectedCategory === id ? null : id)}
                     selectedId={selectedCategory}
+                    categories={categoryMenu?.items || []}
                 />
 
                 {/* Product Listing */}
@@ -49,7 +53,7 @@ export default function MedicinesPage() {
                     <div className="flex justify-between items-end mb-4 px-1">
                         <div>
                             <h3 className="text-xl font-black text-slate-900 dark:text-white leading-none">
-                                {selectedCategory ? `${MEDICINE_CONTENT_MASTER.categories.find(c => c.id === selectedCategory)?.label}` : 'Popular Medicines'}
+                                {selectedCategoryLabel || 'Popular Medicines'}
                             </h3>
                             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide mt-1">
                                 {loading ? 'Loading...' : `${filteredProducts.length} Products Found`}

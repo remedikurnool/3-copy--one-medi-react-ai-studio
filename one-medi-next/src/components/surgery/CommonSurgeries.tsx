@@ -21,7 +21,7 @@ export default function CommonSurgeries() {
                         <div className="animate-spin rounded-full h-8 w-8 border-2 border-primary border-t-transparent"></div>
                     </div>
                 ) : (surgeries || []).map((surgery) => (
-                    <div key={surgery.id} className="bg-white dark:bg-gray-800 rounded-[2rem] p-5 border border-slate-100 dark:border-gray-700 shadow-sm hover:shadow-xl transition-all group cursor-pointer active:scale-[0.99] flex flex-col h-full">
+                    <div key={surgery.id} className="card-modern p-5 flex flex-col h-full group cursor-pointer active:scale-[0.99]">
                         <div className="flex justify-between items-start mb-4">
                             <span className="inline-block px-3 py-1 rounded-lg bg-blue-50 dark:bg-gray-700 text-blue-600 dark:text-blue-400 text-[10px] font-black uppercase tracking-wider">
                                 {surgery.category}
@@ -53,7 +53,7 @@ export default function CommonSurgeries() {
                                 </span>
                             </div>
 
-                            <button className="w-full py-3 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-xs font-black uppercase tracking-widest hover:opacity-90 transition-opacity">
+                            <button className="w-full btn bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-xs uppercase tracking-widest py-3 hover:opacity-90">
                                 View Details
                             </button>
                         </div>

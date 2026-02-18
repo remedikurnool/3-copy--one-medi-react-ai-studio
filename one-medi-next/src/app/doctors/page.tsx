@@ -18,14 +18,13 @@ export default function DoctorListPage() {
 
     const specialties = ['All', 'General Physician', 'Cardiologist', 'Dentist', 'Gynecologist', 'Pediatrician', 'Dermatologist'];
 
-    const { data: allDoctors, loading: loadingAll } = useDoctors();
+    const { data: allDoctors, loading: loadingAll } = useDoctors(undefined, selectedSpecialty);
     const { data: searchResults, loading: loadingSearch } = useDoctorSearch(search);
 
     const isLoading = loadingAll || (search.length >= 2 && loadingSearch);
     const displayDoctors = search.length >= 2 ? searchResults : allDoctors;
-    const filteredDoctors = (displayDoctors || []).filter(doc => {
-        return selectedSpecialty === 'All' || doc.specialization === selectedSpecialty;
-    });
+    // Client-side filtering removed in favor of server-side filtering
+    const filteredDoctors = displayDoctors || [];
 
     return (
         <div className="min-h-screen bg-surface-50 dark:bg-surface-950 font-sans text-slate-900 dark:text-white pb-24 relative">

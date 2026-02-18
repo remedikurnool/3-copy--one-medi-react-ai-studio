@@ -1,5 +1,5 @@
 import React from 'react';
-import Image from 'next/image';
+import { LazyImage } from '../ui/LazyImage';
 import { useCartStore } from '@/store/cartStore';
 import { Medicine } from '@/types';
 
@@ -29,10 +29,10 @@ export default function ProductCard({ product, onClick }: ProductCardProps) {
     return (
         <div
             onClick={onClick}
-            className="group bg-white dark:bg-gray-800 rounded-[2rem] p-4 border border-slate-100 dark:border-gray-700 shadow-sm flex flex-col h-full cursor-pointer hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
+            className="group card-modern p-4 flex flex-col h-full cursor-pointer relative overflow-hidden"
         >
-            <div className="relative h-40 w-full bg-slate-50 dark:bg-gray-700 rounded-2xl overflow-hidden mb-4 shrink-0">
-                <Image
+            <div className="relative h-40 w-full bg-slate-50 dark:bg-gray-700 rounded-2xl overflow-hidden mb-4 shrink-0 shadow-inner-light">
+                <LazyImage
                     src={product.thumbnailImage || product.images[0]}
                     alt={product.name}
                     fill
@@ -70,7 +70,7 @@ export default function ProductCard({ product, onClick }: ProductCardProps) {
 
                     <button
                         onClick={handleAddToCart}
-                        className="bg-primary/10 text-primary hover:bg-primary hover:text-white size-10 rounded-xl flex items-center justify-center transition-all active:scale-95 shadow-sm"
+                        className="btn bg-primary-50 text-primary-600 hover:bg-primary-600 hover:text-white size-10 rounded-xl shadow-sm hover:shadow-primary-500/30"
                         aria-label="Add to cart"
                     >
                         <span className="material-symbols-outlined">add_shopping_cart</span>

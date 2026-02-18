@@ -20,7 +20,7 @@ const BentoItem = ({
         viewport={{ once: true }}
         transition={{ delay, duration: 0.5 }}
         onClick={onClick}
-        className={`group relative overflow-hidden rounded-[2rem] cursor-pointer ${span} ${bgClass} shadow-lg hover:shadow-xl transition-shadow`}
+        className={`group relative overflow-hidden rounded-[2rem] cursor-pointer ${span} ${bgClass} shadow-soft-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300`}
     >
         {/* Background Image / Pattern */}
         {image && (

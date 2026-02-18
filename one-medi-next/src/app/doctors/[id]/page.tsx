@@ -5,6 +5,7 @@ import { useRouter, useParams } from 'next/navigation';
 import { useDoctor } from '../../../hooks/useDoctors';
 import PrescriptionUpload from '../../../components/ui/PrescriptionUpload';
 import PageHeader from '@/components/ui/PageHeader';
+import { LazyImage } from '@/components/ui/LazyImage';
 import { Doctor } from '@/types';
 
 export default function DoctorProfilePage() {
@@ -106,12 +107,15 @@ export default function DoctorProfilePage() {
             <div className="relative flex flex-col items-center pt-6 pb-2 px-4 bg-surface-50 dark:bg-surface-950">
                 <div className="flex flex-col items-center gap-4">
                     <div className="relative">
-                        <div
-                            className="bg-center bg-no-repeat bg-cover rounded-full h-32 w-32 border-4 border-surface-50 dark:border-surface-900 shadow-glass"
-                            style={{ backgroundImage: `url("${doctor.image}")` }}
-                        >
+                        <div className="rounded-full h-32 w-32 border-4 border-surface-50 dark:border-surface-900 shadow-glass overflow-hidden relative">
+                            <LazyImage
+                                src={doctor.image}
+                                alt={doctor.name}
+                                fill
+                                className="object-cover"
+                            />
                         </div>
-                        <div className="absolute bottom-1 right-1 bg-secondary text-white p-1.5 rounded-full border-2 border-surface-50 dark:border-surface-900 flex items-center justify-center shadow-sm">
+                        <div className="absolute bottom-1 right-1 bg-secondary text-white p-1.5 rounded-full border-2 border-surface-50 dark:border-surface-900 flex items-center justify-center shadow-sm z-10">
                             <span className="material-symbols-outlined text-[16px] font-bold">check</span>
                         </div>
                     </div>

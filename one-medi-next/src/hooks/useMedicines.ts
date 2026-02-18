@@ -75,8 +75,8 @@ const mapMedicineNode = (data: DBMedicine): Medicine => ({
     brandTrust: ''
 });
 
-// Hook to fetch all medicines (with optional limit for best sellers)
-export function useMedicines(limit?: number) {
+// Hook to fetch all medicines (with optional limit for best sellers and category filter)
+export function useMedicines(limit?: number, category?: string | null) {
     return useSupabaseQuery<Medicine[]>(
         async () => {
             let query = supabase
@@ -84,6 +84,10 @@ export function useMedicines(limit?: number) {
                 .select('*')
                 .eq('is_active', true)
                 .order('name');
+
+            if (category) {
+                query = query.eq('category', category);
+            }
 
             if (limit) {
                 query = query.limit(limit);
@@ -93,7 +97,7 @@ export function useMedicines(limit?: number) {
             const mappedData = (data as DBMedicine[] || []).map(mapMedicineNode);
             return { data: mappedData, error };
         },
-        [limit]
+        [limit, category]
     );
 }
 

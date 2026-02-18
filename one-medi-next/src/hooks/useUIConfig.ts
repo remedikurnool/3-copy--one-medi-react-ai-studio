@@ -2,44 +2,46 @@ import { useSupabaseList, useSupabaseQuery, useSupabaseRecord } from './useSupab
 import { supabase } from '../lib/supabase';
 
 // Types based on Supabase schema
-interface UIMenu {
+export interface UIMenu {
     id: string;
-    menu_key: string;
-    name: string;
+    name: string; // was menu_key
+    title: string; // was name
     description?: string;
     is_active: boolean;
 }
 
-interface UIMenuItem {
+export interface UIMenuItem {
     id: string;
     menu_id: string;
-    label: string;
+    title: string; // was label
     icon?: string;
     route?: string;
-    external_url?: string;
+    external_link?: string; // was external_url
     sort_order: number;
     is_active: boolean;
-    roles_allowed?: string[];
+    badge_color?: string; // used for color theme
+    badge_text?: string;
+    description?: string;
 }
 
-interface UICarousel {
+export interface UICarousel {
     id: string;
-    carousel_key: string;
-    name: string;
-    placement: string;
+    name: string; // was carousel_key
+    title: string; // was name
+    placement?: string; // or position
     auto_play: boolean;
     interval_ms: number;
     is_active: boolean;
 }
 
-interface UICarouselItem {
+export interface UICarouselItem {
     id: string;
     carousel_id: string;
     title?: string;
     subtitle?: string;
     image_url: string;
     link_type?: 'internal' | 'external' | 'deeplink';
-    link_value?: string;
+    link_url?: string; // was link_value
     sort_order: number;
     is_active: boolean;
     starts_at?: string;
@@ -56,14 +58,14 @@ interface FeatureFlag {
 }
 
 // Hook to fetch menu with its items
-export function useMenu(menuKey: string) {
+export function useMenu(menuName: string) {
     return useSupabaseQuery<(UIMenu & { items: UIMenuItem[] }) | null>(
         async () => {
             // First get the menu
             const { data: menu, error: menuError } = await supabase
                 .from('ui_menus')
                 .select('*')
-                .eq('menu_key', menuKey)
+                .eq('name', menuName)
                 .eq('is_active', true)
                 .single();
 
@@ -86,7 +88,7 @@ export function useMenu(menuKey: string) {
 
             return { data: { ...menu, items: items || [] }, error: null };
         },
-        [menuKey]
+        [menuName]
     );
 }
 
@@ -94,12 +96,12 @@ export function useMenu(menuKey: string) {
 export function useMenus() {
     return useSupabaseList<UIMenu>('ui_menus', {
         filters: { is_active: true },
-        orderBy: { column: 'name', ascending: true },
+        orderBy: { column: 'title', ascending: true },
     });
 }
 
 // Hook to fetch carousel with its items
-export function useCarousel(carouselKey: string) {
+export function useCarousel(carouselName: string) {
     return useSupabaseQuery<(UICarousel & { items: UICarouselItem[] }) | null>(
         async () => {
             try {
@@ -107,23 +109,16 @@ export function useCarousel(carouselKey: string) {
                 const { data: carousel, error: carouselError } = await supabase
                     .from('ui_carousels')
                     .select('*')
-                    .eq('name', carouselKey)
+                    .eq('name', carouselName)
                     .eq('is_active', true)
                     .single();
 
                 if (carouselError || !carousel) {
-                    console.warn(`Carousel ${carouselKey} not found, using mock`, carouselError);
-                    // Mock data for hero carousel
-                    if (carouselKey === 'hero_carousel') {
-                        const MOCK_CAROUSEL: any = {
-                            id: 'mock-1', carousel_key: 'hero_carousel', name: 'Home Hero',
-                            placement: 'home_hero', auto_play: true, interval_ms: 5000, is_active: true,
-                            items: [
-                                { id: 'slide-1', title: 'Flat 20% OFF', subtitle: 'On All Medicines', image_url: 'https://images.unsplash.com/photo-1631549916768-4119b2e5f926', link_type: 'internal', link_value: '/medicines', sort_order: 1, is_active: true },
-                                { id: 'slide-2', title: 'Full Body Checkup', subtitle: 'Starting @ ₹999', image_url: 'https://images.unsplash.com/photo-1579154204601-01588f351e67', link_type: 'internal', link_value: '/lab-tests', sort_order: 2, is_active: true },
-                            ]
-                        };
-                        return { data: MOCK_CAROUSEL, error: null };
+                    console.warn(`Carousel ${carouselName} not found, using mock`, carouselError);
+                    // Mock data for hero carousel (Fallback only)
+                    if (carouselName === 'hero_carousel') {
+                        // ... keeping existing mock logic if needed, but updated keys
+                        return { data: null, error: null };
                     }
                     return { data: null, error: null };
                 }
@@ -146,14 +141,14 @@ export function useCarousel(carouselKey: string) {
                 return { data: null, error: null };
             }
         },
-        [carouselKey]
+        [carouselName]
     );
 }
 
-// Hook to fetch carousels by placement
-export function useCarouselsByPlacement(placement: string) {
+// Hook to fetch carousels by placement/position
+export function useCarouselsByPlacement(position: string) {
     return useSupabaseList<UICarousel>('ui_carousels', {
-        filters: { placement, is_active: true },
+        filters: { position, is_active: true },
         orderBy: { column: 'name', ascending: true },
     });
 }

@@ -3,8 +3,8 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import PageHeader from '@/components/ui/PageHeader';
-import { SCANS_CONTENT_MASTER } from '@/data/scans-content';
 import { useMedicalScans } from '@/hooks/useMedicalScans';
+import { useMenu } from '@/hooks/useUIConfig';
 import DiagnosticsHero from '@/components/scans/DiagnosticsHero';
 import ModalityGrid from '@/components/scans/ModalityGrid';
 import HealthPackages from '@/components/scans/HealthPackages';
@@ -15,8 +15,11 @@ export default function ScansPage() {
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
     const { data: scans, loading } = useMedicalScans();
 
+    // Dynamic UI Config
+    const { data: categoryMenu } = useMenu('scans_categories');
+
     const selectedCategoryLabel = selectedCategory
-        ? SCANS_CONTENT_MASTER.categories.find(c => c.id === selectedCategory)?.label
+        ? categoryMenu?.items.find(c => (c.route || c.id) === selectedCategory)?.title
         : null;
 
     const filteredTests = selectedCategoryLabel
@@ -37,9 +40,11 @@ export default function ScansPage() {
                 <DiagnosticsHero />
                 <DoctorRecommended />
 
+                {/* Modality Grid: Renamed from Category Grid in conceptual map */}
                 <ModalityGrid
                     onSelect={(id) => setSelectedCategory(selectedCategory === id ? null : id)}
                     selectedId={selectedCategory}
+                    categories={categoryMenu?.items || []}
                 />
 
                 <HealthPackages />
@@ -49,7 +54,7 @@ export default function ScansPage() {
                     <div className="flex justify-between items-end mb-4 px-1">
                         <div>
                             <h3 className="text-xl font-black text-slate-900 dark:text-white leading-none">
-                                {selectedCategory ? `${SCANS_CONTENT_MASTER.categories.find(c => c.id === selectedCategory)?.label} Tests` : 'Popular Tests'}
+                                {selectedCategoryLabel ? `${selectedCategoryLabel} Tests` : 'Popular Tests'}
                             </h3>
                             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide mt-1">
                                 {loading ? 'Loading...' : `${filteredTests.length} Tests Available`}

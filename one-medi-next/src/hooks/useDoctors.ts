@@ -51,8 +51,8 @@ const mapDoctorNode = (data: DBDoctor): Doctor => ({
     totalConsultations: 0,
 });
 
-// Hook to fetch all doctors
-export function useDoctors(limit?: number) {
+// Hook to fetch all doctors with optional filtering
+export function useDoctors(limit?: number, specialty?: string | null) {
     return useSupabaseQuery<Doctor[]>(
         async () => {
             let query = supabase
@@ -60,6 +60,14 @@ export function useDoctors(limit?: number) {
                 .select('*')
                 .eq('is_active', true)
                 .order('name');
+
+            if (specialty && specialty !== 'All') {
+                query = query.eq('specialty', specialty);
+            }
+
+            if (limit) {
+                query = query.limit(limit);
+            }
 
             if (limit) {
                 query = query.limit(limit);
@@ -69,7 +77,7 @@ export function useDoctors(limit?: number) {
             const mappedData = (data as DBDoctor[] || []).map(mapDoctorNode);
             return { data: mappedData, error };
         },
-        [limit]
+        [limit, specialty]
     );
 }
 
