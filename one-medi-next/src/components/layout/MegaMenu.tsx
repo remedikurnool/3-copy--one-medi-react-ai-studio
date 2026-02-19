@@ -2,99 +2,115 @@
 
 import React from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-
-const NAV_ITEMS = [
-    { label: 'Medicines', href: '/medicines', icon: 'medication' },
-    { label: 'Lab Tests', href: '/lab-tests', icon: 'biotech' },
-    { label: 'Doctors', href: '/doctors', icon: 'stethoscope' },
-    { label: 'Scans', href: '/scans', icon: 'radiology' },
-    { label: 'Surgeries', href: '/surgeries', icon: 'medical_services' },
-    { label: 'Insurance', href: '/insurance', icon: 'security' },
-    { label: 'Wellness', href: '/wellness', icon: 'self_improvement' },
-    { label: 'Hospitals', href: '/hospitals', icon: 'local_hospital' },
-];
+import { ALL_SERVICES } from '@/constants/services';
+import { getServiceColor } from '@/lib/utils';
 
 export default function MegaMenu() {
-    const [activeMenu, setActiveMenu] = React.useState<string | null>(null);
+    const pathname = usePathname();
+    const [activeCategory, setActiveCategory] = React.useState<string | null>(null);
+
+    // Group services (arbitrary grouping for UI, or just display grid)
+    // For MegaMenu, we'll iterate all services in a clean grid.
+
+    // Split into 3 columns
+    // Split into 4 columns
+    const columns = [
+        ALL_SERVICES.slice(0, 4),
+        ALL_SERVICES.slice(4, 8),
+        ALL_SERVICES.slice(8, 12),
+        ALL_SERVICES.slice(12, 16)
+    ];
 
     return (
-        <nav className="hidden lg:block bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 relative z-40">
-            <div className="max-w-7xl mx-auto px-4 lg:px-8">
-                <ul className="flex items-center gap-8">
-                    {NAV_ITEMS.map((item) => (
-                        <li
-                            key={item.label}
-                            onMouseEnter={() => setActiveMenu(item.label)}
-                            onMouseLeave={() => setActiveMenu(null)}
-                            className="py-4"
-                        >
+        <div className="hidden lg:block border-b border-surface-200 dark:border-surface-800 bg-white dark:bg-slate-900 sticky top-[68px] z-30">
+            <div className="max-w-7xl mx-auto px-8">
+                <nav className="flex items-center gap-8">
+                    {/* Primary Trigger - Services */}
+                    <div
+                        className="group relative py-3"
+                        onMouseEnter={() => setActiveCategory('services')}
+                        onMouseLeave={() => setActiveCategory(null)}
+                    >
+                        <button className={`flex items-center gap-1.5 text-sm font-bold tracking-wide uppercase transition-colors ${activeCategory === 'services' ? 'text-primary' : 'text-slate-600 dark:text-slate-300 hover:text-primary'}`}>
+                            <span className="material-symbols-outlined text-lg">grid_view</span>
+                            All Services
+                            <span className={`material-symbols-outlined text-lg transition-transform duration-300 ${activeCategory === 'services' ? 'rotate-180' : ''}`}>expand_more</span>
+                        </button>
+
+                        {/* Dropdown Content */}
+                        <AnimatePresence>
+                            {activeCategory === 'services' && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: 10 }}
+                                    transition={{ duration: 0.2 }}
+                                    className="absolute top-full left-0 w-[800px] bg-white dark:bg-slate-900 rounded-2xl shadow-xl shadow-slate-200/50 dark:shadow-black/50 border border-surface-100 dark:border-surface-800 p-6 z-50 mt-1"
+                                >
+                                    <div className="grid grid-cols-4 gap-6">
+                                        {columns.map((col, i) => (
+                                            <div key={i} className="flex flex-col gap-2">
+                                                {col.map((service) => {
+                                                    const { bg, text, darkBg } = getServiceColor(service.color);
+                                                    return (
+                                                        <Link
+                                                            key={service.id}
+                                                            href={service.route}
+                                                            className="flex items-start gap-3 p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors group/item"
+                                                        >
+                                                            <div className={`mt-0.5 size-8 rounded-lg ${bg} ${text} ${darkBg} flex items-center justify-center shrink-0 group-hover/item:scale-110 transition-transform`}>
+                                                                <span className="material-symbols-outlined text-lg">{service.icon}</span>
+                                                            </div>
+                                                            <div>
+                                                                <h3 className="text-sm font-bold text-slate-900 dark:text-white group-hover/item:text-primary transition-colors">{service.label}</h3>
+                                                                <p className="text-[10px] text-slate-500 font-medium line-clamp-1">{service.description}</p>
+                                                            </div>
+                                                        </Link>
+                                                    );
+                                                })}
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                    {/* Footer Promo */}
+                                    <div className="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                                        <div className="flex items-center gap-2 text-xs font-bold text-slate-500">
+                                            <span className="material-symbols-outlined text-base text-green-500">verified</span>
+                                            Trusted by 10k+ Doctors
+                                        </div>
+                                        <Link href="/doctors" className="text-xs font-bold text-primary hover:underline">
+                                            View Top Specialists &rarr;
+                                        </Link>
+                                    </div>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </div>
+
+                    {/* Quick Core Links */}
+                    {['Doctors', 'Lab Tests', 'Medicines', 'Scans'].map((label) => {
+                        const service = ALL_SERVICES.find(s => s.label === label);
+                        if (!service) return null;
+                        return (
                             <Link
-                                href={item.href}
-                                className={`text-sm font-bold transition-colors flex items-center gap-2 ${activeMenu === item.label ? 'text-primary-600' : 'text-slate-700 dark:text-slate-300 hover:text-primary-600'
-                                    }`}
+                                key={service.id}
+                                href={service.route}
+                                className={`text-sm font-bold tracking-wide transition-colors ${pathname.startsWith(service.route) ? 'text-primary' : 'text-slate-600 dark:text-slate-300 hover:text-primary'}`}
                             >
-                                {item.label}
-                                {activeMenu === item.label && (
-                                    <span className="material-symbols-outlined text-[16px]">expand_less</span>
-                                )}
-                                {activeMenu !== item.label && (
-                                    <span className="material-symbols-outlined text-[16px] opacity-50">expand_more</span>
-                                )}
+                                {service.label}
                             </Link>
-                        </li>
-                    ))}
-                </ul>
+                        );
+                    })}
 
-                <AnimatePresence>
-                    {activeMenu && (
-                        <motion.div
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: 5 }}
-                            transition={{ duration: 0.2 }}
-                            onMouseEnter={() => setActiveMenu(activeMenu)}
-                            onMouseLeave={() => setActiveMenu(null)}
-                            className="absolute left-0 top-full w-full bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 shadow-xl min-h-[300px] border-b-4 border-b-primary-500"
-                        >
-                            <div className="max-w-7xl mx-auto px-8 py-8 grid grid-cols-4 gap-8">
-                                {/* Column 1: Categories */}
-                                <div className="space-y-4">
-                                    <h4 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Categories</h4>
-                                    <ul className="space-y-2">
-                                        <li><Link href="#" className="text-sm text-slate-600 hover:text-primary-600 font-medium">Top Medicines</Link></li>
-                                        <li><Link href="#" className="text-sm text-slate-600 hover:text-primary-600 font-medium">Chronic Care</Link></li>
-                                        <li><Link href="#" className="text-sm text-slate-600 hover:text-primary-600 font-medium">Baby Care</Link></li>
-                                        <li><Link href="#" className="text-sm text-slate-600 hover:text-primary-600 font-medium">Covid Essentials</Link></li>
-                                    </ul>
-                                </div>
+                    <div className="flex-1" />
 
-                                {/* Column 2: Featured */}
-                                <div className="space-y-4">
-                                    <h4 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Featured</h4>
-                                    <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-xl">
-                                        <span className="text-xs font-bold text-green-600 mb-1 block">Offer</span>
-                                        <p className="font-bold text-slate-800 dark:text-white mb-2">Diabetes Care Plan</p>
-                                        <Link href="#" className="text-xs text-primary-600 font-bold hover:underline">View details &rarr;</Link>
-                                    </div>
-                                </div>
-
-                                {/* Column 3: Banner */}
-                                <div className="col-span-2 relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary-600 to-indigo-700 p-6 text-white">
-                                    <h3 className="text-xl font-bold mb-2">Flat 25% OFF on First Order</h3>
-                                    <p className="text-white/80 text-sm mb-4">Use code: ONEMEDI25</p>
-                                    <button className="bg-white text-primary-700 px-4 py-2 rounded-lg text-sm font-bold shadow-md hover:bg-slate-50 transition-colors">
-                                        Order Now
-                                    </button>
-                                    <div className="absolute -right-10 -bottom-10 opacity-20 text-[150px]">
-                                        💊
-                                    </div>
-                                </div>
-                            </div>
-                        </motion.div>
-                    )}
-                </AnimatePresence>
+                    <Link href="/bookings" className="text-xs font-bold text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors">
+                        My Bookings
+                    </Link>
+                </nav>
             </div>
-        </nav>
+        </div>
     );
 }

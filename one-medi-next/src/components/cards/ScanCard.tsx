@@ -1,52 +1,56 @@
-'use client';
-
 import React from 'react';
-import Image from 'next/image';
 import { motion } from 'framer-motion';
+import { Scan } from '@/types';
 
-export const ScanCard = ({ scan, onClick }: { scan: any, onClick?: () => void }) => {
+export const ScanCard = ({ scan, onClick, className = '' }: { scan: Scan, onClick?: () => void, className?: string }) => {
   return (
     <motion.div
-      className="group relative card-modern overflow-hidden w-[280px] cursor-pointer p-0"
+      className={`group relative overflow-hidden rounded-3xl bg-white dark:bg-surface-900 border border-slate-100 dark:border-surface-800 shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col h-full ${className}`}
       onClick={onClick}
+      whileHover={{ y: -4 }}
     >
-      {/* Top Image Section */}
-      <div className="relative h-36 w-full bg-indigo-50 dark:bg-indigo-900/20">
-        <Image
-          src={scan.image || 'https://images.unsplash.com/photo-1516549882906-589db74c94f7?auto=format&fit=crop&q=80&w=400'}
-          alt={scan.test_name || 'Medical Scan'}
-          fill
-          sizes="280px"
-          className="object-cover group-hover:scale-105 transition-transform duration-700"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-
-        <div className="absolute top-3 right-3 text-white z-10 transition-transform group-hover:rotate-12 duration-300">
-          <div className="bg-white/10 backdrop-blur-md border border-white/20 p-2 rounded-xl">
-            <span className="material-symbols-outlined text-xl">radiology</span>
+      {/* Hero Image / Icon Area */}
+      <div className="relative h-32 w-full overflow-hidden bg-slate-100 dark:bg-surface-800">
+        {scan.image ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={scan.image} alt={scan.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-slate-300">
+            <span className="material-symbols-outlined text-4xl">radiology</span>
           </div>
-        </div>
-
-        <div className="absolute bottom-3 left-4 text-white z-10 w-[90%]">
-          <span className="inline-block px-2 py-0.5 rounded-md bg-indigo-500/80 backdrop-blur-md text-[9px] font-bold uppercase tracking-wider mb-2 shadow-sm border border-white/10">
-            {scan.category || 'Radiology'}
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+        <div className="absolute bottom-2 left-3 right-3 flex justify-between items-end">
+          <span className="bg-white/20 backdrop-blur-sm text-white text-[10px] font-bold px-2 py-0.5 rounded-lg border border-white/10">
+            {scan.category || 'Diagnostic'}
           </span>
-          <h3 className="font-bold text-lg text-white leading-tight drop-shadow-sm truncate font-lexend">
-            {scan.test_name}
-          </h3>
+          {scan.discountPercent && scan.discountPercent > 0 && (
+            <span className="bg-green-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-lg shadow-sm">
+              {scan.discountPercent}% OFF
+            </span>
+          )}
         </div>
       </div>
 
-      <div className="p-4 bg-white dark:bg-slate-800">
-        <div className="flex items-center justify-between">
-          <div className="flex flex-col">
-            <span className="text-[10px] text-slate-400 line-through decoration-slate-300">₹{Number(scan.price) * 1.2}</span>
-            <span className="text-xl font-black text-slate-900 dark:text-white">₹{scan.price}</span>
-          </div>
+      <div className="relative z-10 p-4 flex flex-col h-full flex-1">
+        {/* Content */}
+        <div className="mb-4 flex-1">
+          <h3 className="font-bold text-base text-slate-900 dark:text-white leading-tight mb-1 group-hover:text-primary transition-colors line-clamp-2">
+            {scan.name}
+          </h3>
+          {scan.bodyPart && (
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-2">{scan.bodyPart}</p>
+          )}
+        </div>
 
-          <button className="flex items-center gap-2 text-indigo-600 bg-indigo-50 dark:bg-indigo-900/30 hover:bg-indigo-600 hover:text-white px-4 py-2 rounded-xl transition-all duration-300 font-bold text-xs group/btn">
-            <span>Book</span>
-            <span className="material-symbols-outlined text-base group-hover/btn:translate-x-0.5 transition-transform">arrow_forward</span>
+        {/* Footer: Price & Action */}
+        <div className="mt-auto pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+          <div className="flex flex-col">
+            <span className="text-[10px] text-slate-400 line-through font-bold">₹{scan.mrp}</span>
+            <span className="text-lg font-black text-slate-900 dark:text-white">₹{scan.price}</span>
+          </div>
+          <button className="flex items-center justify-center size-9 rounded-xl bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 hover:bg-primary hover:text-white transition-all">
+            <span className="material-symbols-outlined text-xl">arrow_forward</span>
           </button>
         </div>
       </div>

@@ -5,37 +5,38 @@ import { useRouter, useParams } from 'next/navigation';
 import { useCartStore } from '@/store/cartStore';
 import { useLabTest } from '@/hooks';
 import PageHeader from '@/components/ui/PageHeader';
+import { motion, AnimatePresence } from 'framer-motion';
 
 // Reusable Components for this page
 const InfoCard = ({ icon, label, value, color, darkColor }: any) => (
-    <div className="flex flex-col gap-2 rounded-xl bg-white dark:bg-surface-900 p-4 shadow-sm border border-surface-200 dark:border-surface-800">
-        <div className={`flex size-10 items-center justify-center rounded-full ${color} ${darkColor}`}>
+    <div className="flex flex-col gap-2 rounded-2xl bg-white dark:bg-surface-900 p-4 shadow-sm border border-surface-100 dark:border-surface-800 hover:shadow-md transition-shadow">
+        <div className={`flex size-10 items-center justify-center rounded-xl ${color} ${darkColor}`}>
             <span className="material-symbols-outlined">{icon}</span>
         </div>
         <div>
-            <p className="text-xs text-slate-500 dark:text-slate-400">{label}</p>
-            <p className="text-base font-bold text-slate-900 dark:text-white">{value}</p>
+            <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide">{label}</p>
+            <p className="text-base font-bold text-slate-900 dark:text-white leading-tight mt-0.5">{value}</p>
         </div>
     </div>
 );
 
 const DetailsAccordion = ({ title, children, defaultOpen, badge }: any) => (
-    <details className="group rounded-xl bg-white dark:bg-gray-800 shadow-sm border border-gray-100 dark:border-gray-700 [&_summary::-webkit-details-marker]:hidden" open={defaultOpen}>
-        <summary className="flex cursor-pointer items-center justify-between p-4 text-slate-900 dark:text-white select-none list-none">
+    <details className="group rounded-2xl bg-white dark:bg-surface-900 shadow-sm border border-surface-100 dark:border-surface-800 [&_summary::-webkit-details-marker]:hidden overflow-hidden" open={defaultOpen}>
+        <summary className="flex cursor-pointer items-center justify-between p-4 text-slate-900 dark:text-white select-none list-none active:bg-surface-50 dark:active:bg-surface-800 transition-colors">
             <div className="flex items-center gap-2">
                 <h2 className="text-base font-bold">{title}</h2>
-                {badge && <span className="rounded bg-green-100 dark:bg-green-900/30 px-2 py-0.5 text-[10px] font-bold text-green-700 dark:text-green-400">{badge}</span>}
+                {badge && <span className="rounded-lg bg-green-100 dark:bg-green-900/30 px-2 py-0.5 text-[10px] font-bold text-green-700 dark:text-green-400">{badge}</span>}
             </div>
-            <span className="material-symbols-outlined transition duration-300 group-open:-rotate-180 text-gray-400">expand_more</span>
+            <span className="material-symbols-outlined transition-transform duration-300 group-open:rotate-180 text-surface-400">expand_more</span>
         </summary>
-        <div className="px-4 pb-4 text-sm leading-relaxed text-gray-600 dark:text-gray-300 border-t border-gray-50 dark:border-gray-700/50 pt-3">
+        <div className="px-4 pb-4 text-sm leading-relaxed text-slate-600 dark:text-slate-300 border-t border-surface-50 dark:border-surface-800/50 pt-3">
             {children}
         </div>
     </details>
 );
 
 const ParameterItem = ({ name }: any) => (
-    <li className="flex items-start gap-3">
+    <li className="flex items-start gap-3 p-2 rounded-lg hover:bg-surface-50 dark:hover:bg-surface-800/50 transition-colors">
         <span className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400">
             <span className="material-symbols-outlined text-[14px] font-bold">check</span>
         </span>
@@ -81,8 +82,8 @@ export default function LabTestDetailPage() {
     // Loading state
     if (loading) {
         return (
-            <div className="min-h-screen bg-bg-light dark:bg-bg-dark flex items-center justify-center">
-                <div className="animate-spin rounded-full h-10 w-10 border-2 border-primary border-t-transparent"></div>
+            <div className="min-h-screen bg-surface-50 dark:bg-surface-950 flex items-center justify-center">
+                <span className="material-symbols-outlined text-4xl text-slate-300 animate-spin">progress_activity</span>
             </div>
         );
     }
@@ -108,7 +109,7 @@ export default function LabTestDetailPage() {
     };
 
     return (
-        <div className="min-h-screen bg-surface-50 dark:bg-surface-950 text-slate-900 dark:text-white pb-28 relative flex flex-col font-sans">
+        <div className="min-h-screen bg-surface-50 dark:bg-surface-950 text-slate-900 dark:text-white pb-32 relative flex flex-col font-sans animate-fade-in">
             {/* Sticky Header */}
             <PageHeader
                 title="Test Details"
@@ -116,33 +117,36 @@ export default function LabTestDetailPage() {
                 showLocation={false}
                 className="lg:top-20"
                 actions={
-                    <button onClick={() => router.push('/cart')} className="relative flex size-10 items-center justify-center rounded-full hover:bg-surface-100 dark:hover:bg-surface-800 transition-colors">
-                        <span className="material-symbols-outlined text-[24px]">shopping_cart</span>
-                        {cartItemsCount > 0 && <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">{cartItemsCount}</span>}
+                    <button onClick={() => router.push('/cart')} className="relative flex size-10 items-center justify-center rounded-full bg-white dark:bg-surface-800 shadow-sm border border-surface-200 dark:border-surface-700 hover:bg-surface-50 dark:hover:bg-surface-700 transition-colors">
+                        <span className="material-symbols-outlined text-[20px] text-slate-600 dark:text-slate-300">shopping_cart</span>
+                        {cartItemsCount > 0 && <span className="absolute -top-1 -right-1 flex size-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white shadow-sm ring-2 ring-white dark:ring-surface-900">{cartItemsCount}</span>}
                     </button>
                 }
             />
 
-            <main className="flex-1 w-full">
+            <main className="flex-1 w-full max-w-4xl mx-auto space-y-4 pt-4">
                 {/* Hero Card */}
-                <div className="p-4">
-                    <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary to-blue-400 p-6 shadow-lg text-white">
+                <div className="px-4">
+                    <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary-600 to-indigo-600 p-6 shadow-xl shadow-primary/20 text-white">
                         <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-white/10 blur-3xl"></div>
                         <div className="absolute -left-10 -bottom-10 h-40 w-40 rounded-full bg-white/10 blur-3xl"></div>
+
                         <div className="relative z-10 flex flex-col gap-4">
-                            <div className="inline-flex w-fit items-center gap-1.5 rounded-full bg-white/20 px-3 py-1 backdrop-blur-sm border border-white/10">
+                            <div className="inline-flex w-fit items-center gap-1.5 rounded-full bg-white/20 px-3 py-1 backdrop-blur-md border border-white/20 shadow-inner">
                                 <span className="material-symbols-outlined text-[16px] filled">verified_user</span>
-                                <span className="text-xs font-semibold tracking-wide">NABL Accredited Lab</span>
+                                <span className="text-xs font-bold tracking-wide">NABL Accredited Lab</span>
                             </div>
+
                             <div>
-                                <h2 className="text-2xl font-bold leading-tight">{test.name}</h2>
-                                <p className="mt-1 text-blue-50 text-sm font-medium">{test.description}</p>
+                                <h2 className="text-2xl font-black leading-tight tracking-tight">{test.name}</h2>
+                                <p className="mt-2 text-blue-50 text-sm font-medium leading-relaxed max-w-lg">{test.description}</p>
                             </div>
-                            <div className="mt-2 flex items-end gap-3">
-                                <span className="text-3xl font-bold">₹{currentPrice}</span>
-                                <span className="mb-1 text-lg text-blue-100 line-through decoration-blue-200">₹{currentMrp}</span>
+
+                            <div className="mt-4 flex items-end gap-3">
+                                <span className="text-3xl font-black tracking-tight">₹{currentPrice}</span>
+                                <span className="mb-1.5 text-lg text-blue-200 line-through decoration-blue-300 font-bold">₹{currentMrp}</span>
                                 {test.discountPercent && test.discountPercent > 0 && (
-                                    <span className="mb-1 rounded-md bg-white px-2 py-0.5 text-sm font-bold text-primary">{test.discountPercent}% OFF</span>
+                                    <span className="mb-1.5 rounded-lg bg-white px-2 py-0.5 text-xs font-black text-primary shadow-sm uppercase tracking-wide">{test.discountPercent}% OFF</span>
                                 )}
                             </div>
                         </div>
@@ -150,71 +154,72 @@ export default function LabTestDetailPage() {
                 </div>
 
                 {/* Key Info Grid */}
-                <div className="px-4 mb-4">
+                <div className="px-4">
                     <div className="grid grid-cols-2 gap-3">
-                        <InfoCard icon="schedule" label="Report in" value={currentReportTime || "24 Hours"} color="bg-blue-50 text-primary" darkColor="dark:bg-blue-900/20 dark:text-blue-400" />
-                        <InfoCard icon="bloodtype" label="Sample" value={test.sampleType || "Blood"} color="bg-red-50 text-red-500" darkColor="dark:bg-red-900/20 dark:text-red-400" />
+                        <InfoCard icon="schedule" label="Report in" value={currentReportTime || "24 Hours"} color="bg-blue-50 text-blue-600" darkColor="dark:bg-blue-900/20 dark:text-blue-400" />
+                        <InfoCard icon="bloodtype" label="Sample Type" value={test.sampleType || "Blood"} color="bg-red-50 text-red-600" darkColor="dark:bg-red-900/20 dark:text-red-400" />
                         <InfoCard icon="no_food" label="Fasting" value={test.fastingRequired ? "Required" : "Not Required"} color="bg-amber-50 text-amber-600" darkColor="dark:bg-amber-900/20 dark:text-amber-400" />
                         <InfoCard icon="science" label="Department" value={test.category || "Pathology"} color="bg-emerald-50 text-emerald-600" darkColor="dark:bg-emerald-900/20 dark:text-emerald-400" />
                     </div>
                 </div>
 
                 {/* Centre Selection */}
-                <div className="px-4 mb-4">
-                    <h3 className="text-base font-bold text-slate-900 dark:text-white mb-3">Select Diagnostic Centre</h3>
+                <div className="px-4">
+                    <h3 className="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3 px-1">Select Lab Partner</h3>
                     <div className="flex flex-col gap-3">
                         {test.variants?.map((variant: any) => (
-                            <div
+                            <motion.div
                                 key={variant.centerId}
+                                whileTap={{ scale: 0.98 }}
                                 onClick={() => setSelectedVariant(variant)}
-                                className={`bg-white dark:bg-surface-900 rounded-xl p-3 border transition-all cursor-pointer flex gap-3 ${selectedVariant?.centerId === variant.centerId
-                                    ? 'border-primary ring-1 ring-primary/20 shadow-md'
-                                    : 'border-surface-200 dark:border-surface-700 opacity-80'
+                                className={`rounded-2xl p-3 border transition-all cursor-pointer flex gap-4 ${selectedVariant?.centerId === variant.centerId
+                                    ? 'bg-white dark:bg-surface-900 border-primary ring-2 ring-primary/10 shadow-lg shadow-primary/5'
+                                    : 'bg-white dark:bg-surface-900 border-surface-200 dark:border-surface-700 opacity-80 hover:opacity-100 hover:shadow-md'
                                     }`}
                             >
-                                <div className="size-14 rounded-lg bg-gray-50 dark:bg-gray-700 p-1 shrink-0 flex items-center justify-center overflow-hidden">
+                                <div className="size-16 rounded-xl bg-gray-50 dark:bg-gray-800 p-0.5 shrink-0 overflow-hidden relative border border-surface-100 dark:border-surface-700">
                                     {/* eslint-disable-next-line @next/next/no-img-element */}
                                     <img src={variant.centerImage} alt={variant.centerName} className="size-full object-cover rounded-lg" />
                                 </div>
                                 <div className="flex-1 flex flex-col justify-center">
-                                    <div className="flex justify-between items-start">
+                                    <div className="flex justify-between items-start mb-1">
                                         <h4 className="font-bold text-sm text-slate-900 dark:text-white leading-tight">{variant.centerName}</h4>
-                                        <span className="text-xs font-bold bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 px-1.5 py-0.5 rounded flex items-center gap-0.5">
+                                        <span className="text-[10px] font-bold bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 px-1.5 py-0.5 rounded flex items-center gap-0.5">
                                             {variant.rating || 4.5} <span className="material-symbols-outlined text-[10px] filled">star</span>
                                         </span>
                                     </div>
                                     <div className="flex justify-between items-end mt-1">
-                                        <div className="text-xs text-gray-500 dark:text-gray-400">
+                                        <div className="text-xs text-gray-500 dark:text-gray-400 font-medium">
                                             {variant.reportTime} Report • {variant.distance || 'Nearby'}
                                         </div>
-                                        <span className="font-bold text-slate-900 dark:text-white">₹{variant.price}</span>
+                                        <span className="font-bold text-slate-900 dark:text-white text-base">₹{variant.price}</span>
                                     </div>
                                 </div>
                                 {selectedVariant?.centerId === variant.centerId && (
-                                    <div className="absolute top-0 right-0 p-1.5">
-                                        <span className="material-symbols-outlined text-primary text-[18px] filled">check_circle</span>
+                                    <div className="absolute top-2 right-2">
+                                        <span className="material-symbols-outlined text-primary text-[20px] filled bg-white dark:bg-surface-900 rounded-full">check_circle</span>
                                     </div>
                                 )}
-                            </div>
+                            </motion.div>
                         ))}
                     </div>
                 </div>
 
                 {/* Home Collection Toggle */}
-                <div className="px-4 mb-4">
-                    <div className="flex items-center justify-between rounded-2xl bg-white dark:bg-gray-800 p-4 shadow-sm border border-gray-100 dark:border-gray-700">
+                <div className="px-4">
+                    <div className="flex items-center justify-between rounded-2xl bg-white dark:bg-surface-900 p-4 shadow-sm border border-surface-100 dark:border-surface-800">
                         <div className="flex items-center gap-3">
-                            <div className="flex size-12 items-center justify-center rounded-full bg-primary/10 text-primary shrink-0">
+                            <div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary shrink-0">
                                 <span className="material-symbols-outlined">home_health</span>
                             </div>
                             <div className="flex flex-col">
-                                <h3 className="text-base font-bold text-slate-900 dark:text-white">Home Sample Collection</h3>
-                                <p className="text-xs text-gray-500 dark:text-gray-400">+ ₹50 convenience fee</p>
+                                <h3 className="text-sm font-bold text-slate-900 dark:text-white">Home Collection</h3>
+                                <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">+ ₹50 convenience fee</p>
                             </div>
                         </div>
                         <label className="relative inline-flex cursor-pointer items-center">
                             <input type="checkbox" checked={homeCollection} onChange={(e) => setHomeCollection(e.target.checked)} className="peer sr-only" />
-                            <div className="peer h-7 w-12 rounded-full bg-gray-200 dark:bg-gray-700 after:absolute after:left-[2px] after:top-[2px] after:h-6 after:w-6 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-primary peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none"></div>
+                            <div className="peer h-6 w-11 rounded-full bg-slate-200 dark:bg-slate-700 after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-primary peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none transition-colors"></div>
                         </label>
                     </div>
                 </div>
@@ -223,7 +228,7 @@ export default function LabTestDetailPage() {
                 <div className="flex flex-col gap-3 px-4 pb-4">
                     {test.parametersIncluded && test.parametersIncluded.length > 0 && (
                         <DetailsAccordion title={`Parameters Included (${test.parametersIncluded.length})`} defaultOpen badge="DETAILED">
-                            <ul className="space-y-3">
+                            <ul className="space-y-1">
                                 {test.parametersIncluded.map((param: string, idx: number) => (
                                     <ParameterItem key={idx} name={param} />
                                 ))}
@@ -233,25 +238,34 @@ export default function LabTestDetailPage() {
 
                     {(test.prerequisites || test.preparationInstructions) && (
                         <DetailsAccordion title="Preparation Instructions" defaultOpen={!test.parametersIncluded}>
-                            <p className="whitespace-pre-line">{test.prerequisites || test.preparationInstructions}</p>
+                            <div className="flex items-start gap-3 p-2 bg-amber-50 dark:bg-amber-900/10 rounded-xl border border-amber-100 dark:border-amber-800/20 text-amber-900 dark:text-amber-100">
+                                <span className="material-symbols-outlined text-amber-500 mt-0.5">info</span>
+                                <p className="text-sm font-medium whitespace-pre-line">{test.prerequisites || test.preparationInstructions}</p>
+                            </div>
                         </DetailsAccordion>
                     )}
 
                     <DetailsAccordion title="About this Test">
-                        <p>{test.description}</p>
+                        <p className="p-2">{test.description}</p>
                     </DetailsAccordion>
                 </div>
             </main>
 
             {/* Sticky Footer */}
-            <div className="fixed bottom-0 left-0 right-0 z-40 bg-white/90 dark:bg-surface-950/90 backdrop-blur-md border-t border-surface-200 dark:border-surface-800 p-4 pb-6 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
-                <div className="flex items-center gap-4 max-w-md mx-auto">
+            <div className="fixed bottom-0 left-0 right-0 z-40 bg-white/90 dark:bg-surface-950/90 backdrop-blur-xl border-t border-surface-200 dark:border-surface-800 p-4 pb-6 shadow-[0_-4px_20px_-5px_rgba(0,0,0,0.1)]">
+                <div className="flex items-center gap-4 max-w-4xl mx-auto">
                     <div className="flex flex-col">
-                        <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Total Price</p>
-                        <p className="text-xl font-bold text-slate-900 dark:text-white">₹{totalAmount}</p>
+                        <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Total Price</p>
+                        <div className="flex items-baseline gap-1.5">
+                            <p className="text-2xl font-black text-slate-900 dark:text-white">₹{totalAmount}</p>
+                            <span className="text-sm font-bold text-slate-400 line-through">₹{currentMrp}</span>
+                        </div>
                     </div>
-                    <button onClick={handleBookNow} className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3.5 text-base font-bold text-white shadow-md shadow-blue-500/30 transition-transform active:scale-[0.98]">
-                        <span className="material-symbols-outlined text-[20px]">shopping_cart_checkout</span>
+                    <button
+                        onClick={handleBookNow}
+                        className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-slate-900 dark:bg-white px-6 py-4 text-base font-black text-white dark:text-slate-900 shadow-lg shadow-slate-900/20 dark:shadow-white/10 hover:scale-[1.02] active:scale-[0.98] transition-all"
+                    >
+                        <span className="material-symbols-outlined text-[20px]">add_task</span>
                         Book Now
                     </button>
                 </div>

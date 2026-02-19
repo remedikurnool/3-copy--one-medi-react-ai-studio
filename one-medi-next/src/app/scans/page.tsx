@@ -9,6 +9,8 @@ import DiagnosticsHero from '@/components/scans/DiagnosticsHero';
 import ModalityGrid from '@/components/scans/ModalityGrid';
 import HealthPackages from '@/components/scans/HealthPackages';
 import DoctorRecommended from '@/components/scans/DoctorRecommended';
+import { ScanCard } from '@/components/cards/ScanCard'; // [New Import]
+import { motion } from 'framer-motion';
 
 export default function ScansPage() {
     const router = useRouter();
@@ -29,18 +31,18 @@ export default function ScansPage() {
     return (
         <div className="min-h-screen bg-surface-50 dark:bg-surface-950 pb-32 font-sans text-slate-900 dark:text-white animate-fade-in">
             <PageHeader
-                title="Diagnostics"
+                title="Diagnostics & Scans"
                 showSearch={true}
-                searchPlaceholder="Search MRI, CT, Blood Tests..."
+                searchPlaceholder="Search MRI, CT, X-Ray..."
                 showLocation={true}
                 className="lg:top-20"
             />
 
-            <main className="max-w-7xl mx-auto w-full p-4 space-y-6">
+            <main className="max-w-7xl mx-auto w-full p-4 space-y-8">
                 <DiagnosticsHero />
                 <DoctorRecommended />
 
-                {/* Modality Grid: Renamed from Category Grid in conceptual map */}
+                {/* Modality Grid */}
                 <ModalityGrid
                     onSelect={(id) => setSelectedCategory(selectedCategory === id ? null : id)}
                     selectedId={selectedCategory}
@@ -49,15 +51,15 @@ export default function ScansPage() {
 
                 <HealthPackages />
 
-                {/* Popular Tests Listing */}
+                {/* Popular Scans Listing */}
                 <section>
-                    <div className="flex justify-between items-end mb-4 px-1">
+                    <div className="flex justify-between items-end mb-6 px-1">
                         <div>
                             <h3 className="text-xl font-black text-slate-900 dark:text-white leading-none">
-                                {selectedCategoryLabel ? `${selectedCategoryLabel} Tests` : 'Popular Tests'}
+                                {selectedCategoryLabel ? `${selectedCategoryLabel} Scans` : 'Popular Scans'}
                             </h3>
-                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide mt-1">
-                                {loading ? 'Loading...' : `${filteredTests.length} Tests Available`}
+                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide mt-1.5">
+                                {loading ? 'Loading...' : `${filteredTests.length} Scans Available`}
                             </p>
                         </div>
                         {selectedCategory && (
@@ -71,37 +73,33 @@ export default function ScansPage() {
                     </div>
 
                     {loading ? (
-                        <div className="text-center py-20 opacity-60">
-                            <span className="material-symbols-outlined text-4xl text-slate-300 animate-spin">progress_activity</span>
-                            <p className="mt-2 font-bold text-slate-500">Loading tests...</p>
+                        <div className="flex flex-col items-center justify-center py-20 opacity-60">
+                            <span className="material-symbols-outlined text-4xl text-slate-300 animate-spin">radiology</span>
+                            <p className="mt-2 font-bold text-slate-500 text-sm">Loading diagnostic scans...</p>
                         </div>
                     ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {filteredTests.map((test) => (
-                                <div
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 auto-rows-fr">
+                            {filteredTests.map((test, index) => (
+                                <motion.div
                                     key={test.id}
-                                    onClick={() => router.push(`/scans/${test.id}`)}
-                                    className="bg-white dark:bg-gray-800 p-4 rounded-2xl border border-slate-100 dark:border-gray-700 flex gap-4 cursor-pointer hover:shadow-lg transition-all hover:-translate-y-1 group"
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: index * 0.05 }}
                                 >
-                                    <div className="size-20 rounded-xl bg-slate-50 dark:bg-gray-700 shrink-0 overflow-hidden relative">
-                                        <img src={test.image} alt={test.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-                                    </div>
-                                    <div className="flex-1 min-w-0">
-                                        <div className="flex justify-between items-start mb-1">
-                                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">{test.category}</span>
-                                            {test.discountPercent && test.discountPercent > 0 && (
-                                                <span className="bg-green-50 text-green-600 text-[9px] font-black px-1.5 py-0.5 rounded uppercase">{test.discountPercent}% OFF</span>
-                                            )}
-                                        </div>
-                                        <h4 className="text-sm font-black text-slate-900 dark:text-white leading-tight mb-2 truncate group-hover:text-indigo-600 transition-colors">{test.name}</h4>
-
-                                        <div className="flex items-baseline gap-2 mt-auto">
-                                            <span className="text-lg font-black text-slate-900 dark:text-white">₹{test.price}</span>
-                                            <span className="text-xs font-bold text-slate-400 line-through">₹{test.mrp}</span>
-                                        </div>
-                                    </div>
-                                </div>
+                                    <ScanCard
+                                        scan={test}
+                                        onClick={() => router.push(`/scans/${test.id}`)}
+                                        className="h-full w-full"
+                                    />
+                                </motion.div>
                             ))}
+                        </div>
+                    )}
+
+                    {!loading && filteredTests.length === 0 && (
+                        <div className="text-center py-20 text-slate-400">
+                            <span className="material-symbols-outlined text-4xl mb-2">search_off</span>
+                            <p>No scans found in this category.</p>
                         </div>
                     )}
                 </section>

@@ -88,6 +88,13 @@ export default function Home() {
 
       {/* 2. Quick Access Grid */}
       <motion.section variants={itemVariants} className="px-4 lg:px-8">
+        <div className="mb-4 flex items-end justify-between">
+          <h2 className="text-xl font-bold text-slate-900 dark:text-white font-lexend">Top Categories</h2>
+          <a href="/services" className="text-xs font-bold text-primary-600 hover:text-primary-700 hover:underline flex items-center gap-1 transition-colors">
+            View All
+            <span className="material-symbols-outlined text-[14px]">arrow_forward</span>
+          </a>
+        </div>
         <QuickAccessGrid />
       </motion.section>
 

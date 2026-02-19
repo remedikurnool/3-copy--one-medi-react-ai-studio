@@ -7,7 +7,8 @@ import {
   SmartHeader,
   MegaMenu,
   MobileNav,
-  AdvancedFooter
+  AdvancedFooter,
+  ServiceDrawer
 } from '@/components/layout';
 import { FlyingCartAnimation } from './ui/FlyingCartAnimation';
 
@@ -47,7 +48,7 @@ export const Layout = ({ children }: { children?: React.ReactNode }) => {
 
       <div className="relative z-50">
         <MobileNav />
-        <FlyingCartAnimation />
+        <ServiceDrawer />
       </div>
     </div>
   );
